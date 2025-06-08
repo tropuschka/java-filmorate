@@ -7,11 +7,17 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
 import ru.yandex.practicum.filmorate.model.Film;
 
+import java.util.Collection;
 import java.util.HashMap;
 
 @RestController
 public class FilmController {
     HashMap<Integer, Film> filmList = new HashMap<>();
+
+    @GetMapping
+    public Collection<Film> findAll() {
+        return filmList.values();
+    }
 
     @PostMapping
     public Film create(@RequestBody Film film) {
