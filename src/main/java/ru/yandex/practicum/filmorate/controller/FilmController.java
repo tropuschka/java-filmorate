@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
 import ru.yandex.practicum.filmorate.model.Film;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
 
@@ -20,6 +21,15 @@ public class FilmController {
     public Film create(@RequestBody Film film) {
         if (film.getName() == null || film.getName().isBlank()) {
             throw new ConditionsNotMetException("Название должно быть указано");
+        }
+        if (film.getDescription().length() > 200) {
+            throw new ConditionsNotMetException("Описание не должно быть длиннее 200 символов");
+        }
+        if (film.getReleaseDate().isBefore(LocalDate.of(1985, 12, 28))) {
+            throw new ConditionsNotMetException("Дата релиза не может быть раньше 28 декабря 1885 года");
+        }
+        if (!(film.getDuration().isPositive())) {
+            throw new ConditionsNotMetException("Длительность фильма должна быть положительной");
         }
         film.setId(getNextId());
         filmList.put(film.getId(), film);
@@ -41,16 +51,25 @@ public class FilmController {
             newFilm.setName(oldFilm.getName());
         }
         if (film.getDescription() != null) {
+            if (film.getDescription().length() > 200) {
+                throw new ConditionsNotMetException("Описание не должно быть длиннее 200 символов");
+            }
             newFilm.setDescription(film.getDescription());
         } else {
             newFilm.setDescription(oldFilm.getDescription());
         }
         if (film.getDuration() != null) {
+            if (!(film.getDuration().isPositive())) {
+                throw new ConditionsNotMetException("Длительность фильма должна быть положительной");
+            }
             newFilm.setDuration(film.getDuration());
         } else {
             newFilm.setDuration(oldFilm.getDuration());
         }
         if (film.getReleaseDate() != null) {
+            if (film.getReleaseDate().isBefore(LocalDate.of(1985, 12, 28))) {
+                throw new ConditionsNotMetException("Дата релиза не может быть раньше 28 декабря 1885 года");
+            }
             newFilm.setReleaseDate(film.getReleaseDate());
         } else {
             newFilm.setReleaseDate(oldFilm.getReleaseDate());
