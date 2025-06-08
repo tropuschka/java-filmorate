@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -8,6 +9,7 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
 
+@Slf4j
 @RestController
 public class FilmController {
     HashMap<Integer, Film> filmList = new HashMap<>();
@@ -20,26 +22,27 @@ public class FilmController {
     @PostMapping
     public Film create(@RequestBody Film film) {
         if (film.getName() == null || film.getName().isBlank()) {
-            throw new ConditionsNotMetException("Название должно быть указано");
+            throwValidationException("Название должно быть указано");
         }
         if (film.getDescription().length() > 200) {
-            throw new ConditionsNotMetException("Описание не должно быть длиннее 200 символов");
+            throwValidationException("Описание не должно быть длиннее 200 символов");
         }
         if (film.getReleaseDate().isBefore(LocalDate.of(1985, 12, 28))) {
-            throw new ConditionsNotMetException("Дата релиза не может быть раньше 28 декабря 1885 года");
+            throwValidationException("Дата релиза не может быть раньше 28 декабря 1885 года");
         }
         if (!(film.getDuration().isPositive())) {
-            throw new ConditionsNotMetException("Длительность фильма должна быть положительной");
+            throwValidationException("Длительность фильма должна быть положительной");
         }
         film.setId(getNextId());
         filmList.put(film.getId(), film);
+        log.trace("Фильм {}, айди {}, добавлен", film.getName(), film.getId());
         return film;
     }
 
     @PutMapping
     public Film update(@RequestBody Film film) {
         if (film.getId() == null) {
-            throw new ConditionsNotMetException("Id должен быть указан");
+            throwValidationException("Id должен быть указан");
         }
         Film oldFilm = filmList.get(film.getId());
         Film newFilm = null;
@@ -52,7 +55,7 @@ public class FilmController {
         }
         if (film.getDescription() != null) {
             if (film.getDescription().length() > 200) {
-                throw new ConditionsNotMetException("Описание не должно быть длиннее 200 символов");
+                throwValidationException("Описание не должно быть длиннее 200 символов");
             }
             newFilm.setDescription(film.getDescription());
         } else {
@@ -60,7 +63,7 @@ public class FilmController {
         }
         if (film.getDuration() != null) {
             if (!(film.getDuration().isPositive())) {
-                throw new ConditionsNotMetException("Длительность фильма должна быть положительной");
+                throwValidationException("Длительность фильма должна быть положительной");
             }
             newFilm.setDuration(film.getDuration());
         } else {
@@ -68,7 +71,7 @@ public class FilmController {
         }
         if (film.getReleaseDate() != null) {
             if (film.getReleaseDate().isBefore(LocalDate.of(1985, 12, 28))) {
-                throw new ConditionsNotMetException("Дата релиза не может быть раньше 28 декабря 1885 года");
+                throwValidationException("Дата релиза не может быть раньше 28 декабря 1885 года");
             }
             newFilm.setReleaseDate(film.getReleaseDate());
         } else {
@@ -77,6 +80,7 @@ public class FilmController {
 
         filmList.remove(film.getId());
         filmList.put(film.getId(), newFilm);
+        log.trace("Данные фильма {}, айди {}, обновлены", film.getName(), film.getId());
         return newFilm;
     }
 
@@ -86,5 +90,10 @@ public class FilmController {
                 .max()
                 .orElse(0);
         return ++maxId;
+    }
+
+    private void throwValidationException(String message) {
+        log.error(message);
+        throw new ConditionsNotMetException(message);
     }
 }
