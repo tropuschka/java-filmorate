@@ -62,7 +62,7 @@ public class FilmController {
     }
 
     private Integer getNextId() {
-        Integer maxId = filmList.keySet().stream()
+        int maxId = filmList.keySet().stream()
                 .mapToInt(id -> id)
                 .max()
                 .orElse(0);
