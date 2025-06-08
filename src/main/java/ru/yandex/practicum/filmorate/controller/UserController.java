@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
 import ru.yandex.practicum.filmorate.exceptions.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.model.User;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
 
@@ -24,17 +25,26 @@ public class UserController {
         if (user.getEmail() == null || user.getEmail().isBlank()) {
             throw new ConditionsNotMetException("Имейл должен быть указан");
         }
+        if (!(user.getEmail().contains("@"))) {
+            throw new ConditionsNotMetException("Указан некорректный имейл");
+        }
         if (duplicateData(user.getEmail())) {
             throw new DuplicatedDataException("Этот имейл уже используется");
         }
         if (user.getLogin() == null || user.getLogin().isBlank()) {
             throw new ConditionsNotMetException("Введите логин");
         }
+        if (user.getLogin().contains(" ")) {
+            throw new ConditionsNotMetException("В логине не должно быть пробелов");
+        }
         if (duplicateData(user.getLogin())) {
             throw new DuplicatedDataException("Этот логин уже используется");
         }
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
+        }
+        if (user.getBirthday().isAfter(LocalDate.now())) {
+            throw new ConditionsNotMetException("Указана некорректная дата рождения");
         }
 
         user.setId(getNextId());
@@ -48,13 +58,6 @@ public class UserController {
             throw new ConditionsNotMetException("Id должен быть указан");
         }
         User oldUser = userList.get(user.getId());
-        if (duplicateData(user.getEmail()) && !(oldUser.getEmail().equals(user.getEmail()))) {
-            throw new DuplicatedDataException("Этот имейл уже используется");
-        }
-        if (duplicateData(user.getLogin()) && !(oldUser.getLogin().equals(user.getLogin()))) {
-            throw new DuplicatedDataException("Этот логин уже используется");
-        }
-
         User newUser = null;
         newUser.setId(user.getId());
 
@@ -64,16 +67,32 @@ public class UserController {
             newUser.setName(oldUser.getName());
         }
         if (user.getBirthday() != null) {
+            if (user.getBirthday().isAfter(LocalDate.now())) {
+                throw new ConditionsNotMetException("Указана некорректная дата рождения");
+            }
             newUser.setBirthday(user.getBirthday());
         } else {
             newUser.setBirthday(oldUser.getBirthday());
         }
         if (user.getLogin() != null) {
+            if (user.getLogin().contains(" ")) {
+                throw new ConditionsNotMetException("В логине не должно быть пробелов");
+            }
+            if (duplicateData(user.getLogin()) && !(oldUser.getLogin().equals(user.getLogin()))) {
+                throw new DuplicatedDataException("Этот логин уже используется");
+            }
+
             newUser.setLogin(user.getLogin());
         } else {
             newUser.setLogin(oldUser.getLogin());
         }
         if (user.getEmail() != null) {
+            if (!(user.getEmail().contains("@"))) {
+                throw new ConditionsNotMetException("Указан некорректный имейл");
+            }
+            if (duplicateData(user.getEmail()) && !(oldUser.getEmail().equals(user.getEmail()))) {
+                throw new DuplicatedDataException("Этот имейл уже используется");
+            }
             newUser.setEmail(user.getEmail());
         } else {
             newUser.setEmail(oldUser.getEmail());
