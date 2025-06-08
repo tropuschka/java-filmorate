@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -12,6 +13,7 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
 
+@Slf4j
 public class UserController {
     HashMap<Integer, User> userList = new HashMap<>();
 
@@ -23,39 +25,40 @@ public class UserController {
     @PostMapping
     public User create(@RequestBody User user) {
         if (user.getEmail() == null || user.getEmail().isBlank()) {
-            throw new ConditionsNotMetException("Имейл должен быть указан");
+            throwValidationException("Имейл должен быть указан");
         }
         if (!(user.getEmail().contains("@"))) {
-            throw new ConditionsNotMetException("Указан некорректный имейл");
+            throwValidationException("Указан некорректный имейл");
         }
         if (duplicateData(user.getEmail())) {
-            throw new DuplicatedDataException("Этот имейл уже используется");
+            throwDuplicationException("Имейл уже используется");
         }
         if (user.getLogin() == null || user.getLogin().isBlank()) {
-            throw new ConditionsNotMetException("Введите логин");
+            throwValidationException("Введите логин");
         }
         if (user.getLogin().contains(" ")) {
-            throw new ConditionsNotMetException("В логине не должно быть пробелов");
+            throwValidationException("В логине не должно быть пробелов");
         }
         if (duplicateData(user.getLogin())) {
-            throw new DuplicatedDataException("Этот логин уже используется");
+            throwDuplicationException("Логин уже используется");
         }
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
         if (user.getBirthday().isAfter(LocalDate.now())) {
-            throw new ConditionsNotMetException("Указана некорректная дата рождения");
+            throwValidationException("Указана некорректная дата рождения");
         }
 
         user.setId(getNextId());
         userList.put(user.getId(), user);
+        log.trace("Создан пользователь {}, айди {}", user.getLogin(), user.getId());
         return user;
     }
 
     @PutMapping
     public User update(@RequestBody User user) {
         if (user.getId() == null) {
-            throw new ConditionsNotMetException("Id должен быть указан");
+            throwValidationException("Id должен быть указан");
         }
         User oldUser = userList.get(user.getId());
         User newUser = null;
@@ -68,7 +71,7 @@ public class UserController {
         }
         if (user.getBirthday() != null) {
             if (user.getBirthday().isAfter(LocalDate.now())) {
-                throw new ConditionsNotMetException("Указана некорректная дата рождения");
+                throwValidationException("Указана некорректная дата рождения");
             }
             newUser.setBirthday(user.getBirthday());
         } else {
@@ -76,10 +79,10 @@ public class UserController {
         }
         if (user.getLogin() != null) {
             if (user.getLogin().contains(" ")) {
-                throw new ConditionsNotMetException("В логине не должно быть пробелов");
+                throwValidationException("В логине не должно быть пробелов");
             }
             if (duplicateData(user.getLogin()) && !(oldUser.getLogin().equals(user.getLogin()))) {
-                throw new DuplicatedDataException("Этот логин уже используется");
+                throwDuplicationException("Логин уже используется");
             }
 
             newUser.setLogin(user.getLogin());
@@ -88,10 +91,10 @@ public class UserController {
         }
         if (user.getEmail() != null) {
             if (!(user.getEmail().contains("@"))) {
-                throw new ConditionsNotMetException("Указан некорректный имейл");
+                throwValidationException("Указан некорректный имейл");
             }
             if (duplicateData(user.getEmail()) && !(oldUser.getEmail().equals(user.getEmail()))) {
-                throw new DuplicatedDataException("Этот имейл уже используется");
+                throwDuplicationException("Имейл уже используется");
             }
             newUser.setEmail(user.getEmail());
         } else {
@@ -100,6 +103,7 @@ public class UserController {
 
         userList.remove(user.getId());
         userList.put(user.getId(), newUser);
+        log.trace("Данные пользователя {}, айди {}, обновлены", newUser.getLogin(), newUser.getId());
         return newUser;
     }
 
@@ -113,5 +117,15 @@ public class UserController {
 
     private boolean duplicateData(String data) {
         return userList.values().stream().map(User::getEmail).anyMatch(m -> m.equals(data));
+    }
+
+    private void throwValidationException(String message) {
+        log.error(message);
+        throw new ConditionsNotMetException(message);
+    }
+
+    private void throwDuplicationException(String message) {
+        log.error(message);
+        throw new DuplicatedDataException(message);
     }
 }
