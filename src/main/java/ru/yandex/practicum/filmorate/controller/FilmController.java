@@ -1,9 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
 import ru.yandex.practicum.filmorate.model.Film;
 
@@ -27,6 +24,41 @@ public class FilmController {
         film.setId(getNextId());
         filmList.put(film.getId(), film);
         return film;
+    }
+
+    @PutMapping
+    public Film update(@RequestBody Film film) {
+        if (film.getId() == null) {
+            throw new ConditionsNotMetException("Id должен быть указан");
+        }
+        Film oldFilm = filmList.get(film.getId());
+        Film newFilm = null;
+        newFilm.setId(film.getId());
+
+        if (film.getName() != null) {
+            newFilm.setName(film.getName());
+        } else {
+            newFilm.setName(oldFilm.getName());
+        }
+        if (film.getDescription() != null) {
+            newFilm.setDescription(film.getDescription());
+        } else {
+            newFilm.setDescription(oldFilm.getDescription());
+        }
+        if (film.getDuration() != null) {
+            newFilm.setDuration(film.getDuration());
+        } else {
+            newFilm.setDuration(oldFilm.getDuration());
+        }
+        if (film.getReleaseDate() != null) {
+            newFilm.setReleaseDate(film.getReleaseDate());
+        } else {
+            newFilm.setReleaseDate(oldFilm.getReleaseDate());
+        }
+
+        filmList.remove(film.getId());
+        filmList.put(film.getId(), newFilm);
+        return newFilm;
     }
 
     private Integer getNextId() {
