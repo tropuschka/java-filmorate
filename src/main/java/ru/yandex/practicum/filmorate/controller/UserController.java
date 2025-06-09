@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
 import ru.yandex.practicum.filmorate.exceptions.DuplicatedDataException;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
@@ -60,7 +61,10 @@ public class UserController {
             throwValidationException("Id должен быть указан");
         }
         User oldUser = userList.get(user.getId());
-        User newUser = null;
+        if (oldUser == null) {
+            throwNotFoundException("Пользователь не найден");
+        }
+        User newUser = new User();
         newUser.setId(user.getId());
 
         if (user.getName() != null) {
@@ -126,5 +130,10 @@ public class UserController {
     private void throwDuplicationException(String message) {
         log.error(message);
         throw new DuplicatedDataException(message);
+    }
+
+    private void throwNotFoundException(String message) {
+        log.error(message);
+        throw new NotFoundException(message);
     }
 }

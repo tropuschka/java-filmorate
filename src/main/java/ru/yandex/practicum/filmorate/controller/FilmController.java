@@ -3,9 +3,11 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.Collection;
 import java.util.HashMap;
 
@@ -28,7 +30,7 @@ public class FilmController {
         if (film.getDescription().length() > 200) {
             throwValidationException("Описание не должно быть длиннее 200 символов");
         }
-        if (film.getReleaseDate().isBefore(LocalDate.of(1985, 12, 28))) {
+        if (film.getReleaseDate().isBefore(LocalDate.of(1985, Month.DECEMBER, 28))) {
             throwValidationException("Дата релиза не может быть раньше 28 декабря 1885 года");
         }
         if (!(film.getDuration().isPositive())) {
@@ -46,7 +48,10 @@ public class FilmController {
             throwValidationException("Id должен быть указан");
         }
         Film oldFilm = filmList.get(film.getId());
-        Film newFilm = null;
+        if (oldFilm == null) {
+            throwNotFoundException("Фильм не найден");
+        }
+        Film newFilm = new Film();
         newFilm.setId(film.getId());
 
         if (film.getName() != null) {
@@ -96,5 +101,10 @@ public class FilmController {
     private void throwValidationException(String message) {
         log.error(message);
         throw new ConditionsNotMetException(message);
+    }
+
+    private void throwNotFoundException(String message) {
+        log.error(message);
+        throw new NotFoundException(message);
     }
 }
