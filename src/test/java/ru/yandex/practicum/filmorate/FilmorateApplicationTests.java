@@ -72,11 +72,13 @@ class FilmorateApplicationTests {
 		Collection<Film> controllerFilmList = filmController.findAll();
 
 		assertNotNull(controllerFilmList);
-		assertEquals(controllerFilmList.size(), 2);
+		assertEquals(controllerFilmList.size(), 3);
 	}
 
 	@Test
 	void createUser() {
+		user.setLogin("UserLogin");
+		user.setEmail("user3000@gmail.com");
 		User newUser = userController.create(user);
 
 		assertNotNull(newUser);
@@ -106,7 +108,6 @@ class FilmorateApplicationTests {
 		User user2 = new User();
 		user2.setLogin("User");
 		user2.setEmail("user2@mail.ru");
-		userController.create(user);
 		userController.create(user2);
 
 		Collection<User> controllerUserList = userController.findAll();
