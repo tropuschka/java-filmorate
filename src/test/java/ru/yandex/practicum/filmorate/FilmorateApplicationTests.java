@@ -28,7 +28,7 @@ class FilmorateApplicationTests {
 		film.setName("Name");
 		film.setDescription("Description");
 		film.setReleaseDate(LocalDate.of(2000, Month.JANUARY, 1));
-		film.setDuration(Duration.ofMinutes(45));
+		film.setDuration(45);
 
 		user.setLogin("Login");
 		user.setEmail("mail@mail.ru");
