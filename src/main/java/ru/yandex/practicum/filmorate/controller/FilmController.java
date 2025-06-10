@@ -47,10 +47,10 @@ public class FilmController {
         if (film.getId() == null) {
             throwValidationException("Id должен быть указан");
         }
-        Film oldFilm = filmList.get(film.getId());
-        if (oldFilm == null) {
+        if (!(filmList.containsKey(film.getId()))) {
             throwNotFoundException("Фильм не найден");
         }
+        Film oldFilm = filmList.get(film.getId());
         Film newFilm = new Film();
         newFilm.setId(film.getId());
 
