@@ -49,7 +49,8 @@ public class FilmController {
         }
         Film oldFilm = filmList.get(film.getId());
         if (oldFilm == null) {
-            throwNotFoundException("Фильм не найден");
+            film.setId(getNextId());
+            return filmList.put(film.getId(), film);
         }
         Film newFilm = new Film();
         newFilm.setId(film.getId());
