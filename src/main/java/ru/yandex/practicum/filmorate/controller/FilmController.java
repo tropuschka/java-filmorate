@@ -33,7 +33,7 @@ public class FilmController {
         if (film.getReleaseDate().isBefore(LocalDate.of(1985, Month.DECEMBER, 28))) {
             throwValidationException("Дата релиза не может быть раньше 28 декабря 1885 года");
         }
-        if (!(film.getDuration() > 0)) {
+        if (!(film.getDuration().isPositive())) {
             throwValidationException("Длительность фильма должна быть положительной");
         }
         film.setId(getNextId());
@@ -68,7 +68,7 @@ public class FilmController {
             newFilm.setDescription(oldFilm.getDescription());
         }
         if (film.getDuration() != null) {
-            if (!(film.getDuration() > 0)) {
+            if (!(film.getDuration().isPositive())) {
                 throwValidationException("Длительность фильма должна быть положительной");
             }
             newFilm.setDuration(film.getDuration());

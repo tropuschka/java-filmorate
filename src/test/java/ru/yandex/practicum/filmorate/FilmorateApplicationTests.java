@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.Collection;
@@ -27,7 +28,7 @@ class FilmorateApplicationTests {
 		film.setName("Name");
 		film.setDescription("Description");
 		film.setReleaseDate(LocalDate.of(2000, Month.JANUARY, 1));
-		film.setDuration(45);
+		film.setDuration(Duration.ofMinutes(45));
 
 		user.setLogin("Login");
 		user.setEmail("mail@mail.ru");
