@@ -30,7 +30,7 @@ public class FilmController {
         if (film.getDescription().length() > 200) {
             throwValidationException("Описание не должно быть длиннее 200 символов");
         }
-        if (film.getReleaseDate().isBefore(LocalDate.of(1885, Month.DECEMBER, 28))) {
+        if (film.getReleaseDate().isBefore(LocalDate.of(1895, Month.DECEMBER, 28))) {
             throwValidationException("Дата релиза не может быть раньше 28 декабря 1885 года");
         }
         if (!(film.getDuration() > 0)) {
@@ -76,7 +76,7 @@ public class FilmController {
             newFilm.setDuration(oldFilm.getDuration());
         }
         if (film.getReleaseDate() != null) {
-            if (film.getReleaseDate().isBefore(LocalDate.of(1885, 12, 28))) {
+            if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
                 throwValidationException("Дата релиза не может быть раньше 28 декабря 1885 года");
             }
             newFilm.setReleaseDate(film.getReleaseDate());
