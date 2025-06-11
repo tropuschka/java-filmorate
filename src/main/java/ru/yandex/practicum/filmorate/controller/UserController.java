@@ -10,12 +10,13 @@ import ru.yandex.practicum.filmorate.model.User;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @RestController
 @RequestMapping("/users")
 public class UserController {
-    HashMap<Integer, User> userList = new HashMap<>();
+    private Map<Integer, User> userList = new HashMap<>();
 
     @GetMapping
     public Collection<User> findAll() {

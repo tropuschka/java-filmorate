@@ -10,12 +10,13 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @RestController
 @RequestMapping("/films")
 public class FilmController {
-    HashMap<Integer, Film> filmList = new HashMap<>();
+    private Map<Integer, Film> filmList = new HashMap<>();
 
     @GetMapping
     public Collection<Film> findAll() {
