@@ -105,7 +105,6 @@ public class UserController {
             newUser.setEmail(oldUser.getEmail());
         }
 
-        userList.remove(user.getId());
         userList.put(user.getId(), newUser);
         log.trace("Данные пользователя {}, айди {}, обновлены", newUser.getLogin(), newUser.getId());
         return newUser;

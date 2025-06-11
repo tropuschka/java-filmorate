@@ -85,7 +85,6 @@ public class FilmController {
             newFilm.setReleaseDate(oldFilm.getReleaseDate());
         }
 
-        filmList.remove(film.getId());
         filmList.put(film.getId(), newFilm);
         log.trace("Данные фильма {}, айди {}, обновлены", film.getName(), film.getId());
         return newFilm;
