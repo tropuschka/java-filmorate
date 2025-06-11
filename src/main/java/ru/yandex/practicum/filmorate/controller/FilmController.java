@@ -55,7 +55,7 @@ public class FilmController {
         Film newFilm = new Film();
         newFilm.setId(film.getId());
 
-        if (film.getName() != null) {
+        if (film.getName() != null && !film.getName().isBlank()) {
             newFilm.setName(film.getName());
         } else {
             newFilm.setName(oldFilm.getName());

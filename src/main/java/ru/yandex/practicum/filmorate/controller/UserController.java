@@ -68,7 +68,7 @@ public class UserController {
         User newUser = new User();
         newUser.setId(user.getId());
 
-        if (user.getName() != null) {
+        if (user.getName() != null && !user.getName().isBlank()) {
             newUser.setName(user.getName());
         } else {
             newUser.setName(oldUser.getName());
@@ -81,7 +81,7 @@ public class UserController {
         } else {
             newUser.setBirthday(oldUser.getBirthday());
         }
-        if (user.getLogin() != null) {
+        if (user.getLogin() != null && !user.getLogin().isBlank()) {
             if (user.getLogin().contains(" ")) {
                 throwValidationException("В логине не должно быть пробелов");
             }
