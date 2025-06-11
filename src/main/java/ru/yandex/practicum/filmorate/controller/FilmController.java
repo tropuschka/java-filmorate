@@ -28,13 +28,13 @@ public class FilmController {
         if (film.getName() == null || film.getName().isBlank()) {
             throwValidationException("Название должно быть указано");
         }
-        if (film.getDescription().length() > 200) {
+        if (film.getDescription() != null && film.getDescription().length() > 200) {
             throwValidationException("Описание не должно быть длиннее 200 символов");
         }
         if (film.getReleaseDate() != null && film.getReleaseDate().isBefore(LocalDate.of(1895, Month.DECEMBER, 28))) {
             throwValidationException("Дата релиза не может быть раньше 28 декабря 1885 года");
         }
-        if (!(film.getDuration() > 0)) {
+        if (film.getDuration() != null && !(film.getDuration() > 0)) {
             throwValidationException("Длительность фильма должна быть положительной");
         }
         film.setId(getNextId());
