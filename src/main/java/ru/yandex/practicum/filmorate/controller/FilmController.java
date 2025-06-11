@@ -48,7 +48,7 @@ public class FilmController {
         if (film.getId() == null) {
             throwValidationException("Id должен быть указан");
         }
-        if (!(filmList.containsKey(film.getId()))) {
+        if (!filmList.containsKey(film.getId())) {
             throwNotFoundException("Фильм не найден");
         }
         Film oldFilm = filmList.get(film.getId());
