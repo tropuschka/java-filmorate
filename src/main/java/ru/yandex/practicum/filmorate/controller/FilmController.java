@@ -31,7 +31,7 @@ public class FilmController {
         if (film.getDescription().length() > 200) {
             throwValidationException("Описание не должно быть длиннее 200 символов");
         }
-        if (film.getReleaseDate().isBefore(LocalDate.of(1895, Month.DECEMBER, 28))) {
+        if (film.getReleaseDate() != null && film.getReleaseDate().isBefore(LocalDate.of(1895, Month.DECEMBER, 28))) {
             throwValidationException("Дата релиза не может быть раньше 28 декабря 1885 года");
         }
         if (!(film.getDuration() > 0)) {
