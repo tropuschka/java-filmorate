@@ -216,10 +216,10 @@ class FilmorateApplicationTests {
 
 	@Test
 	void createUserDuplicatedEmail() {
-		User ok_user = new User();
-		ok_user.setLogin("OkUser");
-		ok_user.setEmail("ok_mail@mail.ru");
-		userController.create(ok_user);
+		User okUser = new User();
+		okUser.setLogin("OkUser");
+		okUser.setEmail("ok_mail@mail.ru");
+		userController.create(okUser);
 		User curruptUser = new User();
 		curruptUser.setLogin("CurruptedUser");
 		curruptUser.setEmail("ok_mail@mail.ru");
@@ -249,10 +249,10 @@ class FilmorateApplicationTests {
 	@Test
 	void createUserDuplicatedLogin() {
 		System.out.println(userController.findAll());
-		User ok_user = new User();
-		ok_user.setLogin("Ok_User");
-		ok_user.setEmail("okmail@mail.ru");
-		userController.create(ok_user);
+		User okUser = new User();
+		okUser.setLogin("Ok_User");
+		okUser.setEmail("okmail@mail.ru");
+		userController.create(okUser);
 		User curruptUser = new User();
 		curruptUser.setLogin("Ok_User");
 		curruptUser.setEmail("currupted_user@mail.ru");
@@ -335,10 +335,10 @@ class FilmorateApplicationTests {
 	@Test
 	void changeUserDuplicatedLogin() {
 		System.out.println(userController.findAll());
-		User ok_user = new User();
-		ok_user.setLogin("Ok_User_update");
-		ok_user.setEmail("okmail_updated@mail.ru");
-		userController.create(ok_user);
+		User okUser = new User();
+		okUser.setLogin("Ok_User_update");
+		okUser.setEmail("okmail_updated@mail.ru");
+		userController.create(okUser);
 		User userToUpdate = new User();
 		userToUpdate.setEmail("duplicated_login@mail.ru");
 		userToUpdate.setLogin("Duplicated_Login");
@@ -366,10 +366,10 @@ class FilmorateApplicationTests {
 	@Test
 	void changeUserDuplicatedEmail() {
 		System.out.println(userController.findAll());
-		User ok_user = new User();
-		ok_user.setLogin("OkUser_update");
-		ok_user.setEmail("ok_mail_updated@mail.ru");
-		userController.create(ok_user);
+		User okUser = new User();
+		okUser.setLogin("OkUser_update");
+		okUser.setEmail("ok_mail_updated@mail.ru");
+		userController.create(okUser);
 		User userToUpdate = new User();
 		userToUpdate.setEmail("duplicated_mail@mail.ru");
 		userToUpdate.setLogin("Duplicated_Mail");
