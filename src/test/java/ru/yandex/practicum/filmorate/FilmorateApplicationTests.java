@@ -8,6 +8,7 @@ import org.springframework.web.server.handler.ResponseStatusExceptionHandler;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
+import ru.yandex.practicum.filmorate.exceptions.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -39,7 +40,6 @@ class FilmorateApplicationTests {
 
 	@Test
 	void createFilm() {
-		System.out.println(film.getDescription());
 		Film newFilm = filmController.create(film);
 
 		assertNotNull(newFilm);
@@ -137,6 +137,80 @@ class FilmorateApplicationTests {
 	}
 
 	@Test
+	void createUserNoEmail() {
+		User curruptUser = new User();
+		curruptUser.setLogin("CurruptedUser");
+		curruptUser.setEmail("");
+
+		assertThrows(ConditionsNotMetException.class, () -> userController.create(curruptUser));
+	}
+
+	@Test
+	void createUserWrongEmail() {
+		User curruptUser = new User();
+		curruptUser.setLogin("CurruptedUser");
+		curruptUser.setEmail("mail");
+
+		assertThrows(ConditionsNotMetException.class, () -> userController.create(curruptUser));
+	}
+
+	@Test
+	void createUserDuplicatedEmail() {
+		User ok_user = new User();
+		ok_user.setLogin("OkUser");
+		ok_user.setEmail("ok_mail@mail.ru");
+		userController.create(ok_user);
+		User curruptUser = new User();
+		curruptUser.setLogin("CurruptedUser");
+		curruptUser.setEmail("ok_mail@mail.ru");
+
+		assertThrows(DuplicatedDataException.class, () -> userController.create(curruptUser));
+	}
+
+	@Test
+	void createUserNoLogin() {
+		System.out.println(userController.findAll());
+		User curruptUser = new User();
+		curruptUser.setLogin("");
+		curruptUser.setEmail("currupted_user@mail.ru");
+
+		assertThrows(ConditionsNotMetException.class, () -> userController.create(curruptUser));
+	}
+
+	@Test
+	void createUserLoginWithSpaces() {
+		User curruptUser = new User();
+		curruptUser.setLogin("Currupted User");
+		curruptUser.setEmail("currupted_user@mail.ru");
+
+		assertThrows(ConditionsNotMetException.class, () -> userController.create(curruptUser));
+	}
+
+	@Test
+	void createUserDuplicatedLogin() {
+		System.out.println(userController.findAll());
+		User ok_user = new User();
+		ok_user.setLogin("Ok_User");
+		ok_user.setEmail("okmail@mail.ru");
+		userController.create(ok_user);
+		User curruptUser = new User();
+		curruptUser.setLogin("Ok_User");
+		curruptUser.setEmail("currupted_user@mail.ru");
+
+		assertThrows(DuplicatedDataException.class, () -> userController.create(curruptUser));
+	}
+
+	@Test
+	void createUserLateBirthday() {
+		User curruptUser = new User();
+		curruptUser.setLogin("Currupted User");
+		curruptUser.setEmail("currupted_user@mail.ru");
+		curruptUser.setBirthday(LocalDate.now().plusDays(5));
+
+		assertThrows(ConditionsNotMetException.class, () -> userController.create(curruptUser));
+	}
+
+	@Test
 	void changeUser() {
 		Integer userId = userController.create(user).getId();
 		User userUpdate = new User();
@@ -161,6 +235,6 @@ class FilmorateApplicationTests {
 		Collection<User> controllerUserList = userController.findAll();
 
 		assertNotNull(controllerUserList);
-		assertEquals(controllerUserList.size(), 2);
+		assertEquals(controllerUserList.size(), 4);
 	}
 }

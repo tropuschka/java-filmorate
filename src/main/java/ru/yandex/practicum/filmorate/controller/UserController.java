@@ -31,7 +31,7 @@ public class UserController {
         if (!(user.getEmail().contains("@"))) {
             throwValidationException("Указан некорректный имейл");
         }
-        if (duplicateData(user.getEmail())) {
+        if (duplicateMail(user.getEmail())) {
             throwDuplicationException("Имейл уже используется");
         }
         if (user.getLogin() == null || user.getLogin().isBlank()) {
@@ -40,7 +40,7 @@ public class UserController {
         if (user.getLogin().contains(" ")) {
             throwValidationException("В логине не должно быть пробелов");
         }
-        if (duplicateData(user.getLogin())) {
+        if (duplicateLogin(user.getLogin())) {
             throwDuplicationException("Логин уже используется");
         }
         if (user.getName() == null || user.getName().isBlank()) {
@@ -85,7 +85,7 @@ public class UserController {
             if (user.getLogin().contains(" ")) {
                 throwValidationException("В логине не должно быть пробелов");
             }
-            if (duplicateData(user.getLogin()) && !(oldUser.getLogin().equals(user.getLogin()))) {
+            if (duplicateLogin(user.getLogin()) && !(oldUser.getLogin().equals(user.getLogin()))) {
                 throwDuplicationException("Логин уже используется");
             }
 
@@ -97,7 +97,7 @@ public class UserController {
             if (!(user.getEmail().contains("@"))) {
                 throwValidationException("Указан некорректный имейл");
             }
-            if (duplicateData(user.getEmail()) && !(oldUser.getEmail().equals(user.getEmail()))) {
+            if (duplicateMail(user.getEmail()) && !(oldUser.getEmail().equals(user.getEmail()))) {
                 throwDuplicationException("Имейл уже используется");
             }
             newUser.setEmail(user.getEmail());
@@ -118,8 +118,12 @@ public class UserController {
         return ++maxId;
     }
 
-    private boolean duplicateData(String data) {
+    private boolean duplicateMail(String data) {
         return userList.values().stream().map(User::getEmail).anyMatch(m -> m.equals(data));
+    }
+
+    private boolean duplicateLogin(String data) {
+        return userList.values().stream().map(User::getLogin).anyMatch(m -> m.equals(data));
     }
 
     private void throwValidationException(String message) {
