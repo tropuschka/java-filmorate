@@ -2,9 +2,12 @@ package ru.yandex.practicum.filmorate;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.SpringBootExceptionReporter;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.web.server.handler.ResponseStatusExceptionHandler;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.controller.UserController;
+import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -12,8 +15,7 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.util.Collection;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class FilmorateApplicationTests {
@@ -59,6 +61,13 @@ class FilmorateApplicationTests {
 		assertEquals(film.getDescription(), newFilm.getDescription());
 		assertEquals(film.getReleaseDate(), newFilm.getReleaseDate());
 		assertEquals(film.getDuration(), newFilm.getDuration());
+	}
+
+	@Test
+	void createFilmNoName() {
+		film.setName("");
+
+		assertThrows(ConditionsNotMetException.class, () -> filmController.create(film));
 	}
 
 	@Test
