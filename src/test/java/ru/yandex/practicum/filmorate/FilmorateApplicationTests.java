@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
 import ru.yandex.practicum.filmorate.exceptions.DuplicatedDataException;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -44,21 +45,6 @@ class FilmorateApplicationTests {
 
 		assertNotNull(newFilm);
 		assertEquals(film.getName(), newFilm.getName());
-		assertEquals(film.getDescription(), newFilm.getDescription());
-		assertEquals(film.getReleaseDate(), newFilm.getReleaseDate());
-		assertEquals(film.getDuration(), newFilm.getDuration());
-	}
-
-	@Test
-	void changeFilm() {
-		Integer filmId = filmController.create(film).getId();
-		Film filmUpdate = new Film();
-		filmUpdate.setId(filmId);
-		filmUpdate.setName("New name");
-		Film newFilm = filmController.update(filmUpdate);
-
-		assertNotNull(newFilm);
-		assertEquals(filmUpdate.getName(), newFilm.getName());
 		assertEquals(film.getDescription(), newFilm.getDescription());
 		assertEquals(film.getReleaseDate(), newFilm.getReleaseDate());
 		assertEquals(film.getDuration(), newFilm.getDuration());
@@ -111,6 +97,82 @@ class FilmorateApplicationTests {
 	}
 
 	@Test
+	void changeFilm() {
+		Integer filmId = filmController.create(film).getId();
+		Film filmUpdate = new Film();
+		filmUpdate.setId(filmId);
+		filmUpdate.setName("New name");
+		Film newFilm = filmController.update(filmUpdate);
+
+		assertNotNull(newFilm);
+		assertEquals(filmUpdate.getName(), newFilm.getName());
+		assertEquals(film.getDescription(), newFilm.getDescription());
+		assertEquals(film.getReleaseDate(), newFilm.getReleaseDate());
+		assertEquals(film.getDuration(), newFilm.getDuration());
+	}
+
+	@Test
+	void changeFilmNoId() {
+		Film filmUpdate = new Film();
+		filmUpdate.setName("New name");
+
+		assertThrows(ConditionsNotMetException.class, () -> filmController.update(filmUpdate));
+	}
+
+	@Test
+	void changeFilmNotFound() {
+		Integer filmId = filmController.create(film).getId();
+		Film filmUpdate = new Film();
+		filmUpdate.setId(filmId + 1);
+		filmUpdate.setName("New name");
+
+		assertThrows(NotFoundException.class, () -> filmController.update(filmUpdate));
+	}
+
+	@Test
+	void changeFilmLongDescription() {
+		Integer filmId = filmController.create(film).getId();
+		Film filmUpdate = new Film();
+		filmUpdate.setId(filmId);
+		String description = "Друзья играют в мафию, но по какой-то причине не успевают закончить партию. " +
+				"Через некоторое время один из игравших сообщает другому, что кто-то решил продолжить игру. " +
+				"(дыра в завязке - надо было сразу звонить ментам)";
+		filmUpdate.setDescription(description);
+
+		assertThrows(ConditionsNotMetException.class, () -> filmController.update(filmUpdate));
+	}
+
+	@Test
+	void changeFilmDurationNull() {
+		Integer filmId = filmController.create(film).getId();
+		Film filmUpdate = new Film();
+		filmUpdate.setId(filmId);
+		filmUpdate.setDuration(0);
+
+		assertThrows(ConditionsNotMetException.class, () -> filmController.update(filmUpdate));
+	}
+
+	@Test
+	void changeFilmDurationNegative() {
+		Integer filmId = filmController.create(film).getId();
+		Film filmUpdate = new Film();
+		filmUpdate.setId(filmId);
+		filmUpdate.setDuration(-5);
+
+		assertThrows(ConditionsNotMetException.class, () -> filmController.update(filmUpdate));
+	}
+
+	@Test
+	void changeFilmEarlyDate() {
+		Integer filmId = filmController.create(film).getId();
+		Film filmUpdate = new Film();
+		filmUpdate.setId(filmId);
+		filmUpdate.setReleaseDate(LocalDate.of(1895, Month.NOVEMBER, 20));
+
+		assertThrows(ConditionsNotMetException.class, () -> filmController.update(filmUpdate));
+	}
+
+	@Test
 	void getAllFilms() {
 		Film film2 = film;
 		film2.setName("Film");
@@ -120,7 +182,7 @@ class FilmorateApplicationTests {
 		Collection<Film> controllerFilmList = filmController.findAll();
 
 		assertNotNull(controllerFilmList);
-		assertEquals(controllerFilmList.size(), 3);
+		assertEquals(controllerFilmList.size(), 4);
 	}
 
 	@Test
