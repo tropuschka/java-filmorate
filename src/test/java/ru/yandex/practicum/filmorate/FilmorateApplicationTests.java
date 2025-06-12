@@ -39,6 +39,7 @@ class FilmorateApplicationTests {
 
 	@Test
 	void createFilm() {
+		System.out.println(film.getDescription());
 		Film newFilm = filmController.create(film);
 
 		assertNotNull(newFilm);
@@ -65,9 +66,48 @@ class FilmorateApplicationTests {
 
 	@Test
 	void createFilmNoName() {
-		film.setName("");
+		Film corruptFilm = new Film();
 
-		assertThrows(ConditionsNotMetException.class, () -> filmController.create(film));
+		assertThrows(ConditionsNotMetException.class, () -> filmController.create(corruptFilm));
+	}
+
+	@Test
+	void createFilmLongDescription() {
+		Film corruptFilm = new Film();
+		corruptFilm.setName("LongDescription");
+		String description = "Друзья играют в мафию, но по какой-то причине не успевают закончить партию. " +
+				"Через некоторое время один из игравших сообщает другому, что кто-то решил продолжить игру. " +
+				"(дыра в завязке - надо было сразу звонить ментам)";
+		corruptFilm.setDescription(description);
+
+		assertThrows(ConditionsNotMetException.class, () -> filmController.create(corruptFilm));
+	}
+
+	@Test
+	void createFilmEarlyDate() {
+		Film corruptFilm = new Film();
+		corruptFilm.setName("EarlyDate");
+		corruptFilm.setReleaseDate(LocalDate.of(1895, Month.NOVEMBER, 20));
+
+		assertThrows(ConditionsNotMetException.class, () -> filmController.create(corruptFilm));
+	}
+
+	@Test
+	void createFilmDurationNull() {
+		Film corruptFilm = new Film();
+		corruptFilm.setName("DurationNull");
+		corruptFilm.setDuration(0);
+
+		assertThrows(ConditionsNotMetException.class, () -> filmController.create(corruptFilm));
+	}
+
+	@Test
+	void createFilmDurationNegative() {
+		Film corruptFilm = new Film();
+		corruptFilm.setName("DurationNegative");
+		corruptFilm.setDuration(-5);
+
+		assertThrows(ConditionsNotMetException.class, () -> filmController.create(corruptFilm));
 	}
 
 	@Test
