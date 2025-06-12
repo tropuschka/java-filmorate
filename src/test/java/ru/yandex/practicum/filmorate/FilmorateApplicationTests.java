@@ -2,9 +2,7 @@ package ru.yandex.practicum.filmorate;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.SpringBootExceptionReporter;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.web.server.handler.ResponseStatusExceptionHandler;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
@@ -288,6 +286,102 @@ class FilmorateApplicationTests {
 	}
 
 	@Test
+	void changeUserNoId() {
+		User userUpdate = new User();
+		userUpdate.setName("New name");
+
+		assertThrows(ConditionsNotMetException.class, () -> userController.update(userUpdate));
+	}
+
+	@Test
+	void changeUserNotFound() {
+		User userToUpdate = new User();
+		userToUpdate.setEmail("not_found@mail.ru");
+		userToUpdate.setLogin("Not_Found");
+		Integer userId = userController.create(userToUpdate).getId();
+		User userUpdate = new User();
+		userUpdate.setId(userId + 1);
+		userUpdate.setName("New name");
+
+		assertThrows(NotFoundException.class, () -> userController.update(userUpdate));
+	}
+
+	@Test
+	void changeUserLateBirthday() {
+		User userToUpdate = new User();
+		userToUpdate.setEmail("late_birthday@mail.ru");
+		userToUpdate.setLogin("Late_Birthday");
+		Integer userId = userController.create(userToUpdate).getId();
+		User userUpdate = new User();
+		userUpdate.setId(userId);
+		userUpdate.setBirthday(LocalDate.now().plusDays(5));
+
+		assertThrows(ConditionsNotMetException.class, () -> userController.update(userUpdate));
+	}
+
+	@Test
+	void changeUserLoginWithSpaces() {
+		User userToUpdate = new User();
+		userToUpdate.setEmail("login_with_spaces@mail.ru");
+		userToUpdate.setLogin("Login_With_Spaces");
+		Integer userId = userController.create(userToUpdate).getId();
+		User userUpdate = new User();
+		userUpdate.setId(userId);
+		userUpdate.setLogin("Currupted User");
+
+		assertThrows(ConditionsNotMetException.class, () -> userController.update(userUpdate));
+	}
+
+	@Test
+	void changeUserDuplicatedLogin() {
+		System.out.println(userController.findAll());
+		User ok_user = new User();
+		ok_user.setLogin("Ok_User_update");
+		ok_user.setEmail("okmail_updated@mail.ru");
+		userController.create(ok_user);
+		User userToUpdate = new User();
+		userToUpdate.setEmail("duplicated_login@mail.ru");
+		userToUpdate.setLogin("Duplicated_Login");
+		Integer userId = userController.create(userToUpdate).getId();
+		User userUpdate = new User();
+		userUpdate.setId(userId);
+		userUpdate.setLogin("Ok_User_update");
+
+		assertThrows(DuplicatedDataException.class, () -> userController.update(userUpdate));
+	}
+
+	@Test
+	void changeUserWrongEmail() {
+		User userToUpdate = new User();
+		userToUpdate.setEmail("wrong_mail@mail.ru");
+		userToUpdate.setLogin("Wrong_Mail");
+		Integer userId = userController.create(userToUpdate).getId();
+		User userUpdate = new User();
+		userUpdate.setId(userId);
+		userUpdate.setEmail("mail");
+
+		assertThrows(ConditionsNotMetException.class, () -> userController.update(userUpdate));
+	}
+
+	@Test
+	void changeUserDuplicatedEmail() {
+		System.out.println(userController.findAll());
+		User ok_user = new User();
+		ok_user.setLogin("OkUser_update");
+		ok_user.setEmail("ok_mail_updated@mail.ru");
+		userController.create(ok_user);
+		User userToUpdate = new User();
+		userToUpdate.setEmail("duplicated_mail@mail.ru");
+		userToUpdate.setLogin("Duplicated_Mail");
+		Integer userId = userController.create(userToUpdate).getId();
+		User userUpdate = new User();
+		userUpdate.setId(userId);
+		userUpdate.setEmail("ok_mail_updated@mail.ru");
+
+		assertThrows(DuplicatedDataException.class, () -> userController.update(userUpdate));
+	}
+
+	@Test
 	void getAllUsers() {
 		User user2 = new User();
 		user2.setLogin("User");
@@ -297,6 +391,6 @@ class FilmorateApplicationTests {
 		Collection<User> controllerUserList = userController.findAll();
 
 		assertNotNull(controllerUserList);
-		assertEquals(controllerUserList.size(), 4);
+		assertEquals(controllerUserList.size(), 8);
 	}
 }
