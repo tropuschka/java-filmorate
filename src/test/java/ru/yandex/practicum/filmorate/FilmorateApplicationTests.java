@@ -10,6 +10,8 @@ import ru.yandex.practicum.filmorate.exceptions.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -21,7 +23,8 @@ import static org.junit.jupiter.api.Assertions.*;
 class FilmorateApplicationTests {
 	static Film film = new Film();
 	static User user = new User();
-	static FilmController filmController = new FilmController();
+	static FilmStorage filmStorage = new InMemoryFilmStorage();
+	static FilmController filmController = new FilmController(filmStorage);
 	static UserController userController = new UserController();
 
 	@BeforeAll
