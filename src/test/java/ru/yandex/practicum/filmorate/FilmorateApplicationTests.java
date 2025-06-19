@@ -12,6 +12,8 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -24,8 +26,9 @@ class FilmorateApplicationTests {
 	static Film film = new Film();
 	static User user = new User();
 	static FilmStorage filmStorage = new InMemoryFilmStorage();
+	static UserStorage userStorage = new InMemoryUserStorage();
 	static FilmController filmController = new FilmController(filmStorage);
-	static UserController userController = new UserController();
+	static UserController userController = new UserController(userStorage);
 
 	@BeforeAll
     static void prepare() {
