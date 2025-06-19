@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.exceptions.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
@@ -25,10 +26,13 @@ import static org.junit.jupiter.api.Assertions.*;
 class FilmorateApplicationTests {
 	static Film film = new Film();
 	static User user = new User();
+	static User me = new User();
 	static FilmStorage filmStorage = new InMemoryFilmStorage();
 	static UserStorage userStorage = new InMemoryUserStorage();
+	static UserService userService = new UserService();
 	static FilmController filmController = new FilmController(filmStorage);
-	static UserController userController = new UserController(userStorage);
+	static UserController userController = new UserController(userStorage, userService);
+
 
 	@BeforeAll
     static void prepare() {
@@ -41,6 +45,10 @@ class FilmorateApplicationTests {
 		user.setEmail("mail@mail.ru");
 		user.setBirthday(LocalDate.of(2000, Month.JANUARY, 1));
 		user.setName("Name");
+
+		me.setLogin("Me");
+		me.setEmail("my@mail.ru");
+		userController.create(me);
 	}
 
 	@Test
@@ -278,7 +286,7 @@ class FilmorateApplicationTests {
 
 	@Test
 	void changeUser() {
-		Integer userId = userController.create(user).getId();
+		Long userId = userController.create(user).getId();
 		User userUpdate = new User();
 		userUpdate.setId(userId);
 		userUpdate.setName("New name");
@@ -304,7 +312,7 @@ class FilmorateApplicationTests {
 		User userToUpdate = new User();
 		userToUpdate.setEmail("not_found@mail.ru");
 		userToUpdate.setLogin("Not_Found");
-		Integer userId = userController.create(userToUpdate).getId();
+		Long userId = userController.create(userToUpdate).getId();
 		User userUpdate = new User();
 		userUpdate.setId(userId + 1);
 		userUpdate.setName("New name");
@@ -317,7 +325,7 @@ class FilmorateApplicationTests {
 		User userToUpdate = new User();
 		userToUpdate.setEmail("late_birthday@mail.ru");
 		userToUpdate.setLogin("Late_Birthday");
-		Integer userId = userController.create(userToUpdate).getId();
+		Long userId = userController.create(userToUpdate).getId();
 		User userUpdate = new User();
 		userUpdate.setId(userId);
 		userUpdate.setBirthday(LocalDate.now().plusDays(5));
@@ -330,7 +338,7 @@ class FilmorateApplicationTests {
 		User userToUpdate = new User();
 		userToUpdate.setEmail("login_with_spaces@mail.ru");
 		userToUpdate.setLogin("Login_With_Spaces");
-		Integer userId = userController.create(userToUpdate).getId();
+		Long userId = userController.create(userToUpdate).getId();
 		User userUpdate = new User();
 		userUpdate.setId(userId);
 		userUpdate.setLogin("Currupted User");
@@ -348,7 +356,7 @@ class FilmorateApplicationTests {
 		User userToUpdate = new User();
 		userToUpdate.setEmail("duplicated_login@mail.ru");
 		userToUpdate.setLogin("Duplicated_Login");
-		Integer userId = userController.create(userToUpdate).getId();
+		Long userId = userController.create(userToUpdate).getId();
 		User userUpdate = new User();
 		userUpdate.setId(userId);
 		userUpdate.setLogin("Ok_User_update");
@@ -361,7 +369,7 @@ class FilmorateApplicationTests {
 		User userToUpdate = new User();
 		userToUpdate.setEmail("wrong_mail@mail.ru");
 		userToUpdate.setLogin("Wrong_Mail");
-		Integer userId = userController.create(userToUpdate).getId();
+		Long userId = userController.create(userToUpdate).getId();
 		User userUpdate = new User();
 		userUpdate.setId(userId);
 		userUpdate.setEmail("mail");
@@ -379,12 +387,64 @@ class FilmorateApplicationTests {
 		User userToUpdate = new User();
 		userToUpdate.setEmail("duplicated_mail@mail.ru");
 		userToUpdate.setLogin("Duplicated_Mail");
-		Integer userId = userController.create(userToUpdate).getId();
+		Long userId = userController.create(userToUpdate).getId();
 		User userUpdate = new User();
 		userUpdate.setId(userId);
 		userUpdate.setEmail("ok_mail_updated@mail.ru");
 
 		assertThrows(DuplicatedDataException.class, () -> userController.update(userUpdate));
+	}
+
+	@Test
+	void addFriend() {
+		User friend = new User();
+		friend.setLogin("Friend");
+		friend.setEmail("friend@mail.ru");
+		userController.create(friend);
+		assertEquals(1, userController.addFriend(me, friend).size());
+		assertEquals(me.getFriends().size(), friend.getFriends().size());
+		assertTrue(me.getFriends().contains(friend.getId()));
+		assertTrue(friend.getFriends().contains(me.getId()));
+	}
+
+	@Test
+	void addFriendToNoUser() {
+		User userNoFriends = new User();
+		User friend = new User();
+		friend.setLogin("Friend_To_Nobody");
+		friend.setEmail("friend-to-nobody@mail.ru");
+		userController.create(friend);
+		userNoFriends.setId((long) (userController.findAll().size() + 1));
+		assertThrows(NotFoundException.class, () -> userController.addFriend(userNoFriends, friend));
+		assertNull(friend.getFriends());
+		assertNull(userNoFriends.getFriends());
+	}
+
+	@Test
+	void addNoFriend() {
+		User friend = new User();
+		friend.setLogin("No_Friend");
+		friend.setEmail("no-friend@mail.ru");
+		friend.setId((long) (userController.findAll().size() + 1));
+		assertThrows(NotFoundException.class, () -> userController.addFriend(me, friend));
+		assertNull(friend.getFriends());
+	}
+
+	@Test
+	void addDuplicatedFriend() {
+		User friend = new User();
+		friend.setLogin("Duplicated_Friend");
+		friend.setEmail("duplicated-friend@mail.ru");
+		userController.create(friend);
+		userController.addFriend(me, friend);
+		int friendAmount = me.getFriends().size();
+		assertThrows(DuplicatedDataException.class, () -> userController.addFriend(me, friend));
+		assertEquals(friendAmount, me.getFriends().size());
+	}
+
+	@Test
+	void addSelfFriend() {
+		assertThrows(ConditionsNotMetException.class, () -> userController.addFriend(me, me));
 	}
 
 	@Test
@@ -397,6 +457,6 @@ class FilmorateApplicationTests {
 		Collection<User> controllerUserList = userController.findAll();
 
 		assertNotNull(controllerUserList);
-		assertEquals(controllerUserList.size(), 8);
+		assertEquals(controllerUserList.size(), 9);
 	}
 }
