@@ -11,11 +11,12 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @Component
 public class InMemoryUserStorage implements UserStorage {
-    private Map<Integer, User> userList = new HashMap<>();
+    private Map<Long, User> userList = new HashMap<>();
 
     @Override
     public Collection<User> findAll() {
@@ -109,9 +110,15 @@ public class InMemoryUserStorage implements UserStorage {
         return newUser;
     }
 
-    private Integer getNextId() {
-        int maxId = userList.keySet().stream()
-                .mapToInt(id -> id)
+    @Override
+    public Optional<User> findUserById(Long id) {
+        Optional<User> user = Optional.of(userList.get(id));
+        return user;
+    }
+
+    private Long getNextId() {
+        long maxId = userList.keySet().stream()
+                .mapToLong(id -> id)
                 .max()
                 .orElse(0);
         return ++maxId;
