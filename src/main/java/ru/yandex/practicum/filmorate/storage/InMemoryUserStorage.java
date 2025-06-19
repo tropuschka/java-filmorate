@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
 import ru.yandex.practicum.filmorate.exceptions.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
@@ -12,6 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
+@Component
 public class InMemoryUserStorage implements UserStorage {
     private Map<Integer, User> userList = new HashMap<>();
 
