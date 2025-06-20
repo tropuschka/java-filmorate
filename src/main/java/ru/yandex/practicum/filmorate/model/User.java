@@ -13,11 +13,15 @@ public class User {
     private String login;
     private String name;
     private LocalDate birthday;
-    private Set<Long> friends;
+    private Set<Long> friends = new HashSet<>();;
 
-    public Set<Long> addUserFriend(User user) {
-        if (friends == null) friends = new HashSet<>();
+    public Set<Long> addFriend(User user) {
         friends.add(user.getId());
+        return friends;
+    }
+
+    public Set<Long> deleteFriend(User user) {
+        friends.remove(user.getId());
         return friends;
     }
 }

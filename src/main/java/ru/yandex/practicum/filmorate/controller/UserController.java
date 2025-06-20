@@ -40,6 +40,11 @@ public class UserController {
 
     @PostMapping("/friends")
     public Set<Long> addFriend(@RequestBody User user, User friend) {
-        return userService.addFriend(userStorage, user, friend);
+        return userService.addUserFriend(userStorage, user, friend);
+    }
+
+    @DeleteMapping("/friends")
+    public Set<Long> deleteFriend(@RequestBody User user, User friend) {
+        return userService.deleteUserFriend(userStorage, user, friend);
     }
 }

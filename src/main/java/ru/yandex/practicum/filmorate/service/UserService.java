@@ -13,7 +13,7 @@ import java.util.Set;
 @Slf4j
 @Service
 public class UserService {
-    public Set<Long> addFriend(UserStorage userStorage, User user, User friend) {
+    public Set<Long> addUserFriend(UserStorage userStorage, User user, User friend) {
         if (userStorage.findUserById(user.getId()).isEmpty()
                 || userStorage.findUserById(friend.getId()).isEmpty()) {
             throwNotFoundException("Пользователь не существует");
@@ -27,9 +27,24 @@ public class UserService {
                 throwDuplicationException("Пользователь уже добавлен");
             }
         }
-        user.addUserFriend(friend);
-        friend.addUserFriend(user);
+        user.addFriend(friend);
+        friend.addFriend(user);
         log.trace("Пользователь {} добавлен в список друзей пользователя {}", friend.getName(), user.getName());
+        return user.getFriends();
+    }
+
+    public Set<Long> deleteUserFriend(UserStorage userStorage, User user, User friend) {
+        if (userStorage.findUserById(user.getId()).isEmpty()
+                || userStorage.findUserById(friend.getId()).isEmpty()) {
+            throwNotFoundException("Пользователь не существует");
+        }
+        if (user.equals(friend)
+                || !(user.getFriends().contains(friend.getId()) && friend.getFriends().contains(user.getId()))) {
+            throwNotFoundException("Пользователя нет у вас в друзьях");
+        }
+        if (user.getFriends().contains(friend.getId())) user.deleteFriend(friend);
+        if (friend.getFriends().contains(user.getId())) friend.deleteFriend(user);
+        log.trace("Пользователь {} удален из списка друзей пользователя {}", friend.getName(), user.getName());
         return user.getFriends();
     }
 
