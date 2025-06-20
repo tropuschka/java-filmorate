@@ -125,7 +125,7 @@ class FilmorateApplicationTests {
 
 	@Test
 	void changeFilm() {
-		Integer filmId = filmController.create(film).getId();
+		Long filmId = filmController.create(film).getId();
 		Film filmUpdate = new Film();
 		filmUpdate.setId(filmId);
 		filmUpdate.setName("New name");
@@ -148,7 +148,7 @@ class FilmorateApplicationTests {
 
 	@Test
 	void changeFilmNotFound() {
-		Integer filmId = filmController.create(film).getId();
+		Long filmId = filmController.create(film).getId();
 		Film filmUpdate = new Film();
 		filmUpdate.setId(filmId + 1);
 		filmUpdate.setName("New name");
@@ -158,7 +158,7 @@ class FilmorateApplicationTests {
 
 	@Test
 	void changeFilmLongDescription() {
-		Integer filmId = filmController.create(film).getId();
+		Long filmId = filmController.create(film).getId();
 		Film filmUpdate = new Film();
 		filmUpdate.setId(filmId);
 		String description = "Друзья играют в мафию, но по какой-то причине не успевают закончить партию. " +
@@ -171,7 +171,7 @@ class FilmorateApplicationTests {
 
 	@Test
 	void changeFilmDurationNull() {
-		Integer filmId = filmController.create(film).getId();
+		Long filmId = filmController.create(film).getId();
 		Film filmUpdate = new Film();
 		filmUpdate.setId(filmId);
 		filmUpdate.setDuration(0);
@@ -181,7 +181,7 @@ class FilmorateApplicationTests {
 
 	@Test
 	void changeFilmDurationNegative() {
-		Integer filmId = filmController.create(film).getId();
+		Long filmId = filmController.create(film).getId();
 		Film filmUpdate = new Film();
 		filmUpdate.setId(filmId);
 		filmUpdate.setDuration(-5);
@@ -191,12 +191,44 @@ class FilmorateApplicationTests {
 
 	@Test
 	void changeFilmEarlyDate() {
-		Integer filmId = filmController.create(film).getId();
+		Long filmId = filmController.create(film).getId();
 		Film filmUpdate = new Film();
 		filmUpdate.setId(filmId);
 		filmUpdate.setReleaseDate(LocalDate.of(1895, Month.NOVEMBER, 20));
 
 		assertThrows(ConditionsNotMetException.class, () -> filmController.update(filmUpdate));
+	}
+
+	@Test
+	void likeFilm() {
+		Film likeFilm = new Film();
+		likeFilm.setName("Like Film");
+		filmController.create(likeFilm);
+		int filmLikes = likeFilm.getLikes().size();
+		filmController.like(me, likeFilm.getId());
+		assertEquals(filmLikes + 1, likeFilm.getLikes().size());
+		assertTrue(likeFilm.getLikes().contains(me.getId()));
+	}
+
+	@Test
+	void likeNoFilm() {
+		Film likeFilm = new Film();
+		likeFilm.setName("No Film");
+		likeFilm.setId((long) filmController.findAll().size() + 1);
+		assertThrows(NotFoundException.class, () -> filmController.like(me, likeFilm.getId()));
+		assertEquals(0, likeFilm.getLikes().size());
+		assertFalse(likeFilm.getLikes().contains(me.getId()));
+	}
+
+	@Test
+	void likeFilmDouble() {
+		Film likeFilm = new Film();
+		likeFilm.setName("Double Liked Film");
+		filmController.create(likeFilm);
+		filmController.like(me, likeFilm.getId());
+		int likeAmount = likeFilm.getLikes().size();
+		assertThrows(DuplicatedDataException.class, () -> filmController.like(me, likeFilm.getId()));
+		assertEquals(likeAmount, likeFilm.getLikes().size());
 	}
 
 	@Test
@@ -209,7 +241,7 @@ class FilmorateApplicationTests {
 		Collection<Film> controllerFilmList = filmController.findAll();
 
 		assertNotNull(controllerFilmList);
-		assertEquals(controllerFilmList.size(), 4);
+		assertEquals(5, controllerFilmList.size());
 	}
 
 	@Test
