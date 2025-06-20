@@ -11,8 +11,8 @@ import java.util.Optional;
 @Slf4j
 @Service
 public class FilmService {
-    public static Film likeFilm(FilmStorage filmStorage, User user, Long FilmId) {
-        Optional<Film> optionalFilm = filmStorage.findFilmById(FilmId);
+    public static Film likeFilm(FilmStorage filmStorage, User user, Long filmId) {
+        Optional<Film> optionalFilm = filmStorage.findFilmById(filmId);
         if (optionalFilm.isEmpty()) {
             ExceptionService.throwNotFoundException("Фильм не найден");
         }
@@ -23,6 +23,20 @@ public class FilmService {
         film.like(user.getId());
         log.trace("Пользователь {} оценил фильм {} (количество лайков: {})",
                 user.getName(), film.getName(), film.getLikes().size());
+        return film;
+    }
+
+    public static Film dislikeFilm(FilmStorage filmStorage, User user, Long filmId) {
+        Optional<Film> optionalFilm = filmStorage.findFilmById(filmId);
+        if (optionalFilm.isEmpty()) {
+            ExceptionService.throwNotFoundException("Фильм не найден");
+        }
+        Film film = optionalFilm.get();
+        if (!film.getLikes().contains(user.getId())) {
+            ExceptionService.throwDuplicationException("Пользователь " + user.getName()
+                    + "не оценивал фильм " + film.getName());
+        }
+        film.dislike(user.getId());
         return film;
     }
 }

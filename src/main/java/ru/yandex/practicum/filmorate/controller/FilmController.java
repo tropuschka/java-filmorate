@@ -41,4 +41,9 @@ public class FilmController {
     public Film like(@RequestBody User user, @RequestParam Long id) {
         return FilmService.likeFilm(filmStorage, user, id);
     }
+
+    @DeleteMapping("/like")
+    public Film dislike(@RequestBody User user, @RequestParam Long id) {
+        return FilmService.dislikeFilm(filmStorage, user, id);
+    }
 }
