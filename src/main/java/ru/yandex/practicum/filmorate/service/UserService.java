@@ -38,8 +38,10 @@ public class UserService {
                 || userStorage.findUserById(friend.getId()).isEmpty()) {
             throwNotFoundException("Пользователь не существует");
         }
-        if (user.equals(friend)
-                || !(user.getFriends().contains(friend.getId()) && friend.getFriends().contains(user.getId()))) {
+        if (user.equals(friend)) {
+            throwValidationException("Нельзя удалить из друзей себя");
+        }
+        if (!(user.getFriends().contains(friend.getId()) && friend.getFriends().contains(user.getId()))) {
             throwNotFoundException("Пользователя нет у вас в друзьях");
         }
         if (user.getFriends().contains(friend.getId())) user.deleteFriend(friend);

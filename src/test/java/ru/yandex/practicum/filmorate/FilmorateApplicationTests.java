@@ -416,8 +416,8 @@ class FilmorateApplicationTests {
 		userController.create(friend);
 		userNoFriends.setId((long) (userController.findAll().size() + 1));
 		assertThrows(NotFoundException.class, () -> userController.addFriend(userNoFriends, friend));
-		assertNull(friend.getFriends());
-		assertNull(userNoFriends.getFriends());
+		assertFalse(friend.getFriends().contains(userNoFriends.getId()));
+		assertFalse(userNoFriends.getFriends().contains(friend.getId()));
 	}
 
 	@Test
@@ -427,7 +427,8 @@ class FilmorateApplicationTests {
 		friend.setEmail("no-friend@mail.ru");
 		friend.setId((long) (userController.findAll().size() + 1));
 		assertThrows(NotFoundException.class, () -> userController.addFriend(me, friend));
-		assertNull(friend.getFriends());
+		assertFalse(friend.getFriends().contains(me.getId()));
+		assertFalse(me.getFriends().contains(friend.getId()));
 	}
 
 	@Test
@@ -448,6 +449,46 @@ class FilmorateApplicationTests {
 	}
 
 	@Test
+	void deleteFriend() {
+		User friend = new User();
+		friend.setLogin("Delete_Friend");
+		friend.setEmail("delete-friend@mail.ru");
+		userController.create(friend);
+		me.addFriend(friend);
+		friend.addFriend(me);
+		int friendAmount = me.getFriends().size();
+		friendAmount--;
+		assertEquals(friendAmount, userController.deleteFriend(me, friend).size());
+		assertFalse(me.getFriends().contains(friend.getId()));
+		assertFalse(friend.getFriends().contains(me.getId()));
+	}
+
+	@Test
+	void deleteNotExistingFriend() {
+		User friend = new User();
+		friend.setLogin("Delete_Not_Existing_Friend");
+		friend.setEmail("delete-not-existing-friend@mail.ru");
+		friend.setId((long) userController.findAll().size() + 1);
+		me.addFriend(friend);
+		friend.addFriend(me);
+		assertThrows(NotFoundException.class, () -> userController.deleteFriend(me, friend));
+	}
+
+	@Test
+	void deleteNotAFriend() {
+		User friend = new User();
+		friend.setLogin("Delete_Not_A_Friend");
+		friend.setEmail("delete-not-a-friend@mail.ru");
+		userController.create(friend);
+		assertThrows(NotFoundException.class, () -> userController.deleteFriend(me, friend));
+	}
+
+	@Test
+	void deleteSelfFriend() {
+		assertThrows(ConditionsNotMetException.class, () -> userController.deleteFriend(me, me));
+	}
+
+	@Test
 	void getAllUsers() {
 		User user2 = new User();
 		user2.setLogin("User");
@@ -457,6 +498,6 @@ class FilmorateApplicationTests {
 		Collection<User> controllerUserList = userController.findAll();
 
 		assertNotNull(controllerUserList);
-		assertEquals(controllerUserList.size(), 9);
+		assertEquals(11, controllerUserList.size());
 	}
 }
