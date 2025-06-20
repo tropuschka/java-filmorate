@@ -66,6 +66,8 @@ public class UserService {
         Set<Long> sharedFriends = user.getFriends().stream()
                 .filter(friend.getFriends()::contains)
                 .collect(Collectors.toSet());
+        log.trace("У пользователя {} и пользователя {} {} общих друзей",
+                user.getName(), friend.getName(), sharedFriends.size());
         return sharedFriends;
     }
 }

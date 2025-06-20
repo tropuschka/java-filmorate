@@ -4,7 +4,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.Collection;
 
@@ -32,5 +35,10 @@ public class FilmController {
     @PutMapping
     public Film update(@RequestBody Film film) {
         return filmStorage.update(film);
+    }
+
+    @PostMapping("/like")
+    public Film like(@RequestBody User user, @RequestParam Long id) {
+        return FilmService.likeFilm(filmStorage, user, id);
     }
 }

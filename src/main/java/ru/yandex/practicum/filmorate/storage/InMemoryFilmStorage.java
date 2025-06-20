@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.ExceptionService;
 
 import java.time.LocalDate;
@@ -10,11 +11,12 @@ import java.time.Month;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
-    private Map<Integer, Film> filmList = new HashMap<>();
+    private Map<Long, Film> filmList = new HashMap<>();
 
     @Override
     public Collection<Film> findAll() {
@@ -88,9 +90,15 @@ public class InMemoryFilmStorage implements FilmStorage {
         return newFilm;
     }
 
-    private Integer getNextId() {
-        int maxId = filmList.keySet().stream()
-                .mapToInt(id -> id)
+    @Override
+    public Optional<Film> findFilmById(Long id) {
+        Optional<Film> film = Optional.ofNullable(filmList.get(id));
+        return film;
+    }
+
+    private Long getNextId() {
+        long maxId = filmList.keySet().stream()
+                .mapToLong(id -> id)
                 .max()
                 .orElse(0);
         return ++maxId;
