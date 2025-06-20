@@ -10,7 +10,6 @@ import ru.yandex.practicum.filmorate.exceptions.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
@@ -27,11 +26,13 @@ class FilmorateApplicationTests {
 	static Film film = new Film();
 	static User user = new User();
 	static User me = new User();
+	static User myFriend = new User();
+	static User othersFriend = new User();
+	static User sharedFriend = new User();
 	static FilmStorage filmStorage = new InMemoryFilmStorage();
 	static UserStorage userStorage = new InMemoryUserStorage();
-	static UserService userService = new UserService();
 	static FilmController filmController = new FilmController(filmStorage);
-	static UserController userController = new UserController(userStorage, userService);
+	static UserController userController = new UserController(userStorage);
 
 
 	@BeforeAll
@@ -49,6 +50,20 @@ class FilmorateApplicationTests {
 		me.setLogin("Me");
 		me.setEmail("my@mail.ru");
 		userController.create(me);
+
+		myFriend.setLogin("My_Friend");
+		myFriend.setEmail("my-friend@mail.ru");
+		userController.create(myFriend);
+		userController.addFriend(me, myFriend);
+
+		othersFriend.setLogin("Others_Friend");
+		othersFriend.setEmail("others-friend@mail.ru");
+		userController.create(othersFriend);
+
+		sharedFriend.setLogin("Shared_Friend");
+		sharedFriend.setEmail("shared-friend@mail.ru");
+		userController.create(sharedFriend);
+		me.addFriend(sharedFriend);
 	}
 
 	@Test
@@ -401,8 +416,7 @@ class FilmorateApplicationTests {
 		friend.setLogin("Friend");
 		friend.setEmail("friend@mail.ru");
 		userController.create(friend);
-		assertEquals(1, userController.addFriend(me, friend).size());
-		assertEquals(me.getFriends().size(), friend.getFriends().size());
+		assertEquals(3, userController.addFriend(me, friend).size());
 		assertTrue(me.getFriends().contains(friend.getId()));
 		assertTrue(friend.getFriends().contains(me.getId()));
 	}
@@ -489,6 +503,54 @@ class FilmorateApplicationTests {
 	}
 
 	@Test
+	void findSharedFriends() {
+		User otherUser = new User();
+		otherUser.setLogin("Other_User");
+		otherUser.setEmail("other-user@mail.ru");
+		userController.create(otherUser);
+		me.addFriend(sharedFriend);
+		otherUser.addFriend(othersFriend);
+		otherUser.addFriend(sharedFriend);
+		assertTrue(userController.findSharedFriends(me, otherUser).contains(sharedFriend.getId()));
+		assertEquals(1, userController.findSharedFriends(me, otherUser).size());
+	}
+
+	@Test
+	void findNoSharedFriends() {
+		User otherUser = new User();
+		otherUser.setLogin("User_With_No_Shared_Friends");
+		otherUser.setEmail("other-user-with-no-shared@mail.ru");
+		userController.create(otherUser);
+		otherUser.addFriend(othersFriend);
+		assertEquals(0, userController.findSharedFriends(me, otherUser).size());
+	}
+
+	@Test
+	void findSharedFriendsWithNoUser() {
+		User otherUser = new User();
+		otherUser.setLogin("No_User");
+		otherUser.setEmail("no-user@mail.ru");
+		otherUser.addFriend(othersFriend);
+		otherUser.addFriend(sharedFriend);
+		assertThrows(NotFoundException.class, () -> userController.findSharedFriends(me, otherUser).size());
+	}
+
+	@Test
+	void findSharedFriendsOfNoUser() {
+		User otherUser = new User();
+		otherUser.setLogin("No_User");
+		otherUser.setEmail("no-user@mail.ru");
+		otherUser.addFriend(othersFriend);
+		otherUser.addFriend(sharedFriend);
+		assertThrows(NotFoundException.class, () -> userController.findSharedFriends(otherUser, me).size());
+	}
+
+	@Test
+	void findSelfSharedFriends() {
+		assertThrows(ConditionsNotMetException.class, () -> userController.findSharedFriends(me, me).size());
+	}
+
+	@Test
 	void getAllUsers() {
 		User user2 = new User();
 		user2.setLogin("User");
@@ -498,6 +560,6 @@ class FilmorateApplicationTests {
 		Collection<User> controllerUserList = userController.findAll();
 
 		assertNotNull(controllerUserList);
-		assertEquals(11, controllerUserList.size());
+		assertEquals(15, controllerUserList.size());
 	}
 }

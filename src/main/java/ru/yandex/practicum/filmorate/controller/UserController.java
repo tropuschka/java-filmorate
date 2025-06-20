@@ -15,12 +15,10 @@ import java.util.Set;
 @RequestMapping("/users")
 public class UserController {
     private final UserStorage userStorage;
-    private final UserService userService;
 
     @Autowired
-    public UserController(UserStorage userStorage, UserService userService) {
+    public UserController(UserStorage userStorage) {
         this.userStorage = userStorage;
-        this.userService = userService;
     }
 
     @GetMapping
@@ -38,13 +36,18 @@ public class UserController {
         return userStorage.update(user);
     }
 
+    @GetMapping("/friends")
+    public Set<Long> findSharedFriends(@RequestBody User user, User friend) {
+        return UserService.findSharedFriend(userStorage, user, friend);
+    }
+
     @PostMapping("/friends")
     public Set<Long> addFriend(@RequestBody User user, User friend) {
-        return userService.addUserFriend(userStorage, user, friend);
+        return UserService.addUserFriend(userStorage, user, friend);
     }
 
     @DeleteMapping("/friends")
     public Set<Long> deleteFriend(@RequestBody User user, User friend) {
-        return userService.deleteUserFriend(userStorage, user, friend);
+        return UserService.deleteUserFriend(userStorage, user, friend);
     }
 }

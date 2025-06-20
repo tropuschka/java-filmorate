@@ -2,9 +2,8 @@ package ru.yandex.practicum.filmorate.storage;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
-import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.ExceptionService;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -25,16 +24,16 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film create(Film film) {
         if (film.getName() == null || film.getName().isBlank()) {
-            throwValidationException("Название должно быть указано");
+            ExceptionService.throwValidationException("Название должно быть указано");
         }
         if (film.getDescription() != null && film.getDescription().length() > 200) {
-            throwValidationException("Описание не должно быть длиннее 200 символов");
+            ExceptionService.throwValidationException("Описание не должно быть длиннее 200 символов");
         }
         if (film.getReleaseDate() != null && film.getReleaseDate().isBefore(LocalDate.of(1895, Month.DECEMBER, 28))) {
-            throwValidationException("Дата релиза не может быть раньше 28 декабря 1885 года");
+            ExceptionService.throwValidationException("Дата релиза не может быть раньше 28 декабря 1885 года");
         }
         if (film.getDuration() != null && !(film.getDuration() > 0)) {
-            throwValidationException("Длительность фильма должна быть положительной");
+            ExceptionService.throwValidationException("Длительность фильма должна быть положительной");
         }
         film.setId(getNextId());
         filmList.put(film.getId(), film);
@@ -45,10 +44,10 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film update(Film film) {
         if (film.getId() == null) {
-            throwValidationException("Id должен быть указан");
+            ExceptionService.throwValidationException("Id должен быть указан");
         }
         if (!filmList.containsKey(film.getId())) {
-            throwNotFoundException("Фильм не найден");
+            ExceptionService.throwNotFoundException("Фильм не найден");
         }
         Film oldFilm = filmList.get(film.getId());
         Film newFilm = new Film();
@@ -61,7 +60,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         }
         if (film.getDescription() != null) {
             if (film.getDescription().length() > 200) {
-                throwValidationException("Описание не должно быть длиннее 200 символов");
+                ExceptionService.throwValidationException("Описание не должно быть длиннее 200 символов");
             }
             newFilm.setDescription(film.getDescription());
         } else {
@@ -69,7 +68,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         }
         if (film.getDuration() != null) {
             if (!(film.getDuration() > 0)) {
-                throwValidationException("Длительность фильма должна быть положительной");
+                ExceptionService.throwValidationException("Длительность фильма должна быть положительной");
             }
             newFilm.setDuration(film.getDuration());
         } else {
@@ -77,7 +76,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         }
         if (film.getReleaseDate() != null) {
             if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
-                throwValidationException("Дата релиза не может быть раньше 28 декабря 1885 года");
+                ExceptionService.throwValidationException("Дата релиза не может быть раньше 28 декабря 1885 года");
             }
             newFilm.setReleaseDate(film.getReleaseDate());
         } else {
@@ -95,15 +94,5 @@ public class InMemoryFilmStorage implements FilmStorage {
                 .max()
                 .orElse(0);
         return ++maxId;
-    }
-
-    private void throwValidationException(String message) {
-        log.error(message);
-        throw new ConditionsNotMetException(message);
-    }
-
-    private void throwNotFoundException(String message) {
-        log.error(message);
-        throw new NotFoundException(message);
     }
 }
