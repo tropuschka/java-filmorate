@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 class FilmorateApplicationTests {
 	static Film film = new Film();
+	static Film dislikeFilm = new Film();
 	static User user = new User();
 	static User me = new User();
 	static User myFriend = new User();
@@ -64,6 +65,10 @@ class FilmorateApplicationTests {
 		sharedFriend.setEmail("shared-friend@mail.ru");
 		userController.create(sharedFriend);
 		me.addFriend(sharedFriend);
+
+		dislikeFilm.setName("Dislike Film");
+		filmController.create(dislikeFilm);
+		filmController.like(me, dislikeFilm.getId());
 	}
 
 	@Test
@@ -232,6 +237,31 @@ class FilmorateApplicationTests {
 	}
 
 	@Test
+	void dislikeFilm() {
+		int likeAmount = dislikeFilm.getLikes().size();
+		filmController.dislike(me, dislikeFilm.getId());
+		assertEquals(likeAmount - 1, dislikeFilm.getLikes().size());
+		assertFalse(dislikeFilm.getLikes().contains(me.getId()));
+	}
+
+	@Test
+	void dislikeNoFilm() {
+		Film dislikeFilm = new Film();
+		dislikeFilm.setName("No Film");
+		Long filmId = (long) filmController.findAll().size() + 1;
+		dislikeFilm.setId(filmId);
+		assertThrows(NotFoundException.class, () -> filmController.dislike(me, dislikeFilm.getId()));
+		assertEquals(0, dislikeFilm.getLikes().size());
+	}
+
+	@Test
+	void dislikeNotLikedFilm() {
+		int likeAmount = dislikeFilm.getLikes().size();
+		assertThrows(ConditionsNotMetException.class, () -> filmController.dislike(myFriend, dislikeFilm.getId()));
+		assertEquals(likeAmount, dislikeFilm.getLikes().size());
+	}
+
+	@Test
 	void getAllFilms() {
 		Film film2 = film;
 		film2.setName("Film");
@@ -241,7 +271,7 @@ class FilmorateApplicationTests {
 		Collection<Film> controllerFilmList = filmController.findAll();
 
 		assertNotNull(controllerFilmList);
-		assertEquals(5, controllerFilmList.size());
+		assertEquals(6, controllerFilmList.size());
 	}
 
 	@Test
