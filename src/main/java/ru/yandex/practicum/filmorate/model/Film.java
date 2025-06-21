@@ -22,4 +22,8 @@ public class Film {
     public void dislike(Long userId) {
         likes.remove(userId);
     }
+
+    public Integer likeAmount() {
+        return likes.size();
+    }
 }

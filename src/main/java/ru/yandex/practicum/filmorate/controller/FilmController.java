@@ -46,4 +46,9 @@ public class FilmController {
     public Film dislike(@RequestBody User user, @RequestParam Long id) {
         return FilmService.dislikeFilm(filmStorage, user, id);
     }
+
+    @GetMapping("/top")
+    public Collection<Film> getTop() {
+        return FilmService.getTop(filmStorage);
+    }
 }

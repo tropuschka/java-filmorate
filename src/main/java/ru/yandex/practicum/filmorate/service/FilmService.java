@@ -6,7 +6,8 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -38,5 +39,13 @@ public class FilmService {
         }
         film.dislike(user.getId());
         return film;
+    }
+
+    public static Collection<Film> getTop(FilmStorage filmStorage) {
+        List<Film> filmTop = filmStorage.findAll().stream()
+                .sorted(Comparator.comparing(Film::likeAmount).reversed())
+                .collect(Collectors.toList());
+        if (filmTop.size() > 10) return filmTop.subList(0, 9);
+        else return filmTop;
     }
 }
