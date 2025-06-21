@@ -17,6 +17,7 @@ import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.ArrayList;
 import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -34,6 +35,17 @@ class FilmorateApplicationTests {
 	static UserStorage userStorage = new InMemoryUserStorage();
 	static FilmController filmController = new FilmController(filmStorage);
 	static UserController userController = new UserController(userStorage);
+	static Film topFilm1 = new Film();
+	static Film topFilm2 = new Film();
+	static Film topFilm3 = new Film();
+	static Film topFilm4 = new Film();
+	static Film topFilm5 = new Film();
+	static Film topFilm6 = new Film();
+	static Film topFilm7 = new Film();
+	static Film topFilm8 = new Film();
+	static Film topFilm9 = new Film();
+	static FilmStorage topFilmStorage = new InMemoryFilmStorage();
+	static FilmController topFilmController = new FilmController(topFilmStorage);
 
 
 	@BeforeAll
@@ -69,6 +81,39 @@ class FilmorateApplicationTests {
 		dislikeFilm.setName("Dislike Film");
 		filmController.create(dislikeFilm);
 		filmController.like(me, dislikeFilm.getId());
+
+		topFilm1.setName("Film 1");
+		topFilmController.create(topFilm1);
+		topFilmController.like(me, topFilm1.getId());
+
+		topFilm2.setName("Film 2");
+		topFilmController.create(topFilm2);
+
+		topFilm3.setName("Film 3");
+		topFilmController.create(topFilm3);
+		topFilmController.like(me, topFilm3.getId());
+		topFilmController.like(myFriend, topFilm3.getId());
+
+		topFilm4.setName("Film 4");
+		topFilmController.create(topFilm4);
+		topFilmController.like(me, topFilm4.getId());
+		topFilmController.like(myFriend, topFilm4.getId());
+		topFilmController.like(othersFriend, topFilm4.getId());
+
+		topFilm5.setName("Film 5");
+		topFilmController.create(topFilm5);
+
+		topFilm6.setName("Film 6");
+		topFilmController.create(topFilm6);
+
+		topFilm7.setName("Film 7");
+		topFilmController.create(topFilm7);
+
+		topFilm8.setName("Film 8");
+		topFilmController.create(topFilm8);
+
+		topFilm9.setName("Film 9");
+		topFilmController.create(topFilm9);
 	}
 
 	@Test
@@ -259,6 +304,35 @@ class FilmorateApplicationTests {
 		int likeAmount = dislikeFilm.getLikes().size();
 		assertThrows(ConditionsNotMetException.class, () -> filmController.dislike(myFriend, dislikeFilm.getId()));
 		assertEquals(likeAmount, dislikeFilm.getLikes().size());
+	}
+
+	@Test
+	void getFilmTop9() {
+		ArrayList<Film> filmTop = (ArrayList<Film>) topFilmController.getTop();
+		assertEquals(9, filmTop.size());
+		assertEquals(filmTop.getFirst(), topFilm4);
+		assertEquals(filmTop.get(1), topFilm3);
+		assertEquals(filmTop.get(2), topFilm1);
+	}
+
+	@Test
+	void getFilmTop10() {
+		topFilmController.create(film);
+		ArrayList<Film> filmTop = (ArrayList<Film>) topFilmController.getTop();
+		assertEquals(10, filmTop.size());
+		assertEquals(filmTop.getFirst(), topFilm4);
+		assertEquals(filmTop.get(1), topFilm3);
+		assertEquals(filmTop.get(2), topFilm1);
+	}
+
+	@Test
+	void getFilmTop11() {
+		topFilmController.create(dislikeFilm);
+		ArrayList<Film> filmTop = (ArrayList<Film>) topFilmController.getTop();
+		assertEquals(10, filmTop.size());
+		assertEquals(filmTop.getFirst(), topFilm4);
+		assertEquals(filmTop.get(1), topFilm3);
+		assertEquals(filmTop.get(2), topFilm1);
 	}
 
 	@Test
