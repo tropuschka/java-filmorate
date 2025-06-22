@@ -35,7 +35,7 @@ public class FilmController {
         return filmStorage.update(film);
     }
 
-    @PostMapping("/{id}/like/{userId}")
+    @PutMapping("/{id}/like/{userId}")
     public Film like(@PathVariable Long id, @PathVariable Long userId) {
         return FilmService.likeFilm(filmStorage, id, userId);
     }
