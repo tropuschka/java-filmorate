@@ -132,7 +132,9 @@ class FilmorateApplicationTests {
 	void createFilmNoName() {
 		Film corruptFilm = new Film();
 
-		assertThrows(ConditionsNotMetException.class, () -> filmController.create(corruptFilm));
+		ConditionsNotMetException conditionsNotMet = assertThrows(ConditionsNotMetException.class,
+				() -> filmController.create(corruptFilm));
+		assertEquals("Название должно быть указано", conditionsNotMet.getMessage());
 	}
 
 	@Test
@@ -144,7 +146,9 @@ class FilmorateApplicationTests {
 				"(дыра в завязке - надо было сразу звонить ментам)";
 		corruptFilm.setDescription(description);
 
-		assertThrows(ConditionsNotMetException.class, () -> filmController.create(corruptFilm));
+		ConditionsNotMetException conditionsNotMet = assertThrows(ConditionsNotMetException.class,
+				() -> filmController.create(corruptFilm));
+		assertEquals("Описание не должно быть длиннее 200 символов", conditionsNotMet.getMessage());
 	}
 
 	@Test
@@ -153,7 +157,9 @@ class FilmorateApplicationTests {
 		corruptFilm.setName("EarlyDate");
 		corruptFilm.setReleaseDate(LocalDate.of(1895, Month.NOVEMBER, 20));
 
-		assertThrows(ConditionsNotMetException.class, () -> filmController.create(corruptFilm));
+		ConditionsNotMetException conditionsNotMet = assertThrows(ConditionsNotMetException.class,
+				() -> filmController.create(corruptFilm));
+		assertEquals("Дата релиза не может быть раньше 28 декабря 1885 года", conditionsNotMet.getMessage());
 	}
 
 	@Test
@@ -162,7 +168,9 @@ class FilmorateApplicationTests {
 		corruptFilm.setName("DurationNull");
 		corruptFilm.setDuration(0);
 
-		assertThrows(ConditionsNotMetException.class, () -> filmController.create(corruptFilm));
+		ConditionsNotMetException conditionsNotMet = assertThrows(ConditionsNotMetException.class,
+				() -> filmController.create(corruptFilm));
+		assertEquals("Длительность фильма должна быть положительной", conditionsNotMet.getMessage());
 	}
 
 	@Test
@@ -171,7 +179,9 @@ class FilmorateApplicationTests {
 		corruptFilm.setName("DurationNegative");
 		corruptFilm.setDuration(-5);
 
-		assertThrows(ConditionsNotMetException.class, () -> filmController.create(corruptFilm));
+		ConditionsNotMetException conditionsNotMet = assertThrows(ConditionsNotMetException.class,
+				() -> filmController.create(corruptFilm));
+		assertEquals("Длительность фильма должна быть положительной", conditionsNotMet.getMessage());
 	}
 
 	@Test
@@ -194,7 +204,9 @@ class FilmorateApplicationTests {
 		Film filmUpdate = new Film();
 		filmUpdate.setName("New name");
 
-		assertThrows(ConditionsNotMetException.class, () -> filmController.update(filmUpdate));
+		ConditionsNotMetException conditionsNotMet = assertThrows(ConditionsNotMetException.class,
+				() -> filmController.update(filmUpdate));
+		assertEquals("Id должен быть указан", conditionsNotMet.getMessage());
 	}
 
 	@Test
@@ -204,7 +216,9 @@ class FilmorateApplicationTests {
 		filmUpdate.setId(filmId + 1);
 		filmUpdate.setName("New name");
 
-		assertThrows(NotFoundException.class, () -> filmController.update(filmUpdate));
+		NotFoundException notFoundException = assertThrows(NotFoundException.class,
+				() -> filmController.update(filmUpdate));
+		assertEquals("Фильм не найден", notFoundException.getMessage());
 	}
 
 	@Test
@@ -217,7 +231,9 @@ class FilmorateApplicationTests {
 				"(дыра в завязке - надо было сразу звонить ментам)";
 		filmUpdate.setDescription(description);
 
-		assertThrows(ConditionsNotMetException.class, () -> filmController.update(filmUpdate));
+		ConditionsNotMetException conditionsNotMetException = assertThrows(ConditionsNotMetException.class,
+				() -> filmController.update(filmUpdate));
+		assertEquals("Описание не должно быть длиннее 200 символов", conditionsNotMetException.getMessage());
 	}
 
 	@Test
@@ -227,7 +243,9 @@ class FilmorateApplicationTests {
 		filmUpdate.setId(filmId);
 		filmUpdate.setDuration(0);
 
-		assertThrows(ConditionsNotMetException.class, () -> filmController.update(filmUpdate));
+		ConditionsNotMetException conditionsNotMetException = assertThrows(ConditionsNotMetException.class,
+				() -> filmController.update(filmUpdate));
+		assertEquals("Длительность фильма должна быть положительной", conditionsNotMetException.getMessage());
 	}
 
 	@Test
@@ -237,7 +255,9 @@ class FilmorateApplicationTests {
 		filmUpdate.setId(filmId);
 		filmUpdate.setDuration(-5);
 
-		assertThrows(ConditionsNotMetException.class, () -> filmController.update(filmUpdate));
+		ConditionsNotMetException conditionsNotMetException = assertThrows(ConditionsNotMetException.class,
+				() -> filmController.update(filmUpdate));
+		assertEquals("Длительность фильма должна быть положительной", conditionsNotMetException.getMessage());
 	}
 
 	@Test
@@ -247,7 +267,10 @@ class FilmorateApplicationTests {
 		filmUpdate.setId(filmId);
 		filmUpdate.setReleaseDate(LocalDate.of(1895, Month.NOVEMBER, 20));
 
-		assertThrows(ConditionsNotMetException.class, () -> filmController.update(filmUpdate));
+		ConditionsNotMetException conditionsNotMetException = assertThrows(ConditionsNotMetException.class,
+				() -> filmController.update(filmUpdate));
+		assertEquals("Дата релиза не может быть раньше 28 декабря 1885 года",
+				conditionsNotMetException.getMessage());
 	}
 
 	@Test
@@ -266,7 +289,9 @@ class FilmorateApplicationTests {
 		Film likeFilm = new Film();
 		likeFilm.setName("No Film");
 		likeFilm.setId((long) filmController.findAll().size() + 1);
-		assertThrows(NotFoundException.class, () -> filmController.like(likeFilm.getId(), me.getId()));
+		NotFoundException notFoundException = assertThrows(NotFoundException.class,
+				() -> filmController.like(likeFilm.getId(), me.getId()));
+		assertEquals("Фильм не найден", notFoundException.getMessage());
 		assertEquals(0, likeFilm.getLikes().size());
 		assertFalse(likeFilm.getLikes().contains(me.getId()));
 	}
@@ -278,7 +303,9 @@ class FilmorateApplicationTests {
 		filmController.create(likeFilm);
 		filmController.like(likeFilm.getId(), me.getId());
 		int likeAmount = likeFilm.getLikes().size();
-		assertThrows(DuplicatedDataException.class, () -> filmController.like(likeFilm.getId(), me.getId()));
+		DuplicatedDataException duplicatedDataException = assertThrows(DuplicatedDataException.class,
+				() -> filmController.like(likeFilm.getId(), me.getId()));
+		assertEquals("Лайк уже поставлен", duplicatedDataException.getMessage());
 		assertEquals(likeAmount, likeFilm.getLikes().size());
 	}
 
@@ -296,14 +323,19 @@ class FilmorateApplicationTests {
 		dislikeNoFilm.setName("No Film");
 		Long filmId = (long) filmController.findAll().size() + 1;
 		dislikeNoFilm.setId(filmId);
-		assertThrows(NotFoundException.class, () -> filmController.dislike(dislikeNoFilm.getId(), me.getId()));
+		NotFoundException notFoundException = assertThrows(NotFoundException.class,
+				() -> filmController.dislike(dislikeNoFilm.getId(), me.getId()));
+		assertEquals("Фильм не найден", notFoundException.getMessage());
 		assertEquals(0, dislikeNoFilm.getLikes().size());
 	}
 
 	@Test
 	void dislikeNotLikedFilm() {
 		int likeAmount = dislikeFilm.getLikes().size();
-		assertThrows(ConditionsNotMetException.class, () -> filmController.dislike(dislikeFilm.getId(), myFriend.getId()));
+		ConditionsNotMetException conditionsNotMetException = assertThrows(ConditionsNotMetException.class,
+				() -> filmController.dislike(dislikeFilm.getId(), myFriend.getId()));
+		assertEquals("Пользователь с айди " + myFriend.getId() + "не оценивал фильм " + dislikeFilm.getId(),
+				conditionsNotMetException.getMessage());
 		assertEquals(likeAmount, dislikeFilm.getLikes().size());
 	}
 
@@ -360,12 +392,17 @@ class FilmorateApplicationTests {
 
 	@Test
 	void getFilmTop0() {
-		assertThrows(ConditionsNotMetException.class, () -> topFilmController.getTop(0));
+		ConditionsNotMetException conditionsNotMetException = assertThrows(ConditionsNotMetException.class,
+				() -> topFilmController.getTop(0));
+		assertEquals("Количество позиций в топе не может быть меньше 1",
+				conditionsNotMetException.getMessage());
 	}
 
 	@Test
 	void getFilmTopNegative() {
-		assertThrows(ConditionsNotMetException.class, () -> topFilmController.getTop(-1));
+		ConditionsNotMetException conditionsNotMet = assertThrows(ConditionsNotMetException.class,
+				() -> topFilmController.getTop(-1));
+		assertEquals("Количество позиций в топе не может быть меньше 1", conditionsNotMet.getMessage());
 	}
 
 	@Test
@@ -408,7 +445,9 @@ class FilmorateApplicationTests {
 		curruptUser.setLogin("CurruptedUser");
 		curruptUser.setEmail("");
 
-		assertThrows(ConditionsNotMetException.class, () -> userController.create(curruptUser));
+		ConditionsNotMetException conditionsNotMetException = assertThrows(ConditionsNotMetException.class,
+				() -> userController.create(curruptUser));
+		assertEquals("Имейл должен быть указан", conditionsNotMetException.getMessage());
 	}
 
 	@Test
@@ -417,7 +456,9 @@ class FilmorateApplicationTests {
 		curruptUser.setLogin("CurruptedUser");
 		curruptUser.setEmail("mail");
 
-		assertThrows(ConditionsNotMetException.class, () -> userController.create(curruptUser));
+		ConditionsNotMetException conditionsNotMetException = assertThrows(ConditionsNotMetException.class,
+				() -> userController.create(curruptUser));
+		assertEquals("Указан некорректный имейл", conditionsNotMetException.getMessage());
 	}
 
 	@Test
@@ -430,7 +471,9 @@ class FilmorateApplicationTests {
 		curruptUser.setLogin("CurruptedUser");
 		curruptUser.setEmail("ok_mail@mail.ru");
 
-		assertThrows(DuplicatedDataException.class, () -> userController.create(curruptUser));
+		DuplicatedDataException duplicatedDataException = assertThrows(DuplicatedDataException.class,
+				() -> userController.create(curruptUser));
+		assertEquals("Имейл уже используется", duplicatedDataException.getMessage());
 	}
 
 	@Test
@@ -439,7 +482,9 @@ class FilmorateApplicationTests {
 		curruptUser.setLogin("");
 		curruptUser.setEmail("currupted_user@mail.ru");
 
-		assertThrows(ConditionsNotMetException.class, () -> userController.create(curruptUser));
+		ConditionsNotMetException conditionsNotMetException = assertThrows(ConditionsNotMetException.class,
+				() -> userController.create(curruptUser));
+		assertEquals("Введите логин", conditionsNotMetException.getMessage());
 	}
 
 	@Test
@@ -448,7 +493,9 @@ class FilmorateApplicationTests {
 		curruptUser.setLogin("Currupted User");
 		curruptUser.setEmail("currupted_user@mail.ru");
 
-		assertThrows(ConditionsNotMetException.class, () -> userController.create(curruptUser));
+		ConditionsNotMetException conditionsNotMetException = assertThrows(ConditionsNotMetException.class,
+				() -> userController.create(curruptUser));
+		assertEquals("В логине не должно быть пробелов", conditionsNotMetException.getMessage());
 	}
 
 	@Test
@@ -461,7 +508,9 @@ class FilmorateApplicationTests {
 		curruptUser.setLogin("Ok_User");
 		curruptUser.setEmail("currupted_user@mail.ru");
 
-		assertThrows(DuplicatedDataException.class, () -> userController.create(curruptUser));
+		DuplicatedDataException duplicatedDataException = assertThrows(DuplicatedDataException.class,
+				() -> userController.create(curruptUser));
+		assertEquals("Логин уже используется", duplicatedDataException.getMessage());
 	}
 
 	@Test
@@ -471,7 +520,9 @@ class FilmorateApplicationTests {
 		curruptUser.setEmail("currupted_user@mail.ru");
 		curruptUser.setBirthday(LocalDate.now().plusDays(5));
 
-		assertThrows(ConditionsNotMetException.class, () -> userController.create(curruptUser));
+		ConditionsNotMetException conditionsNotMetException = assertThrows(ConditionsNotMetException.class,
+				() -> userController.create(curruptUser));
+		assertEquals("Указана некорректная дата рождения", conditionsNotMetException.getMessage());
 	}
 
 	@Test
@@ -494,7 +545,9 @@ class FilmorateApplicationTests {
 		User userUpdate = new User();
 		userUpdate.setName("New name");
 
-		assertThrows(ConditionsNotMetException.class, () -> userController.update(userUpdate));
+		ConditionsNotMetException conditionsNotMetException = assertThrows(ConditionsNotMetException.class,
+				() -> userController.update(userUpdate));
+		assertEquals("Id должен быть указан", conditionsNotMetException.getMessage());
 	}
 
 	@Test
@@ -507,7 +560,9 @@ class FilmorateApplicationTests {
 		userUpdate.setId(userId + 1);
 		userUpdate.setName("New name");
 
-		assertThrows(NotFoundException.class, () -> userController.update(userUpdate));
+		NotFoundException notFoundException = assertThrows(NotFoundException.class,
+				() -> userController.update(userUpdate));
+		assertEquals("Пользователь не найден", notFoundException.getMessage());
 	}
 
 	@Test
@@ -520,7 +575,9 @@ class FilmorateApplicationTests {
 		userUpdate.setId(userId);
 		userUpdate.setBirthday(LocalDate.now().plusDays(5));
 
-		assertThrows(ConditionsNotMetException.class, () -> userController.update(userUpdate));
+		ConditionsNotMetException conditionsNotMetException = assertThrows(ConditionsNotMetException.class,
+				() -> userController.update(userUpdate));
+		assertEquals("Указана некорректная дата рождения", conditionsNotMetException.getMessage());
 	}
 
 	@Test
@@ -533,7 +590,9 @@ class FilmorateApplicationTests {
 		userUpdate.setId(userId);
 		userUpdate.setLogin("Currupted User");
 
-		assertThrows(ConditionsNotMetException.class, () -> userController.update(userUpdate));
+		ConditionsNotMetException conditionsNotMetException = assertThrows(ConditionsNotMetException.class,
+				() -> userController.update(userUpdate));
+		assertEquals("В логине не должно быть пробелов", conditionsNotMetException.getMessage());
 	}
 
 	@Test
@@ -550,7 +609,9 @@ class FilmorateApplicationTests {
 		userUpdate.setId(userId);
 		userUpdate.setLogin("Ok_User_update");
 
-		assertThrows(DuplicatedDataException.class, () -> userController.update(userUpdate));
+		DuplicatedDataException duplicatedDataException = assertThrows(DuplicatedDataException.class,
+				() -> userController.update(userUpdate));
+		assertEquals("Логин уже используется", duplicatedDataException.getMessage());
 	}
 
 	@Test
@@ -563,7 +624,9 @@ class FilmorateApplicationTests {
 		userUpdate.setId(userId);
 		userUpdate.setEmail("mail");
 
-		assertThrows(ConditionsNotMetException.class, () -> userController.update(userUpdate));
+		ConditionsNotMetException conditionsNotMetException = assertThrows(ConditionsNotMetException.class,
+				() -> userController.update(userUpdate));
+		assertEquals("Указан некорректный имейл", conditionsNotMetException.getMessage());
 	}
 
 	@Test
@@ -581,7 +644,9 @@ class FilmorateApplicationTests {
 		userUpdate.setId(userId);
 		userUpdate.setEmail("ok_mail_updated@mail.ru");
 
-		assertThrows(DuplicatedDataException.class, () -> userController.update(userUpdate));
+		DuplicatedDataException duplicatedDataException = assertThrows(DuplicatedDataException.class,
+				() -> userController.update(userUpdate));
+		assertEquals("Имейл уже используется", duplicatedDataException.getMessage());
 	}
 
 	@Test
@@ -603,7 +668,10 @@ class FilmorateApplicationTests {
 		friend.setEmail("friend-to-nobody@mail.ru");
 		userController.create(friend);
 		userNoFriends.setId((long) (userController.findAll().size() + 1));
-		assertThrows(NotFoundException.class, () -> userController.addFriend(userNoFriends.getId(), friend.getId()));
+		NotFoundException notFoundException = assertThrows(NotFoundException.class,
+				() -> userController.addFriend(userNoFriends.getId(), friend.getId()));
+		assertEquals("Пользователь с айди " + userNoFriends.getId() + " не существует",
+				notFoundException.getMessage());
 		assertFalse(friend.getFriends().contains(userNoFriends.getId()));
 		assertFalse(userNoFriends.getFriends().contains(friend.getId()));
 	}
@@ -614,7 +682,10 @@ class FilmorateApplicationTests {
 		friend.setLogin("No_Friend");
 		friend.setEmail("no-friend@mail.ru");
 		friend.setId((long) (userController.findAll().size() + 1));
-		assertThrows(NotFoundException.class, () -> userController.addFriend(me.getId(), friend.getId()));
+		NotFoundException notFoundException = assertThrows(NotFoundException.class,
+				() -> userController.addFriend(me.getId(), friend.getId()));
+		assertEquals("Пользователь с айди " + friend.getId() + " не существует",
+				notFoundException.getMessage());
 		assertFalse(friend.getFriends().contains(me.getId()));
 		assertFalse(me.getFriends().contains(friend.getId()));
 	}
@@ -627,13 +698,18 @@ class FilmorateApplicationTests {
 		userController.create(friend);
 		userController.addFriend(me.getId(), friend.getId());
 		int friendAmount = me.getFriends().size();
-		assertThrows(DuplicatedDataException.class, () -> userController.addFriend(me.getId(), friend.getId()));
+		DuplicatedDataException duplicatedDataException = assertThrows(DuplicatedDataException.class,
+				() -> userController.addFriend(me.getId(), friend.getId()));
+		assertEquals("Пользователь " + friend.getName()
+				+ " уже есть в списке друзей пользователя " + me.getName(), duplicatedDataException.getMessage());
 		assertEquals(friendAmount, me.getFriends().size());
 	}
 
 	@Test
 	void addSelfFriend() {
-		assertThrows(ConditionsNotMetException.class, () -> userController.addFriend(me.getId(), me.getId()));
+		ConditionsNotMetException conditionsNotMetException = assertThrows(ConditionsNotMetException.class,
+				() -> userController.addFriend(me.getId(), me.getId()));
+		assertEquals("Нельзя добавить в друзья себя", conditionsNotMetException.getMessage());
 	}
 
 	@Test
@@ -659,7 +735,24 @@ class FilmorateApplicationTests {
 		friend.setId((long) userController.findAll().size() + 1);
 		me.addFriend(friend);
 		friend.addFriend(me);
-		assertThrows(NotFoundException.class, () -> userController.deleteFriend(me.getId(), friend.getId()));
+		NotFoundException notFoundException = assertThrows(NotFoundException.class,
+				() -> userController.deleteFriend(me.getId(), friend.getId()));
+		assertEquals("Пользователь с айди " + friend.getId() + " не существует",
+				notFoundException.getMessage());
+	}
+
+	@Test
+	void deleteNoUserFriend() {
+		User friend = new User();
+		friend.setLogin("Delete_Not_Existing_Friend");
+		friend.setEmail("delete-not-existing-friend@mail.ru");
+		friend.setId((long) userController.findAll().size() + 1);
+		me.addFriend(friend);
+		friend.addFriend(me);
+		NotFoundException notFoundException = assertThrows(NotFoundException.class,
+				() -> userController.deleteFriend(friend.getId(), me.getId()));
+		assertEquals("Пользователь с айди " + friend.getId() + " не существует",
+				notFoundException.getMessage());
 	}
 
 	@Test
@@ -668,12 +761,17 @@ class FilmorateApplicationTests {
 		friend.setLogin("Delete_Not_A_Friend");
 		friend.setEmail("delete-not-a-friend@mail.ru");
 		userController.create(friend);
-		assertThrows(NotFoundException.class, () -> userController.deleteFriend(me.getId(), friend.getId()));
+		NotFoundException notFoundException = assertThrows(NotFoundException.class,
+				() -> userController.deleteFriend(me.getId(), friend.getId()));
+		assertEquals("Пользователя " + friend.getName() + " нет в друзьях пользователя " + me.getName(),
+				notFoundException.getMessage());
 	}
 
 	@Test
 	void deleteSelfFriend() {
-		assertThrows(ConditionsNotMetException.class, () -> userController.deleteFriend(me.getId(), me.getId()));
+		ConditionsNotMetException conditionsNotMetException = assertThrows(ConditionsNotMetException.class,
+				() -> userController.deleteFriend(me.getId(), me.getId()));
+		assertEquals("Нельзя удалить из друзей себя", conditionsNotMetException.getMessage());
 	}
 
 	@Test
@@ -683,8 +781,10 @@ class FilmorateApplicationTests {
 
 	@Test
 	void getFriendsNoUser() {
-		assertThrows(NotFoundException.class,
+		NotFoundException notFoundException = assertThrows(NotFoundException.class,
 				() -> userController.getFriends((long) userController.findAll().size() + 1));
+		assertEquals("Пользователь с айди " + (userController.findAll().size() + 1) + " не существует",
+			notFoundException.getMessage());
 	}
 
 	@Test
@@ -717,7 +817,10 @@ class FilmorateApplicationTests {
 		otherUser.setEmail("no-user@mail.ru");
 		otherUser.addFriend(othersFriend);
 		otherUser.addFriend(sharedFriend);
-		assertThrows(NotFoundException.class, () -> userController.findSharedFriends(me.getId(), otherUser.getId()).size());
+		NotFoundException notFoundException = assertThrows(NotFoundException.class,
+				() -> userController.findSharedFriends(me.getId(), otherUser.getId()).size());
+		assertEquals("Пользователь с айди " + otherUser.getId() + " не существует",
+				notFoundException.getMessage());
 	}
 
 	@Test
@@ -727,12 +830,17 @@ class FilmorateApplicationTests {
 		otherUser.setEmail("no-user@mail.ru");
 		otherUser.addFriend(othersFriend);
 		otherUser.addFriend(sharedFriend);
-		assertThrows(NotFoundException.class, () -> userController.findSharedFriends(otherUser.getId(), me.getId()).size());
+		NotFoundException notFoundException = assertThrows(NotFoundException.class,
+				() -> userController.findSharedFriends(otherUser.getId(), me.getId()).size());
+		assertEquals("Пользователь с айди " + otherUser.getId() + " не существует",
+				notFoundException.getMessage());
 	}
 
 	@Test
 	void findSelfSharedFriends() {
-		assertThrows(ConditionsNotMetException.class, () -> userController.findSharedFriends(me.getId(), me.getId()).size());
+		ConditionsNotMetException conditionsNotMetException = assertThrows(ConditionsNotMetException.class,
+				() -> userController.findSharedFriends(me.getId(), me.getId()).size());
+		assertEquals("Для сравнения нужны два разных пользователя", conditionsNotMetException.getMessage());
 	}
 
 	@Test
