@@ -627,7 +627,7 @@ class FilmorateApplicationTests {
 		friend.addFriend(me);
 		int friendAmount = me.getFriends().size();
 		friendAmount--;
-		assertEquals(friendAmount, userController.deleteFriend(me, friend.getId()).size());
+		assertEquals(friendAmount, userController.deleteFriend(me.getId(), friend.getId()).size());
 		assertFalse(me.getFriends().contains(friend.getId()));
 		assertFalse(friend.getFriends().contains(me.getId()));
 	}
@@ -640,7 +640,7 @@ class FilmorateApplicationTests {
 		friend.setId((long) userController.findAll().size() + 1);
 		me.addFriend(friend);
 		friend.addFriend(me);
-		assertThrows(NotFoundException.class, () -> userController.deleteFriend(me, friend.getId()));
+		assertThrows(NotFoundException.class, () -> userController.deleteFriend(me.getId(), friend.getId()));
 	}
 
 	@Test
@@ -649,12 +649,12 @@ class FilmorateApplicationTests {
 		friend.setLogin("Delete_Not_A_Friend");
 		friend.setEmail("delete-not-a-friend@mail.ru");
 		userController.create(friend);
-		assertThrows(NotFoundException.class, () -> userController.deleteFriend(me, friend.getId()));
+		assertThrows(NotFoundException.class, () -> userController.deleteFriend(me.getId(), friend.getId()));
 	}
 
 	@Test
 	void deleteSelfFriend() {
-		assertThrows(ConditionsNotMetException.class, () -> userController.deleteFriend(me, me.getId()));
+		assertThrows(ConditionsNotMetException.class, () -> userController.deleteFriend(me.getId(), me.getId()));
 	}
 
 	@Test
