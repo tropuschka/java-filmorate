@@ -677,8 +677,8 @@ class FilmorateApplicationTests {
 		me.addFriend(sharedFriend);
 		otherUser.addFriend(othersFriend);
 		otherUser.addFriend(sharedFriend);
-		assertTrue(userController.findSharedFriends(me, otherUser.getId()).contains(sharedFriend.getId()));
-		assertEquals(1, userController.findSharedFriends(me, otherUser.getId()).size());
+		assertTrue(userController.findSharedFriends(me.getId(), otherUser.getId()).contains(sharedFriend.getId()));
+		assertEquals(1, userController.findSharedFriends(me.getId(), otherUser.getId()).size());
 	}
 
 	@Test
@@ -688,7 +688,7 @@ class FilmorateApplicationTests {
 		otherUser.setEmail("other-user-with-no-shared@mail.ru");
 		userController.create(otherUser);
 		otherUser.addFriend(othersFriend);
-		assertEquals(0, userController.findSharedFriends(me, otherUser.getId()).size());
+		assertEquals(0, userController.findSharedFriends(me.getId(), otherUser.getId()).size());
 	}
 
 	@Test
@@ -698,7 +698,7 @@ class FilmorateApplicationTests {
 		otherUser.setEmail("no-user@mail.ru");
 		otherUser.addFriend(othersFriend);
 		otherUser.addFriend(sharedFriend);
-		assertThrows(NotFoundException.class, () -> userController.findSharedFriends(me, otherUser.getId()).size());
+		assertThrows(NotFoundException.class, () -> userController.findSharedFriends(me.getId(), otherUser.getId()).size());
 	}
 
 	@Test
@@ -708,12 +708,12 @@ class FilmorateApplicationTests {
 		otherUser.setEmail("no-user@mail.ru");
 		otherUser.addFriend(othersFriend);
 		otherUser.addFriend(sharedFriend);
-		assertThrows(NotFoundException.class, () -> userController.findSharedFriends(otherUser, me.getId()).size());
+		assertThrows(NotFoundException.class, () -> userController.findSharedFriends(otherUser.getId(), me.getId()).size());
 	}
 
 	@Test
 	void findSelfSharedFriends() {
-		assertThrows(ConditionsNotMetException.class, () -> userController.findSharedFriends(me, me.getId()).size());
+		assertThrows(ConditionsNotMetException.class, () -> userController.findSharedFriends(me.getId(), me.getId()).size());
 	}
 
 	@Test

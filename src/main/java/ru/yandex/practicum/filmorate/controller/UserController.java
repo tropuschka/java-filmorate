@@ -41,9 +41,9 @@ public class UserController {
         return UserService.getFriends(userStorage, id);
     }
 
-    @GetMapping("/{userId}/friend/shared")
-    public Collection<Long> findSharedFriends(@RequestBody User user, @PathVariable Long userId) {
-        return UserService.findSharedFriend(userStorage, user, userId);
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public Collection<Long> findSharedFriends(@PathVariable Long id, @PathVariable Long otherId) {
+        return UserService.findSharedFriend(userStorage, id, otherId);
     }
 
     @PutMapping("/{id}/friends/{friendId}")

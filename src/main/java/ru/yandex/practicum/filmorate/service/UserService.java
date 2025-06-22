@@ -66,15 +66,15 @@ public class UserService {
         return user.getFriends();
     }
 
-    public static Collection<Long> findSharedFriend(UserStorage userStorage, User user, Long friendId) {
-        if (userStorage.findUserById(user.getId()).isEmpty()) {
-            ExceptionService.throwNotFoundException("Пользователь " + user.getName() + " не существует");
+    public static Collection<Long> findSharedFriend(UserStorage userStorage, Long userId, Long otherId) {
+        if (userStorage.findUserById(userId).isEmpty()) {
+            ExceptionService.throwNotFoundException("Пользователь с айди " + userId + " не существует");
         }
-        User friend;
-        if (userStorage.findUserById(friendId).isEmpty()) {
-            ExceptionService.throwNotFoundException("Пользователь с айди " + friendId + " не существует");
+        if (userStorage.findUserById(otherId).isEmpty()) {
+            ExceptionService.throwNotFoundException("Пользователь с айди " + otherId + " не существует");
         }
-        friend = userStorage.findUserById(friendId).get();
+        User user = userStorage.findUserById(userId).get();
+        User friend = userStorage.findUserById(otherId).get();
         if (user.equals(friend)) {
             ExceptionService.throwValidationException("Для сравнения нужны два разных пользователя");
         }
