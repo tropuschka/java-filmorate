@@ -658,6 +658,17 @@ class FilmorateApplicationTests {
 	}
 
 	@Test
+	void getFriends() {
+		assertEquals(me.getFriends().size(), userController.getFriends(me.getId()).size());
+	}
+
+	@Test
+	void getFriendsNoUser() {
+		assertThrows(NotFoundException.class,
+				() -> userController.getFriends((long) userController.findAll().size() + 1));
+	}
+
+	@Test
 	void findSharedFriends() {
 		User otherUser = new User();
 		otherUser.setLogin("Other_User");
