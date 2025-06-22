@@ -12,32 +12,32 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class FilmService {
-    public static Film likeFilm(FilmStorage filmStorage, User user, Long filmId) {
+    public static Film likeFilm(FilmStorage filmStorage, Long filmId, Long userId) {
         Optional<Film> optionalFilm = filmStorage.findFilmById(filmId);
         if (optionalFilm.isEmpty()) {
             ExceptionService.throwNotFoundException("Фильм не найден");
         }
         Film film = optionalFilm.get();
-        if (film.getLikes().contains(user.getId())) {
+        if (film.getLikes().contains(userId)) {
             ExceptionService.throwDuplicationException("Лайк уже поставлен");
         }
-        film.like(user.getId());
-        log.trace("Пользователь {} оценил фильм {} (количество лайков: {})",
-                user.getName(), film.getName(), film.getLikes().size());
+        film.like(userId);
+        log.trace("Пользователь с айди {} оценил фильм с айди {} (количество лайков: {})",
+                userId, filmId, film.getLikes().size());
         return film;
     }
 
-    public static Film dislikeFilm(FilmStorage filmStorage, User user, Long filmId) {
+    public static Film dislikeFilm(FilmStorage filmStorage, Long filmId, Long userId) {
         Optional<Film> optionalFilm = filmStorage.findFilmById(filmId);
         if (optionalFilm.isEmpty()) {
             ExceptionService.throwNotFoundException("Фильм не найден");
         }
         Film film = optionalFilm.get();
-        if (!film.getLikes().contains(user.getId())) {
-            ExceptionService.throwValidationException("Пользователь " + user.getName()
+        if (!film.getLikes().contains(userId)) {
+            ExceptionService.throwValidationException("Пользователь с айди " + userId
                     + "не оценивал фильм " + film.getName());
         }
-        film.dislike(user.getId());
+        film.dislike(userId);
         return film;
     }
 

@@ -36,14 +36,14 @@ public class FilmController {
         return filmStorage.update(film);
     }
 
-    @PostMapping("/{filmId}/like")
-    public Film like(@RequestBody User user, @PathVariable Long filmId) {
-        return FilmService.likeFilm(filmStorage, user, filmId);
+    @PostMapping("/{id}/like/{userId}")
+    public Film like(@PathVariable Long id, @PathVariable Long userId) {
+        return FilmService.likeFilm(filmStorage, id, userId);
     }
 
-    @DeleteMapping("/{filmId}/like")
-    public Film dislike(@RequestBody User user, @PathVariable Long filmId) {
-        return FilmService.dislikeFilm(filmStorage, user, filmId);
+    @DeleteMapping("/{id}/like/{userId}")
+    public Film dislike(@PathVariable Long id, @PathVariable Long userId) {
+        return FilmService.dislikeFilm(filmStorage, id, userId);
     }
 
     @GetMapping("/top")

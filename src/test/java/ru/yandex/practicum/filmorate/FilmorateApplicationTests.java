@@ -81,25 +81,25 @@ class FilmorateApplicationTests {
 
 		dislikeFilm.setName("Dislike Film");
 		filmController.create(dislikeFilm);
-		filmController.like(me, dislikeFilm.getId());
+		filmController.like(dislikeFilm.getId(), me.getId());
 
 		topFilm1.setName("Film 1");
 		topFilmController.create(topFilm1);
-		topFilmController.like(me, topFilm1.getId());
+		topFilmController.like(topFilm1.getId(), me.getId());
 
 		topFilm2.setName("Film 2");
 		topFilmController.create(topFilm2);
 
 		topFilm3.setName("Film 3");
 		topFilmController.create(topFilm3);
-		topFilmController.like(me, topFilm3.getId());
-		topFilmController.like(myFriend, topFilm3.getId());
+		topFilmController.like(topFilm3.getId(), me.getId());
+		topFilmController.like(topFilm3.getId(), myFriend.getId());
 
 		topFilm4.setName("Film 4");
 		topFilmController.create(topFilm4);
-		topFilmController.like(me, topFilm4.getId());
-		topFilmController.like(myFriend, topFilm4.getId());
-		topFilmController.like(othersFriend, topFilm4.getId());
+		topFilmController.like(topFilm4.getId(), me.getId());
+		topFilmController.like(topFilm4.getId(), myFriend.getId());
+		topFilmController.like(topFilm4.getId(), othersFriend.getId());
 
 		topFilm5.setName("Film 5");
 		topFilmController.create(topFilm5);
@@ -256,7 +256,7 @@ class FilmorateApplicationTests {
 		likeFilm.setName("Like Film");
 		filmController.create(likeFilm);
 		int filmLikes = likeFilm.getLikes().size();
-		filmController.like(me, likeFilm.getId());
+		filmController.like(likeFilm.getId(), me.getId());
 		assertEquals(filmLikes + 1, likeFilm.getLikes().size());
 		assertTrue(likeFilm.getLikes().contains(me.getId()));
 	}
@@ -266,7 +266,7 @@ class FilmorateApplicationTests {
 		Film likeFilm = new Film();
 		likeFilm.setName("No Film");
 		likeFilm.setId((long) filmController.findAll().size() + 1);
-		assertThrows(NotFoundException.class, () -> filmController.like(me, likeFilm.getId()));
+		assertThrows(NotFoundException.class, () -> filmController.like(likeFilm.getId(), me.getId()));
 		assertEquals(0, likeFilm.getLikes().size());
 		assertFalse(likeFilm.getLikes().contains(me.getId()));
 	}
@@ -276,16 +276,16 @@ class FilmorateApplicationTests {
 		Film likeFilm = new Film();
 		likeFilm.setName("Double Liked Film");
 		filmController.create(likeFilm);
-		filmController.like(me, likeFilm.getId());
+		filmController.like(likeFilm.getId(), me.getId());
 		int likeAmount = likeFilm.getLikes().size();
-		assertThrows(DuplicatedDataException.class, () -> filmController.like(me, likeFilm.getId()));
+		assertThrows(DuplicatedDataException.class, () -> filmController.like(likeFilm.getId(), me.getId()));
 		assertEquals(likeAmount, likeFilm.getLikes().size());
 	}
 
 	@Test
 	void dislikeFilm() {
 		int likeAmount = dislikeFilm.getLikes().size();
-		filmController.dislike(me, dislikeFilm.getId());
+		filmController.dislike(dislikeFilm.getId(), me.getId());
 		assertEquals(likeAmount - 1, dislikeFilm.getLikes().size());
 		assertFalse(dislikeFilm.getLikes().contains(me.getId()));
 	}
@@ -296,14 +296,14 @@ class FilmorateApplicationTests {
 		dislikeNoFilm.setName("No Film");
 		Long filmId = (long) filmController.findAll().size() + 1;
 		dislikeNoFilm.setId(filmId);
-		assertThrows(NotFoundException.class, () -> filmController.dislike(me, dislikeNoFilm.getId()));
+		assertThrows(NotFoundException.class, () -> filmController.dislike(dislikeNoFilm.getId(), me.getId()));
 		assertEquals(0, dislikeNoFilm.getLikes().size());
 	}
 
 	@Test
 	void dislikeNotLikedFilm() {
 		int likeAmount = dislikeFilm.getLikes().size();
-		assertThrows(ConditionsNotMetException.class, () -> filmController.dislike(myFriend, dislikeFilm.getId()));
+		assertThrows(ConditionsNotMetException.class, () -> filmController.dislike(dislikeFilm.getId(), myFriend.getId()));
 		assertEquals(likeAmount, dislikeFilm.getLikes().size());
 	}
 
