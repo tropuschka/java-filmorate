@@ -5,13 +5,14 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
+import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class UserService {
-    public static Set<Long> addUserFriend(UserStorage userStorage, Long userId, Long friendId) {
+    public static Collection<Long> addUserFriend(UserStorage userStorage, Long userId, Long friendId) {
         if (userStorage.findUserById(userId).isEmpty()) {
             ExceptionService.throwNotFoundException("Пользователь с айди " + userId + " не существует");
         }
@@ -36,7 +37,7 @@ public class UserService {
         return user.getFriends();
     }
 
-    public static Set<Long> deleteUserFriend(UserStorage userStorage, Long userId, Long friendId) {
+    public static Collection<Long> deleteUserFriend(UserStorage userStorage, Long userId, Long friendId) {
         if (userStorage.findUserById(userId).isEmpty()) {
             ExceptionService.throwNotFoundException("Пользователь с айди " + userId + " не существует");
         }
@@ -57,7 +58,15 @@ public class UserService {
         return user.getFriends();
     }
 
-    public static Set<Long> findSharedFriend(UserStorage userStorage, User user, Long friendId) {
+    public static Collection<Long> getFriends(UserStorage userStorage, Long userId) {
+        if (userStorage.findUserById(userId).isEmpty()) {
+            ExceptionService.throwNotFoundException("Пользователь с айди " + userId + " не существует");
+        }
+        User user = userStorage.findUserById(userId).get();
+        return user.getFriends();
+    }
+
+    public static Collection<Long> findSharedFriend(UserStorage userStorage, User user, Long friendId) {
         if (userStorage.findUserById(user.getId()).isEmpty()) {
             ExceptionService.throwNotFoundException("Пользователь " + user.getName() + " не существует");
         }

@@ -36,18 +36,23 @@ public class UserController {
         return userStorage.update(user);
     }
 
+    @GetMapping("/{id}/friends")
+    public Collection<Long> getFriends(@PathVariable Long id) {
+        return UserService.getFriends(userStorage, id);
+    }
+
     @GetMapping("/{userId}/friend/shared")
-    public Set<Long> findSharedFriends(@RequestBody User user, @PathVariable Long userId) {
+    public Collection<Long> findSharedFriends(@RequestBody User user, @PathVariable Long userId) {
         return UserService.findSharedFriend(userStorage, user, userId);
     }
 
     @PutMapping("/{id}/friends/{friendId}")
-    public Set<Long> addFriend(@PathVariable Long id, @PathVariable Long friendId) {
+    public Collection<Long> addFriend(@PathVariable Long id, @PathVariable Long friendId) {
         return UserService.addUserFriend(userStorage, id, friendId);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
-    public Set<Long> deleteFriend(@PathVariable Long id, @PathVariable Long friendId) {
+    public Collection<Long> deleteFriend(@PathVariable Long id, @PathVariable Long friendId) {
         return UserService.deleteUserFriend(userStorage, id, friendId);
     }
 }
