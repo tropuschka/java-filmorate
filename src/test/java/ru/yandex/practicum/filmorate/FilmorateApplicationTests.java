@@ -309,7 +309,7 @@ class FilmorateApplicationTests {
 
 	@Test
 	void getFilmTop9() {
-		List<Film> filmTop = (List<Film>) topFilmController.getTop();
+		List<Film> filmTop = (List<Film>) topFilmController.getTop(10);
 		assertEquals(9, filmTop.size());
 		assertEquals(filmTop.getFirst(), topFilm4);
 		assertEquals(filmTop.get(1), topFilm3);
@@ -324,7 +324,7 @@ class FilmorateApplicationTests {
 			top10FilmController.create(film);
 		}
 		top10FilmController.create(film);
-		List<Film> filmTop = (List<Film>) top10FilmController.getTop();
+		List<Film> filmTop = (List<Film>) top10FilmController.getTop(10);
 		assertEquals(10, filmTop.size());
 		assertEquals(filmTop.getFirst(), topFilm4);
 		assertEquals(filmTop.get(1), topFilm3);
@@ -342,7 +342,7 @@ class FilmorateApplicationTests {
 		film11.setName("Film 11");
 		top11FilmController.create(film);
 		top11FilmController.create(film11);
-		ArrayList<Film> filmTop = new ArrayList<>(top11FilmController.getTop());
+		ArrayList<Film> filmTop = new ArrayList<>(top11FilmController.getTop(10));
 		assertEquals(10, filmTop.size());
 		assertEquals(filmTop.getFirst(), topFilm4);
 		assertEquals(filmTop.get(1), topFilm3);
@@ -350,10 +350,29 @@ class FilmorateApplicationTests {
 	}
 
 	@Test
+	void getFilmTop3() {
+		List<Film> filmTop = (List<Film>) topFilmController.getTop(3);
+		assertEquals(3, filmTop.size());
+		assertEquals(filmTop.getFirst(), topFilm4);
+		assertEquals(filmTop.get(1), topFilm3);
+		assertEquals(filmTop.get(2), topFilm1);
+	}
+
+	@Test
+	void getFilmTop0() {
+		assertThrows(ConditionsNotMetException.class, () -> topFilmController.getTop(0));
+	}
+
+	@Test
+	void getFilmTopNegative() {
+		assertThrows(ConditionsNotMetException.class, () -> topFilmController.getTop(-1));
+	}
+
+	@Test
 	void getEmptyTop() {
 		FilmStorage emptyFilmStorage = new InMemoryFilmStorage();
 		FilmController emptyFilmController = new FilmController(emptyFilmStorage);
-		List<Film> filmTop = (List<Film>) emptyFilmController.getTop();
+		List<Film> filmTop = (List<Film>) emptyFilmController.getTop(10);
 		assertEquals(0, filmTop.size());
 	}
 

@@ -42,6 +42,9 @@ public class FilmService {
     }
 
     public static Collection<Film> getTop(FilmStorage filmStorage, int amount) {
+        if (amount <= 0) {
+            ExceptionService.throwValidationException("Количество позиций в топе не может быть меньше 1");
+        }
         ArrayList<Film> filmTop = filmStorage.findAll().stream()
                 .sorted(Comparator.comparing(Film::likeAmount).reversed())
                 .distinct()
