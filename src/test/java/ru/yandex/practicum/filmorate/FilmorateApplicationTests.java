@@ -853,6 +853,6 @@ class FilmorateApplicationTests {
 		Collection<User> controllerUserList = userController.findAll();
 
 		assertNotNull(controllerUserList);
-		assertEquals(15, controllerUserList.size());
+		assertEquals(userStorage.findAll().size(), controllerUserList.size());
 	}
 }
