@@ -11,15 +11,15 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class UserService {
-    public static Set<Long> addUserFriend(UserStorage userStorage, User user, Long friendId) {
-        if (userStorage.findUserById(user.getId()).isEmpty()) {
-            ExceptionService.throwNotFoundException("Пользователь " + user.getName() + " не существует");
+    public static Set<Long> addUserFriend(UserStorage userStorage, Long userId, Long friendId) {
+        if (userStorage.findUserById(userId).isEmpty()) {
+            ExceptionService.throwNotFoundException("Пользователь с айди " + userId + " не существует");
         }
-        User friend;
         if (userStorage.findUserById(friendId).isEmpty()) {
             ExceptionService.throwNotFoundException("Пользователь с айди " + friendId + " не существует");
         }
-        friend = userStorage.findUserById(friendId).get();
+        User user = userStorage.findUserById(userId).get();
+        User friend = userStorage.findUserById(friendId).get();
         if (user.equals(friend)) {
             ExceptionService.throwValidationException("Нельзя добавить в друзья себя");
         }

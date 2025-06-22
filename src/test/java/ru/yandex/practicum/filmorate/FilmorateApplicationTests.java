@@ -68,7 +68,7 @@ class FilmorateApplicationTests {
 		myFriend.setLogin("My_Friend");
 		myFriend.setEmail("my-friend@mail.ru");
 		userController.create(myFriend);
-		userController.addFriend(me, myFriend.getId());
+		userController.addFriend(me.getId(), myFriend.getId());
 
 		othersFriend.setLogin("Others_Friend");
 		othersFriend.setEmail("others-friend@mail.ru");
@@ -571,7 +571,7 @@ class FilmorateApplicationTests {
 		friend.setLogin("Friend");
 		friend.setEmail("friend@mail.ru");
 		userController.create(friend);
-		assertEquals(3, userController.addFriend(me, friend.getId()).size());
+		assertEquals(3, userController.addFriend(me.getId(), friend.getId()).size());
 		assertTrue(me.getFriends().contains(friend.getId()));
 		assertTrue(friend.getFriends().contains(me.getId()));
 	}
@@ -584,7 +584,7 @@ class FilmorateApplicationTests {
 		friend.setEmail("friend-to-nobody@mail.ru");
 		userController.create(friend);
 		userNoFriends.setId((long) (userController.findAll().size() + 1));
-		assertThrows(NotFoundException.class, () -> userController.addFriend(userNoFriends, friend.getId()));
+		assertThrows(NotFoundException.class, () -> userController.addFriend(userNoFriends.getId(), friend.getId()));
 		assertFalse(friend.getFriends().contains(userNoFriends.getId()));
 		assertFalse(userNoFriends.getFriends().contains(friend.getId()));
 	}
@@ -595,7 +595,7 @@ class FilmorateApplicationTests {
 		friend.setLogin("No_Friend");
 		friend.setEmail("no-friend@mail.ru");
 		friend.setId((long) (userController.findAll().size() + 1));
-		assertThrows(NotFoundException.class, () -> userController.addFriend(me, friend.getId()));
+		assertThrows(NotFoundException.class, () -> userController.addFriend(me.getId(), friend.getId()));
 		assertFalse(friend.getFriends().contains(me.getId()));
 		assertFalse(me.getFriends().contains(friend.getId()));
 	}
@@ -606,15 +606,15 @@ class FilmorateApplicationTests {
 		friend.setLogin("Duplicated_Friend");
 		friend.setEmail("duplicated-friend@mail.ru");
 		userController.create(friend);
-		userController.addFriend(me, friend.getId());
+		userController.addFriend(me.getId(), friend.getId());
 		int friendAmount = me.getFriends().size();
-		assertThrows(DuplicatedDataException.class, () -> userController.addFriend(me, friend.getId()));
+		assertThrows(DuplicatedDataException.class, () -> userController.addFriend(me.getId(), friend.getId()));
 		assertEquals(friendAmount, me.getFriends().size());
 	}
 
 	@Test
 	void addSelfFriend() {
-		assertThrows(ConditionsNotMetException.class, () -> userController.addFriend(me, me.getId()));
+		assertThrows(ConditionsNotMetException.class, () -> userController.addFriend(me.getId(), me.getId()));
 	}
 
 	@Test

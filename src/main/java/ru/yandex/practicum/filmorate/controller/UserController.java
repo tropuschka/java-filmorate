@@ -41,9 +41,9 @@ public class UserController {
         return UserService.findSharedFriend(userStorage, user, userId);
     }
 
-    @PostMapping("/{userId}/friend")
-    public Set<Long> addFriend(@RequestBody User user, @PathVariable Long userId) {
-        return UserService.addUserFriend(userStorage, user, userId);
+    @PutMapping("/{id}/friends/{friendId}")
+    public Set<Long> addFriend(@PathVariable Long id, @PathVariable Long friendId) {
+        return UserService.addUserFriend(userStorage, id, friendId);
     }
 
     @DeleteMapping("/{userId}/friend")
