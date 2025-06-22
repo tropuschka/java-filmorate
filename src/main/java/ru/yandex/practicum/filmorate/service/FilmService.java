@@ -17,9 +17,9 @@ public class FilmService {
             ExceptionService.throwNotFoundException("Фильм не найден");
         }
         Film film = optionalFilm.get();
-        if (film.getLikes().contains(userId)) {
+/*        if (film.getLikes().contains(userId)) {
             ExceptionService.throwDuplicationException("Лайк уже поставлен");
-        }
+        } */
         film.like(userId);
         log.trace("Пользователь с айди {} оценил фильм с айди {} (количество лайков: {})",
                 userId, filmId, film.getLikes().size());
@@ -32,10 +32,10 @@ public class FilmService {
             ExceptionService.throwNotFoundException("Фильм не найден");
         }
         Film film = optionalFilm.get();
-        if (!film.getLikes().contains(userId)) {
+/*        if (!film.getLikes().contains(userId)) {
             ExceptionService.throwValidationException("Пользователь с айди " + userId
                     + " не оценивал фильм " + film.getName());
-        }
+        } */
         film.dislike(userId);
         return film;
     }

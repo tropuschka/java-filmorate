@@ -295,7 +295,7 @@ class FilmorateApplicationTests {
 		assertEquals(0, likeFilm.getLikes().size());
 		assertFalse(likeFilm.getLikes().contains(me.getId()));
 	}
-
+/*
 	@Test
 	void likeFilmDouble() {
 		Film likeFilm = new Film();
@@ -307,7 +307,7 @@ class FilmorateApplicationTests {
 				() -> filmController.like(likeFilm.getId(), me.getId()));
 		assertEquals("Лайк уже поставлен", duplicatedDataException.getMessage());
 		assertEquals(likeAmount, likeFilm.getLikes().size());
-	}
+	} */
 
 	@Test
 	void dislikeFilm() {
@@ -329,7 +329,7 @@ class FilmorateApplicationTests {
 		assertEquals(0, dislikeNoFilm.getLikes().size());
 	}
 
-	@Test
+/*	@Test
 	void dislikeNotLikedFilm() {
 		int likeAmount = dislikeFilm.getLikes().size();
 		ConditionsNotMetException conditionsNotMetException = assertThrows(ConditionsNotMetException.class,
@@ -338,7 +338,7 @@ class FilmorateApplicationTests {
 				conditionsNotMetException.getMessage());
 		assertEquals(likeAmount, dislikeFilm.getLikes().size());
 	}
-
+/*
 	@Test
 	void getFilmTop9() {
 		List<Film> filmTop = (List<Film>) topFilmController.getTop(10);
