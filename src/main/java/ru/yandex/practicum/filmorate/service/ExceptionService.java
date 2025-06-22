@@ -11,13 +11,13 @@ import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 @Slf4j
 @Service
 public class ExceptionService {
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public static void throwValidationException(String message) {
         log.error(message);
         throw new ConditionsNotMetException(message);
     }
 
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     public static void throwNotFoundException(String message) {
         log.error(message);
         throw new NotFoundException(message);
