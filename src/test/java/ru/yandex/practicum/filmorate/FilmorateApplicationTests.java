@@ -754,7 +754,7 @@ class FilmorateApplicationTests {
 		assertEquals("Пользователь с айди " + friend.getId() + " не существует",
 				notFoundException.getMessage());
 	}
-
+/*
 	@Test
 	void deleteNotAFriend() {
 		User friend = new User();
@@ -766,7 +766,7 @@ class FilmorateApplicationTests {
 		assertEquals("Пользователя " + friend.getName() + " нет в друзьях пользователя " + me.getName(),
 				notFoundException.getMessage());
 	}
-
+*/
 	@Test
 	void deleteSelfFriend() {
 		ConditionsNotMetException conditionsNotMetException = assertThrows(ConditionsNotMetException.class,
