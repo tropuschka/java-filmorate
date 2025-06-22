@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class UserService {
-    public Collection<Long> addUserFriend(UserStorage userStorage, Long userId, Long friendId) {
+    public static Collection<Long> addUserFriend(UserStorage userStorage, Long userId, Long friendId) {
         if (userStorage.findUserById(userId).isEmpty()) {
             ExceptionService.throwNotFoundException("Пользователь с айди " + userId + " не существует");
         }
@@ -37,7 +37,7 @@ public class UserService {
         return user.getFriends();
     }
 
-    public Collection<Long> deleteUserFriend(UserStorage userStorage, Long userId, Long friendId) {
+    public static Collection<Long> deleteUserFriend(UserStorage userStorage, Long userId, Long friendId) {
         if (userStorage.findUserById(userId).isEmpty()) {
             ExceptionService.throwNotFoundException("Пользователь с айди " + userId + " не существует");
         }
@@ -58,7 +58,7 @@ public class UserService {
         return user.getFriends();
     }
 
-    public Collection<Long> getFriends(UserStorage userStorage, Long userId) {
+    public static Collection<Long> getFriends(UserStorage userStorage, Long userId) {
         if (userStorage.findUserById(userId).isEmpty()) {
             ExceptionService.throwNotFoundException("Пользователь с айди " + userId + " не существует");
         }
@@ -66,7 +66,7 @@ public class UserService {
         return user.getFriends();
     }
 
-    public int findSharedFriend(UserStorage userStorage, Long userId, Long otherId) {
+    public static Collection<Long> findSharedFriend(UserStorage userStorage, Long userId, Long otherId) {
         if (userStorage.findUserById(userId).isEmpty()) {
             ExceptionService.throwNotFoundException("Пользователь с айди " + userId + " не существует");
         }
@@ -83,6 +83,6 @@ public class UserService {
                 .collect(Collectors.toSet());
         log.trace("У пользователя {} и пользователя {} {} общих друзей",
                 user.getName(), friend.getName(), sharedFriends.size());
-        return sharedFriends.size();
+        return sharedFriends;
     }
 }

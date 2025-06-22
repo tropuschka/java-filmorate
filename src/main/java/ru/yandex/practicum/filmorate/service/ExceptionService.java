@@ -12,22 +12,22 @@ import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 @Slf4j
 @Service
 public class ExceptionService {
-    @ExceptionHandler
+    @ExceptionHandler({ConditionsNotMetException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public static void throwValidationException(String message) {
         log.error(message);
         throw new ConditionsNotMetException(message);
     }
 
-    @ExceptionHandler
+    @ExceptionHandler({NotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public static void throwNotFoundException(String message) {
         log.error(message);
         throw new NotFoundException(message);
     }
 
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler({ConditionsNotMetException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public static void throwDuplicationException(String message) {
         log.error(message);
         throw new DuplicatedDataException(message);

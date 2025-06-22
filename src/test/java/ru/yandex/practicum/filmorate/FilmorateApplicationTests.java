@@ -793,7 +793,8 @@ class FilmorateApplicationTests {
 		me.addFriend(sharedFriend);
 		otherUser.addFriend(othersFriend);
 		otherUser.addFriend(sharedFriend);
-		assertEquals(1, userController.findSharedFriends(me.getId(), otherUser.getId()));
+		assertTrue(userController.findSharedFriends(me.getId(), otherUser.getId()).contains(sharedFriend.getId()));
+		assertEquals(1, userController.findSharedFriends(me.getId(), otherUser.getId()).size());
 	}
 
 	@Test
@@ -803,7 +804,7 @@ class FilmorateApplicationTests {
 		otherUser.setEmail("other-user-with-no-shared@mail.ru");
 		userController.create(otherUser);
 		otherUser.addFriend(othersFriend);
-		assertEquals(0, userController.findSharedFriends(me.getId(), otherUser.getId()));
+		assertEquals(0, userController.findSharedFriends(me.getId(), otherUser.getId()).size());
 	}
 
 	@Test
@@ -814,7 +815,7 @@ class FilmorateApplicationTests {
 		otherUser.addFriend(othersFriend);
 		otherUser.addFriend(sharedFriend);
 		NotFoundException notFoundException = assertThrows(NotFoundException.class,
-				() -> userController.findSharedFriends(me.getId(), otherUser.getId()));
+				() -> userController.findSharedFriends(me.getId(), otherUser.getId()).size());
 		assertEquals("Пользователь с айди " + otherUser.getId() + " не существует",
 				notFoundException.getMessage());
 	}
@@ -827,7 +828,7 @@ class FilmorateApplicationTests {
 		otherUser.addFriend(othersFriend);
 		otherUser.addFriend(sharedFriend);
 		NotFoundException notFoundException = assertThrows(NotFoundException.class,
-				() -> userController.findSharedFriends(otherUser.getId(), me.getId()));
+				() -> userController.findSharedFriends(otherUser.getId(), me.getId()).size());
 		assertEquals("Пользователь с айди " + otherUser.getId() + " не существует",
 				notFoundException.getMessage());
 	}
@@ -835,7 +836,7 @@ class FilmorateApplicationTests {
 	@Test
 	void findSelfSharedFriends() {
 		ConditionsNotMetException conditionsNotMetException = assertThrows(ConditionsNotMetException.class,
-				() -> userController.findSharedFriends(me.getId(), me.getId()));
+				() -> userController.findSharedFriends(me.getId(), me.getId()).size());
 		assertEquals("Для сравнения нужны два разных пользователя", conditionsNotMetException.getMessage());
 	}
 

@@ -14,7 +14,6 @@ import java.util.Collection;
 @RequestMapping("/users")
 public class UserController {
     private final UserStorage userStorage;
-    private final UserService userService = new UserService();
 
     @Autowired
     public UserController(UserStorage userStorage) {
@@ -38,21 +37,21 @@ public class UserController {
 
     @GetMapping("/{id}/friends")
     public Collection<Long> getFriends(@PathVariable Long id) {
-        return userService.getFriends(userStorage, id);
+        return UserService.getFriends(userStorage, id);
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
-    public int findSharedFriends(@PathVariable Long id, @PathVariable Long otherId) {
-        return userService.findSharedFriend(userStorage, id, otherId);
+    public Collection<Long> findSharedFriends(@PathVariable Long id, @PathVariable Long otherId) {
+        return UserService.findSharedFriend(userStorage, id, otherId);
     }
 
     @PutMapping("/{id}/friends/{friendId}")
     public Collection<Long> addFriend(@PathVariable Long id, @PathVariable Long friendId) {
-        return userService.addUserFriend(userStorage, id, friendId);
+        return UserService.addUserFriend(userStorage, id, friendId);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
     public Collection<Long> deleteFriend(@PathVariable Long id, @PathVariable Long friendId) {
-        return userService.deleteUserFriend(userStorage, id, friendId);
+        return UserService.deleteUserFriend(userStorage, id, friendId);
     }
 }
