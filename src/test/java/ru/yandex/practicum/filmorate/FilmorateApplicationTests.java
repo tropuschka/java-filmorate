@@ -334,7 +334,7 @@ class FilmorateApplicationTests {
 		int likeAmount = dislikeFilm.getLikes().size();
 		ConditionsNotMetException conditionsNotMetException = assertThrows(ConditionsNotMetException.class,
 				() -> filmController.dislike(dislikeFilm.getId(), myFriend.getId()));
-		assertEquals("Пользователь с айди " + myFriend.getId() + "не оценивал фильм " + dislikeFilm.getId(),
+		assertEquals("Пользователь с айди " + myFriend.getId() + " не оценивал фильм " + dislikeFilm.getName(),
 				conditionsNotMetException.getMessage());
 		assertEquals(likeAmount, dislikeFilm.getLikes().size());
 	}
@@ -516,7 +516,7 @@ class FilmorateApplicationTests {
 	@Test
 	void createUserLateBirthday() {
 		User curruptUser = new User();
-		curruptUser.setLogin("Currupted User");
+		curruptUser.setLogin("Currupted_User");
 		curruptUser.setEmail("currupted_user@mail.ru");
 		curruptUser.setBirthday(LocalDate.now().plusDays(5));
 

@@ -34,7 +34,7 @@ public class FilmService {
         Film film = optionalFilm.get();
         if (!film.getLikes().contains(userId)) {
             ExceptionService.throwValidationException("Пользователь с айди " + userId
-                    + "не оценивал фильм " + film.getName());
+                    + " не оценивал фильм " + film.getName());
         }
         film.dislike(userId);
         return film;
