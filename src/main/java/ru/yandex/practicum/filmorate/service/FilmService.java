@@ -41,14 +41,14 @@ public class FilmService {
         return film;
     }
 
-    public static Collection<Film> getTop(FilmStorage filmStorage) {
+    public static Collection<Film> getTop(FilmStorage filmStorage, int amount) {
         ArrayList<Film> filmTop = filmStorage.findAll().stream()
                 .sorted(Comparator.comparing(Film::likeAmount).reversed())
                 .distinct()
                 .collect(Collectors.toCollection(ArrayList::new));
         List<Film> top10 = new ArrayList<>();
         if (!filmTop.isEmpty()) {
-            for (int i = 0; i < 10 && i < filmTop.size(); i++) {
+            for (int i = 0; i < amount && i < filmTop.size(); i++) {
                 top10.add(filmTop.get(i));
             }
         }

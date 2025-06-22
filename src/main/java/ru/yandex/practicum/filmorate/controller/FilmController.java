@@ -46,8 +46,8 @@ public class FilmController {
         return FilmService.dislikeFilm(filmStorage, id, userId);
     }
 
-    @GetMapping("/top")
-    public Collection<Film> getTop() {
-        return FilmService.getTop(filmStorage);
+    @GetMapping("/popular")
+    public Collection<Film> getTop(@RequestParam(defaultValue = "10") int count) {
+        return FilmService.getTop(filmStorage, count);
     }
 }
