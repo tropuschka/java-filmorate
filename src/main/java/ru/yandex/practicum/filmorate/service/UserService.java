@@ -66,7 +66,7 @@ public class UserService {
         return user.getFriends();
     }
 
-    public Collection<Long> findSharedFriend(UserStorage userStorage, Long userId, Long otherId) {
+    public int findSharedFriend(UserStorage userStorage, Long userId, Long otherId) {
         if (userStorage.findUserById(userId).isEmpty()) {
             ExceptionService.throwNotFoundException("Пользователь с айди " + userId + " не существует");
         }
@@ -83,6 +83,6 @@ public class UserService {
                 .collect(Collectors.toSet());
         log.trace("У пользователя {} и пользователя {} {} общих друзей",
                 user.getName(), friend.getName(), sharedFriends.size());
-        return sharedFriends;
+        return sharedFriends.size();
     }
 }

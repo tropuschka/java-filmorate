@@ -42,7 +42,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
-    public Collection<Long> findSharedFriends(@PathVariable Long id, @PathVariable Long otherId) {
+    public int findSharedFriends(@PathVariable Long id, @PathVariable Long otherId) {
         return userService.findSharedFriend(userStorage, id, otherId);
     }
 
