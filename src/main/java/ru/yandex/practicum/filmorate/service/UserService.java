@@ -11,13 +11,15 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class UserService {
-    public static Set<Long> addUserFriend(UserStorage userStorage, User user, User friend) {
+    public static Set<Long> addUserFriend(UserStorage userStorage, User user, Long friendId) {
         if (userStorage.findUserById(user.getId()).isEmpty()) {
             ExceptionService.throwNotFoundException("Пользователь " + user.getName() + " не существует");
         }
-        if (userStorage.findUserById(friend.getId()).isEmpty()) {
-            ExceptionService.throwNotFoundException("Пользователь " + friend.getName() + " не существует");
+        User friend;
+        if (userStorage.findUserById(friendId).isEmpty()) {
+            ExceptionService.throwNotFoundException("Пользователь с айди " + friendId + " не существует");
         }
+        friend = userStorage.findUserById(friendId).get();
         if (user.equals(friend)) {
             ExceptionService.throwValidationException("Нельзя добавить в друзья себя");
         }
@@ -34,13 +36,15 @@ public class UserService {
         return user.getFriends();
     }
 
-    public static Set<Long> deleteUserFriend(UserStorage userStorage, User user, User friend) {
+    public static Set<Long> deleteUserFriend(UserStorage userStorage, User user, Long friendId) {
         if (userStorage.findUserById(user.getId()).isEmpty()) {
             ExceptionService.throwNotFoundException("Пользователь " + user.getName() + " не существует");
         }
-        if (userStorage.findUserById(friend.getId()).isEmpty()) {
-            ExceptionService.throwNotFoundException("Пользователь " + friend.getName() + " не существует");
+        User friend;
+        if (userStorage.findUserById(friendId).isEmpty()) {
+            ExceptionService.throwNotFoundException("Пользователь с айди " + friendId + " не существует");
         }
+        friend = userStorage.findUserById(friendId).get();
         if (user.equals(friend)) {
             ExceptionService.throwValidationException("Нельзя удалить из друзей себя");
         }
@@ -53,13 +57,15 @@ public class UserService {
         return user.getFriends();
     }
 
-    public static Set<Long> findSharedFriend(UserStorage userStorage, User user, User friend) {
+    public static Set<Long> findSharedFriend(UserStorage userStorage, User user, Long friendId) {
         if (userStorage.findUserById(user.getId()).isEmpty()) {
             ExceptionService.throwNotFoundException("Пользователь " + user.getName() + " не существует");
         }
-        if (userStorage.findUserById(friend.getId()).isEmpty()) {
-            ExceptionService.throwNotFoundException("Пользователь " + friend.getName() + " не существует");
+        User friend;
+        if (userStorage.findUserById(friendId).isEmpty()) {
+            ExceptionService.throwNotFoundException("Пользователь с айди " + friendId + " не существует");
         }
+        friend = userStorage.findUserById(friendId).get();
         if (user.equals(friend)) {
             ExceptionService.throwValidationException("Для сравнения нужны два разных пользователя");
         }

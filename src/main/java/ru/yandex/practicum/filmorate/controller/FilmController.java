@@ -7,7 +7,6 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.Collection;
 
@@ -37,14 +36,14 @@ public class FilmController {
         return filmStorage.update(film);
     }
 
-    @PostMapping("/like")
-    public Film like(@RequestBody User user, @RequestParam Long id) {
-        return FilmService.likeFilm(filmStorage, user, id);
+    @PostMapping("/{filmId}/like")
+    public Film like(@RequestBody User user, @PathVariable Long filmId) {
+        return FilmService.likeFilm(filmStorage, user, filmId);
     }
 
-    @DeleteMapping("/like")
-    public Film dislike(@RequestBody User user, @RequestParam Long id) {
-        return FilmService.dislikeFilm(filmStorage, user, id);
+    @DeleteMapping("/{filmId}/like")
+    public Film dislike(@RequestBody User user, @PathVariable Long filmId) {
+        return FilmService.dislikeFilm(filmStorage, user, filmId);
     }
 
     @GetMapping("/top")

@@ -36,18 +36,18 @@ public class UserController {
         return userStorage.update(user);
     }
 
-    @GetMapping("/friends")
-    public Set<Long> findSharedFriends(@RequestBody User user, User friend) {
-        return UserService.findSharedFriend(userStorage, user, friend);
+    @GetMapping("/{userId}/friend/shared")
+    public Set<Long> findSharedFriends(@RequestBody User user, @PathVariable Long userId) {
+        return UserService.findSharedFriend(userStorage, user, userId);
     }
 
-    @PostMapping("/friends")
-    public Set<Long> addFriend(@RequestBody User user, User friend) {
-        return UserService.addUserFriend(userStorage, user, friend);
+    @PostMapping("/{userId}/friend")
+    public Set<Long> addFriend(@RequestBody User user, @PathVariable Long userId) {
+        return UserService.addUserFriend(userStorage, user, userId);
     }
 
-    @DeleteMapping("/friends")
-    public Set<Long> deleteFriend(@RequestBody User user, User friend) {
-        return UserService.deleteUserFriend(userStorage, user, friend);
+    @DeleteMapping("/{userId}/friend")
+    public Set<Long> deleteFriend(@RequestBody User user, @PathVariable Long userId) {
+        return UserService.deleteUserFriend(userStorage, user, userId);
     }
 }
