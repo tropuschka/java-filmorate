@@ -17,7 +17,7 @@ public class ExceptionService {
         throw new ConditionsNotMetException(message);
     }
 
-    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public static void throwNotFoundException(String message) {
         log.error(message);
         throw new NotFoundException(message);
