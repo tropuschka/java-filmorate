@@ -42,10 +42,16 @@ public class FilmService {
     }
 
     public static Collection<Film> getTop(FilmStorage filmStorage) {
-        List<Film> filmTop = filmStorage.findAll().stream()
+        ArrayList<Film> filmTop = filmStorage.findAll().stream()
                 .sorted(Comparator.comparing(Film::likeAmount).reversed())
-                .collect(Collectors.toList());
-        if (filmTop.size() > 10) return filmTop.subList(0, 9);
-        else return filmTop;
+                .distinct()
+                .collect(Collectors.toCollection(ArrayList::new));
+        List<Film> top10 = new ArrayList<>();
+        if (!filmTop.isEmpty()) {
+            for (int i = 0; i < 10 && i < filmTop.size(); i++) {
+                top10.add(filmTop.get(i));
+            }
+        }
+        return top10;
     }
 }

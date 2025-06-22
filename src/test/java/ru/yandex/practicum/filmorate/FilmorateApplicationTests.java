@@ -19,6 +19,7 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -291,12 +292,12 @@ class FilmorateApplicationTests {
 
 	@Test
 	void dislikeNoFilm() {
-		Film dislikeFilm = new Film();
-		dislikeFilm.setName("No Film");
+		Film dislikeNoFilm = new Film();
+		dislikeNoFilm.setName("No Film");
 		Long filmId = (long) filmController.findAll().size() + 1;
-		dislikeFilm.setId(filmId);
-		assertThrows(NotFoundException.class, () -> filmController.dislike(me, dislikeFilm.getId()));
-		assertEquals(0, dislikeFilm.getLikes().size());
+		dislikeNoFilm.setId(filmId);
+		assertThrows(NotFoundException.class, () -> filmController.dislike(me, dislikeNoFilm.getId()));
+		assertEquals(0, dislikeNoFilm.getLikes().size());
 	}
 
 	@Test
@@ -308,7 +309,7 @@ class FilmorateApplicationTests {
 
 	@Test
 	void getFilmTop9() {
-		ArrayList<Film> filmTop = (ArrayList<Film>) topFilmController.getTop();
+		List<Film> filmTop = (List<Film>) topFilmController.getTop();
 		assertEquals(9, filmTop.size());
 		assertEquals(filmTop.getFirst(), topFilm4);
 		assertEquals(filmTop.get(1), topFilm3);
@@ -317,8 +318,13 @@ class FilmorateApplicationTests {
 
 	@Test
 	void getFilmTop10() {
-		topFilmController.create(film);
-		ArrayList<Film> filmTop = (ArrayList<Film>) topFilmController.getTop();
+		FilmStorage top10FilmStorage = new InMemoryFilmStorage();
+		FilmController top10FilmController = new FilmController(top10FilmStorage);
+		for (Film film : topFilmStorage.findAll()) {
+			top10FilmController.create(film);
+		}
+		top10FilmController.create(film);
+		List<Film> filmTop = (List<Film>) top10FilmController.getTop();
 		assertEquals(10, filmTop.size());
 		assertEquals(filmTop.getFirst(), topFilm4);
 		assertEquals(filmTop.get(1), topFilm3);
@@ -327,12 +333,28 @@ class FilmorateApplicationTests {
 
 	@Test
 	void getFilmTop11() {
-		topFilmController.create(dislikeFilm);
-		ArrayList<Film> filmTop = (ArrayList<Film>) topFilmController.getTop();
+		FilmStorage top11FilmStorage = new InMemoryFilmStorage();
+		FilmController top11FilmController = new FilmController(top11FilmStorage);
+		for (Film film : topFilmStorage.findAll()) {
+			top11FilmController.create(film);
+		}
+		Film film11 = new Film();
+		film11.setName("Film 11");
+		top11FilmController.create(film);
+		top11FilmController.create(film11);
+		ArrayList<Film> filmTop = new ArrayList<>(top11FilmController.getTop());
 		assertEquals(10, filmTop.size());
 		assertEquals(filmTop.getFirst(), topFilm4);
 		assertEquals(filmTop.get(1), topFilm3);
 		assertEquals(filmTop.get(2), topFilm1);
+	}
+
+	@Test
+	void getEmptyTop() {
+		FilmStorage emptyFilmStorage = new InMemoryFilmStorage();
+		FilmController emptyFilmController = new FilmController(emptyFilmStorage);
+		List<Film> filmTop = (List<Film>) emptyFilmController.getTop();
+		assertEquals(0, filmTop.size());
 	}
 
 	@Test
@@ -394,7 +416,6 @@ class FilmorateApplicationTests {
 
 	@Test
 	void createUserNoLogin() {
-		System.out.println(userController.findAll());
 		User curruptUser = new User();
 		curruptUser.setLogin("");
 		curruptUser.setEmail("currupted_user@mail.ru");
@@ -413,7 +434,6 @@ class FilmorateApplicationTests {
 
 	@Test
 	void createUserDuplicatedLogin() {
-		System.out.println(userController.findAll());
 		User okUser = new User();
 		okUser.setLogin("Ok_User");
 		okUser.setEmail("okmail@mail.ru");
@@ -499,7 +519,6 @@ class FilmorateApplicationTests {
 
 	@Test
 	void changeUserDuplicatedLogin() {
-		System.out.println(userController.findAll());
 		User okUser = new User();
 		okUser.setLogin("Ok_User_update");
 		okUser.setEmail("okmail_updated@mail.ru");
