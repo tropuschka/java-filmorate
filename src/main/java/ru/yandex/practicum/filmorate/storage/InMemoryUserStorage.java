@@ -2,9 +2,6 @@ package ru.yandex.practicum.filmorate.storage;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
-import ru.yandex.practicum.filmorate.exceptions.DuplicatedDataException;
-import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.ExceptionService;
 
@@ -27,28 +24,28 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User create(User user) {
         if (user.getEmail() == null || user.getEmail().isBlank()) {
-            throwValidationException("Имейл должен быть указан");
+            ExceptionService.throwValidationException("Имейл должен быть указан");
         }
         if (!(user.getEmail().contains("@"))) {
-            throwValidationException("Указан некорректный имейл");
+            ExceptionService.throwValidationException("Указан некорректный имейл");
         }
         if (duplicateMail(user.getEmail())) {
-            throwDuplicationException("Имейл уже используется");
+            ExceptionService.throwDuplicationException("Имейл уже используется");
         }
         if (user.getLogin() == null || user.getLogin().isBlank()) {
-            throwValidationException("Введите логин");
+            ExceptionService.throwValidationException("Введите логин");
         }
         if (user.getLogin().contains(" ")) {
-            throwValidationException("В логине не должно быть пробелов");
+            ExceptionService.throwValidationException("В логине не должно быть пробелов");
         }
         if (duplicateLogin(user.getLogin())) {
-            throwDuplicationException("Логин уже используется");
+            ExceptionService.throwDuplicationException("Логин уже используется");
         }
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
         if (user.getBirthday() != null && user.getBirthday().isAfter(LocalDate.now())) {
-            throwValidationException("Указана некорректная дата рождения");
+            ExceptionService.throwValidationException("Указана некорректная дата рождения");
         }
 
         user.setId(getNextId());
@@ -60,11 +57,11 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User update(User user) {
         if (user.getId() == null) {
-            throwValidationException("Id должен быть указан");
+            ExceptionService.throwValidationException("Id должен быть указан");
         }
         User oldUser = userList.get(user.getId());
         if (oldUser == null) {
-            throwNotFoundException("Пользователь не найден");
+            ExceptionService.throwNotFoundException("Пользователь не найден");
         }
         User newUser = new User();
         newUser.setId(user.getId());
@@ -76,7 +73,7 @@ public class InMemoryUserStorage implements UserStorage {
         }
         if (user.getBirthday() != null) {
             if (user.getBirthday().isAfter(LocalDate.now())) {
-                throwValidationException("Указана некорректная дата рождения");
+                ExceptionService.throwValidationException("Указана некорректная дата рождения");
             }
             newUser.setBirthday(user.getBirthday());
         } else {
@@ -84,10 +81,10 @@ public class InMemoryUserStorage implements UserStorage {
         }
         if (user.getLogin() != null && !user.getLogin().isBlank()) {
             if (user.getLogin().contains(" ")) {
-                throwValidationException("В логине не должно быть пробелов");
+                ExceptionService.throwValidationException("В логине не должно быть пробелов");
             }
             if (duplicateLogin(user.getLogin()) && !(oldUser.getLogin().equals(user.getLogin()))) {
-                throwDuplicationException("Логин уже используется");
+                ExceptionService.throwDuplicationException("Логин уже используется");
             }
 
             newUser.setLogin(user.getLogin());
@@ -96,10 +93,10 @@ public class InMemoryUserStorage implements UserStorage {
         }
         if (user.getEmail() != null) {
             if (!(user.getEmail().contains("@"))) {
-                throwValidationException("Указан некорректный имейл");
+                ExceptionService.throwValidationException("Указан некорректный имейл");
             }
             if (duplicateMail(user.getEmail()) && !(oldUser.getEmail().equals(user.getEmail()))) {
-                throwDuplicationException("Имейл уже используется");
+                ExceptionService.throwDuplicationException("Имейл уже используется");
             }
             newUser.setEmail(user.getEmail());
         } else {
@@ -131,20 +128,5 @@ public class InMemoryUserStorage implements UserStorage {
 
     private boolean duplicateLogin(String data) {
         return userList.values().stream().map(User::getLogin).anyMatch(m -> m.equals(data));
-    }
-
-    private void throwValidationException(String message) {
-        log.error(message);
-        throw new ConditionsNotMetException(message);
-    }
-
-    private void throwDuplicationException(String message) {
-        log.error(message);
-        throw new DuplicatedDataException(message);
-    }
-
-    private void throwNotFoundException(String message) {
-        log.error(message);
-        throw new NotFoundException(message);
     }
 }
