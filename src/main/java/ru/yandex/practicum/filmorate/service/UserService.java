@@ -49,9 +49,9 @@ public class UserService {
         if (user.equals(friend)) {
             ExceptionService.throwValidationException("Нельзя удалить из друзей себя");
         }
-        if (!(user.getFriends().contains(friend.getId()) && friend.getFriends().contains(user.getId()))) {
-            ExceptionService.throwNotFoundException("Пользователя " + friend.getName() + " нет в друзьях пользователя " + user.getName());
-        }
+//        if (!(user.getFriends().contains(friend.getId()) && friend.getFriends().contains(user.getId()))) {
+//            ExceptionService.throwNotFoundException("Пользователя " + friend.getName() + " нет в друзьях пользователя " + user.getName());
+//        }
         if (user.getFriends().contains(friend.getId())) user.deleteFriend(friend);
         if (friend.getFriends().contains(user.getId())) friend.deleteFriend(user);
         log.trace("Пользователь {} удален из списка друзей пользователя {}", friend.getName(), user.getName());
