@@ -3,6 +3,8 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
+import ru.yandex.practicum.filmorate.exceptions.DuplicatedDataException;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -17,10 +19,10 @@ public class UserService {
 
     public static Collection<Long> addUserFriend(UserStorage userStorage, Long userId, Long friendId) {
         if (userStorage.findUserById(userId).isEmpty()) {
-            ExceptionService.throwNotFoundException("Пользователь с айди " + userId + " не существует");
+            throw new NotFoundException("Пользователь с айди " + userId + " не существует");
         }
         if (userStorage.findUserById(friendId).isEmpty()) {
-            ExceptionService.throwNotFoundException("Пользователь с айди " + friendId + " не существует");
+            throw new NotFoundException("Пользователь с айди " + friendId + " не существует");
         }
         User user = userStorage.findUserById(userId).get();
         User friend = userStorage.findUserById(friendId).get();
@@ -30,7 +32,7 @@ public class UserService {
         if (user.getFriends() != null && friend.getFriends() != null) {
             if (user.getFriends().contains(friend.getId()) // сделала &&, чтобы в случае, если дружба односторонняя,
                     && friend.getFriends().contains(user.getId())) { // она обновлялась до двусторонней
-            ExceptionService.throwDuplicationException("Пользователь " + friend.getName()
+            throw new DuplicatedDataException("Пользователь " + friend.getName()
                         + " уже есть в списке друзей пользователя " + user.getName());
             }
         }
@@ -42,10 +44,10 @@ public class UserService {
 
     public static Collection<Long> deleteUserFriend(UserStorage userStorage, Long userId, Long friendId) {
         if (userStorage.findUserById(userId).isEmpty()) {
-            ExceptionService.throwNotFoundException("Пользователь с айди " + userId + " не существует");
+            throw new NotFoundException("Пользователь с айди " + userId + " не существует");
         }
         if (userStorage.findUserById(friendId).isEmpty()) {
-            ExceptionService.throwNotFoundException("Пользователь с айди " + friendId + " не существует");
+            throw new NotFoundException("Пользователь с айди " + friendId + " не существует");
         }
         User user = userStorage.findUserById(userId).get();
         User friend = userStorage.findUserById(friendId).get();
@@ -60,7 +62,7 @@ public class UserService {
 
     public static Collection<User> getFriends(UserStorage userStorage, Long userId) {
         if (userStorage.findUserById(userId).isEmpty()) {
-            ExceptionService.throwNotFoundException("Пользователь с айди " + userId + " не существует");
+            throw new NotFoundException("Пользователь с айди " + userId + " не существует");
         }
         User user = userStorage.findUserById(userId).get();
         Set<User> friendList = new HashSet<>();
@@ -74,10 +76,10 @@ public class UserService {
 
     public static Collection<User> findSharedFriend(UserStorage userStorage, Long userId, Long otherId) {
         if (userStorage.findUserById(userId).isEmpty()) {
-            ExceptionService.throwNotFoundException("Пользователь с айди " + userId + " не существует");
+            throw new NotFoundException("Пользователь с айди " + userId + " не существует");
         }
         if (userStorage.findUserById(otherId).isEmpty()) {
-            ExceptionService.throwNotFoundException("Пользователь с айди " + otherId + " не существует");
+            throw new NotFoundException("Пользователь с айди " + otherId + " не существует");
         }
         User user = userStorage.findUserById(userId).get();
         User friend = userStorage.findUserById(otherId).get();

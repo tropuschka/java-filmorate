@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
@@ -15,7 +16,7 @@ public class FilmService {
     public static Film likeFilm(FilmStorage filmStorage, Long filmId, Long userId) {
         Optional<Film> optionalFilm = filmStorage.findFilmById(filmId);
         if (optionalFilm.isEmpty()) {
-            ExceptionService.throwNotFoundException("Фильм не найден");
+            throw new NotFoundException("Фильм не найден");
         }
         Film film = optionalFilm.get();
         film.like(userId);
@@ -27,7 +28,7 @@ public class FilmService {
     public static Film dislikeFilm(FilmStorage filmStorage, Long filmId, Long userId) {
         Optional<Film> optionalFilm = filmStorage.findFilmById(filmId);
         if (optionalFilm.isEmpty()) {
-            ExceptionService.throwNotFoundException("Фильм не найден");
+            throw new NotFoundException("Фильм не найден");
         }
         Film film = optionalFilm.get();
         film.dislike(userId);
