@@ -12,8 +12,6 @@ import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 @Slf4j
 @RestControllerAdvice
 public class ExceptionService {
-    @ExceptionHandler(value = ConditionsNotMetException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public static void throwValidationException(String message) {
         log.error(message);
         throw new ConditionsNotMetException(message);
