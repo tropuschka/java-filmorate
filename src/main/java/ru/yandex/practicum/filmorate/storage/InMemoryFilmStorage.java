@@ -17,7 +17,6 @@ import java.util.Optional;
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
     private Map<Long, Film> filmList = new HashMap<>();
-    private static final ExceptionService exceptionService = new ExceptionService();
 
     @Override
     public Collection<Film> findAll() {
@@ -27,16 +26,16 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film create(Film film) {
         if (film.getName() == null || film.getName().isBlank()) {
-            exceptionService.throwValidationException(new ConditionsNotMetException("Название должно быть указано"));
+            throw new ConditionsNotMetException("Название должно быть указано");
         }
         if (film.getDescription() != null && film.getDescription().length() > 200) {
-            exceptionService.throwValidationException(new ConditionsNotMetException("Описание не должно быть длиннее 200 символов"));
+            throw new ConditionsNotMetException("Описание не должно быть длиннее 200 символов");
         }
         if (film.getReleaseDate() != null && film.getReleaseDate().isBefore(LocalDate.of(1895, Month.DECEMBER, 28))) {
-            exceptionService.throwValidationException(new ConditionsNotMetException("Дата релиза не может быть раньше 28 декабря 1885 года"));
+            throw new ConditionsNotMetException("Дата релиза не может быть раньше 28 декабря 1885 года");
         }
         if (film.getDuration() != null && !(film.getDuration() > 0)) {
-            exceptionService.throwValidationException(new ConditionsNotMetException("Длительность фильма должна быть положительной"));
+            throw new ConditionsNotMetException("Длительность фильма должна быть положительной");
         }
         film.setId(getNextId());
         filmList.put(film.getId(), film);
@@ -47,7 +46,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film update(Film film) {
         if (film.getId() == null) {
-            exceptionService.throwValidationException(new ConditionsNotMetException("Id должен быть указан"));
+            throw new ConditionsNotMetException("Id должен быть указан"));
         }
         if (!filmList.containsKey(film.getId())) {
             ExceptionService.throwNotFoundException("Фильм не найден");
@@ -63,7 +62,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         }
         if (film.getDescription() != null) {
             if (film.getDescription().length() > 200) {
-                exceptionService.throwValidationException(new ConditionsNotMetException("Описание не должно быть длиннее 200 символов"));
+                throw new ConditionsNotMetException("Описание не должно быть длиннее 200 символов");
             }
             newFilm.setDescription(film.getDescription());
         } else {
@@ -71,7 +70,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         }
         if (film.getDuration() != null) {
             if (!(film.getDuration() > 0)) {
-                exceptionService.throwValidationException(new ConditionsNotMetException("Длительность фильма должна быть положительной"));
+                throw new ConditionsNotMetException("Длительность фильма должна быть положительной");
             }
             newFilm.setDuration(film.getDuration());
         } else {
@@ -79,7 +78,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         }
         if (film.getReleaseDate() != null) {
             if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
-                exceptionService.throwValidationException(new ConditionsNotMetException("Дата релиза не может быть раньше 28 декабря 1885 года"));
+                throw new ConditionsNotMetException("Дата релиза не может быть раньше 28 декабря 1885 года");
             }
             newFilm.setReleaseDate(film.getReleaseDate());
         } else {

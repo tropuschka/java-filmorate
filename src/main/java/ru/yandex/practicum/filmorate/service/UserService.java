@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class UserService {
-    private static final ExceptionService exceptionService = new ExceptionService();
 
     public static Collection<Long> addUserFriend(UserStorage userStorage, Long userId, Long friendId) {
         if (userStorage.findUserById(userId).isEmpty()) {
@@ -26,7 +25,7 @@ public class UserService {
         User user = userStorage.findUserById(userId).get();
         User friend = userStorage.findUserById(friendId).get();
         if (user.equals(friend)) {
-            exceptionService.throwValidationException(new ConditionsNotMetException("Нельзя добавить в друзья себя"));
+            throw new ConditionsNotMetException("Нельзя добавить в друзья себя");
         }
         if (user.getFriends() != null && friend.getFriends() != null) {
             if (user.getFriends().contains(friend.getId()) // сделала &&, чтобы в случае, если дружба односторонняя,
@@ -51,7 +50,7 @@ public class UserService {
         User user = userStorage.findUserById(userId).get();
         User friend = userStorage.findUserById(friendId).get();
         if (user.equals(friend)) {
-            exceptionService.throwValidationException(new ConditionsNotMetException("Нельзя удалить из друзей себя"));
+            throw new ConditionsNotMetException("Нельзя удалить из друзей себя");
         }
         if (user.getFriends().contains(friend.getId())) user.deleteFriend(friend);
         if (friend.getFriends().contains(user.getId())) friend.deleteFriend(user);
@@ -83,7 +82,7 @@ public class UserService {
         User user = userStorage.findUserById(userId).get();
         User friend = userStorage.findUserById(otherId).get();
         if (user.equals(friend)) {
-            exceptionService.throwValidationException(new ConditionsNotMetException("Для сравнения нужны два разных пользователя"));
+            throw  new ConditionsNotMetException("Для сравнения нужны два разных пользователя");
         }
         Set<Long> sharedFriendsId = user.getFriends().stream()
                 .filter(friend.getFriends()::contains)

@@ -12,8 +12,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class FilmService {
-    private static final ExceptionService exceptionService = new ExceptionService();
-
     public static Film likeFilm(FilmStorage filmStorage, Long filmId, Long userId) {
         Optional<Film> optionalFilm = filmStorage.findFilmById(filmId);
         if (optionalFilm.isEmpty()) {
@@ -38,7 +36,7 @@ public class FilmService {
 
     public static Collection<Film> getTop(FilmStorage filmStorage, int amount) {
         if (amount <= 0) {
-            exceptionService.throwValidationException(new ConditionsNotMetException("Количество позиций в топе не может быть меньше 1"));
+            throw new ConditionsNotMetException("Количество позиций в топе не может быть меньше 1");
         }
         ArrayList<Film> filmTop = filmStorage.findAll().stream()
                 .sorted(Comparator.comparing(Film::likeAmount).reversed())
