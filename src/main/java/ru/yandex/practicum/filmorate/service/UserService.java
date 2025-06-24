@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -13,6 +14,8 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class UserService {
+    private static final ExceptionService exceptionService = new ExceptionService();
+
     public static Collection<Long> addUserFriend(UserStorage userStorage, Long userId, Long friendId) {
         if (userStorage.findUserById(userId).isEmpty()) {
             ExceptionService.throwNotFoundException("Пользователь с айди " + userId + " не существует");
@@ -23,7 +26,7 @@ public class UserService {
         User user = userStorage.findUserById(userId).get();
         User friend = userStorage.findUserById(friendId).get();
         if (user.equals(friend)) {
-            ExceptionService.throwValidationException("Нельзя добавить в друзья себя");
+            exceptionService.throwValidationException(new ConditionsNotMetException("Нельзя добавить в друзья себя"));
         }
         if (user.getFriends() != null && friend.getFriends() != null) {
             if (user.getFriends().contains(friend.getId()) // сделала &&, чтобы в случае, если дружба односторонняя,
@@ -48,11 +51,8 @@ public class UserService {
         User user = userStorage.findUserById(userId).get();
         User friend = userStorage.findUserById(friendId).get();
         if (user.equals(friend)) {
-            ExceptionService.throwValidationException("Нельзя удалить из друзей себя");
+            exceptionService.throwValidationException(new ConditionsNotMetException("Нельзя удалить из друзей себя"));
         }
-//        if (!(user.getFriends().contains(friend.getId()) && friend.getFriends().contains(user.getId()))) {
-//            ExceptionService.throwNotFoundException("Пользователя " + friend.getName() + " нет в друзьях пользователя " + user.getName());
-//        }
         if (user.getFriends().contains(friend.getId())) user.deleteFriend(friend);
         if (friend.getFriends().contains(user.getId())) friend.deleteFriend(user);
         log.trace("Пользователь {} удален из списка друзей пользователя {}", friend.getName(), user.getName());
@@ -83,7 +83,7 @@ public class UserService {
         User user = userStorage.findUserById(userId).get();
         User friend = userStorage.findUserById(otherId).get();
         if (user.equals(friend)) {
-            ExceptionService.throwValidationException("Для сравнения нужны два разных пользователя");
+            exceptionService.throwValidationException(new ConditionsNotMetException("Для сравнения нужны два разных пользователя"));
         }
         Set<Long> sharedFriendsId = user.getFriends().stream()
                 .filter(friend.getFriends()::contains)

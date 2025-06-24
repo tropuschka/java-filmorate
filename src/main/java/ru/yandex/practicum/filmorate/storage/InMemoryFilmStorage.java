@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.ExceptionService;
 
@@ -16,6 +17,7 @@ import java.util.Optional;
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
     private Map<Long, Film> filmList = new HashMap<>();
+    private static final ExceptionService exceptionService = new ExceptionService();
 
     @Override
     public Collection<Film> findAll() {
@@ -25,16 +27,16 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film create(Film film) {
         if (film.getName() == null || film.getName().isBlank()) {
-            ExceptionService.throwValidationException("Название должно быть указано");
+            exceptionService.throwValidationException(new ConditionsNotMetException("Название должно быть указано"));
         }
         if (film.getDescription() != null && film.getDescription().length() > 200) {
-            ExceptionService.throwValidationException("Описание не должно быть длиннее 200 символов");
+            exceptionService.throwValidationException(new ConditionsNotMetException("Описание не должно быть длиннее 200 символов"));
         }
         if (film.getReleaseDate() != null && film.getReleaseDate().isBefore(LocalDate.of(1895, Month.DECEMBER, 28))) {
-            ExceptionService.throwValidationException("Дата релиза не может быть раньше 28 декабря 1885 года");
+            exceptionService.throwValidationException(new ConditionsNotMetException("Дата релиза не может быть раньше 28 декабря 1885 года"));
         }
         if (film.getDuration() != null && !(film.getDuration() > 0)) {
-            ExceptionService.throwValidationException("Длительность фильма должна быть положительной");
+            exceptionService.throwValidationException(new ConditionsNotMetException("Длительность фильма должна быть положительной"));
         }
         film.setId(getNextId());
         filmList.put(film.getId(), film);
@@ -45,7 +47,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film update(Film film) {
         if (film.getId() == null) {
-            ExceptionService.throwValidationException("Id должен быть указан");
+            exceptionService.throwValidationException(new ConditionsNotMetException("Id должен быть указан"));
         }
         if (!filmList.containsKey(film.getId())) {
             ExceptionService.throwNotFoundException("Фильм не найден");
@@ -61,7 +63,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         }
         if (film.getDescription() != null) {
             if (film.getDescription().length() > 200) {
-                ExceptionService.throwValidationException("Описание не должно быть длиннее 200 символов");
+                exceptionService.throwValidationException(new ConditionsNotMetException("Описание не должно быть длиннее 200 символов"));
             }
             newFilm.setDescription(film.getDescription());
         } else {
@@ -69,7 +71,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         }
         if (film.getDuration() != null) {
             if (!(film.getDuration() > 0)) {
-                ExceptionService.throwValidationException("Длительность фильма должна быть положительной");
+                exceptionService.throwValidationException(new ConditionsNotMetException("Длительность фильма должна быть положительной"));
             }
             newFilm.setDuration(film.getDuration());
         } else {
@@ -77,7 +79,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         }
         if (film.getReleaseDate() != null) {
             if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
-                ExceptionService.throwValidationException("Дата релиза не может быть раньше 28 декабря 1885 года");
+                exceptionService.throwValidationException(new ConditionsNotMetException("Дата релиза не может быть раньше 28 декабря 1885 года"));
             }
             newFilm.setReleaseDate(film.getReleaseDate());
         } else {

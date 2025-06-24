@@ -2,11 +2,8 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.ExceptionService;
 import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -56,11 +53,5 @@ public class UserController {
     @DeleteMapping("/{id}/friends/{friendId}")
     public Collection<Long> deleteFriend(@PathVariable Long id, @PathVariable Long friendId) {
         return UserService.deleteUserFriend(userStorage, id, friendId);
-    }
-
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(value = ConditionsNotMetException.class)
-    public void conditionsNotMet(ConditionsNotMetException e) {
-        ExceptionService.throwValidationException(e.getMessage());
     }
 }
