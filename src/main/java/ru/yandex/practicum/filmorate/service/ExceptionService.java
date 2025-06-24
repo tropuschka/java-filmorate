@@ -13,21 +13,18 @@ import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 @RestControllerAdvice
 public class ExceptionService {
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public static void throwValidationException(String message) {
         log.error(message);
         throw new ConditionsNotMetException(message);
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
     public static void throwNotFoundException(String message) {
         log.error(message);
         throw new NotFoundException(message);
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public static void throwDuplicationException(String message) {
         log.error(message);
         throw new DuplicatedDataException(message);
