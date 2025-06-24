@@ -23,15 +23,15 @@ public class ExceptionService {
 
     @ExceptionHandler(value = NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String throwNotFoundException(final NotFoundException e) {
+    public Map<String, String> throwNotFoundException(final NotFoundException e) {
         log.error(e.getMessage());
-        return e.getMessage();
+        return Map.of("NotFoundException", e.getMessage());
     }
 
     @ExceptionHandler(value = DuplicatedDataException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public String throwDuplicationException(final DuplicatedDataException e) {
+    public Map<String, String> throwDuplicationException(final DuplicatedDataException e) {
         log.error(e.getMessage());
-        return e.getMessage();
+        return Map.of("DuplicatedDataException", e.getMessage());
     }
 }
