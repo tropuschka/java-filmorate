@@ -6,6 +6,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
+import ru.yandex.practicum.filmorate.exceptions.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
@@ -16,7 +17,9 @@ import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -335,7 +338,7 @@ class FilmorateApplicationTests {
 				conditionsNotMetException.getMessage());
 		assertEquals(likeAmount, dislikeFilm.getLikes().size());
 	}
-/*
+*/
 	@Test
 	void getFilmTop9() {
 		List<Film> filmTop = (List<Film>) topFilmController.getTop(10);
@@ -420,7 +423,7 @@ class FilmorateApplicationTests {
 		Collection<Film> controllerFilmList = filmController.findAll();
 
 		assertNotNull(controllerFilmList);
-		assertEquals(6, controllerFilmList.size());
+		assertEquals(filmStorage.findAll().size(), controllerFilmList.size());
 	}
 
 	@Test
@@ -793,7 +796,7 @@ class FilmorateApplicationTests {
 		me.addFriend(sharedFriend);
 		otherUser.addFriend(othersFriend);
 		otherUser.addFriend(sharedFriend);
-		assertTrue(userController.findSharedFriends(me.getId(), otherUser.getId()).contains(sharedFriend.getId()));
+		assertTrue(userController.findSharedFriends(me.getId(), otherUser.getId()).contains(sharedFriend));
 		assertEquals(1, userController.findSharedFriends(me.getId(), otherUser.getId()).size());
 	}
 

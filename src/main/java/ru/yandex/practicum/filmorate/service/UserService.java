@@ -6,6 +6,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -58,15 +59,21 @@ public class UserService {
         return user.getFriends();
     }
 
-    public static Collection<Long> getFriends(UserStorage userStorage, Long userId) {
+    public static Collection<User> getFriends(UserStorage userStorage, Long userId) {
         if (userStorage.findUserById(userId).isEmpty()) {
             ExceptionService.throwNotFoundException("Пользователь с айди " + userId + " не существует");
         }
         User user = userStorage.findUserById(userId).get();
-        return user.getFriends();
+        Set<User> friendList = new HashSet<>();
+        for (Long friendId : user.getFriends()) {
+            if (userStorage.findUserById(friendId).isPresent()) {
+                friendList.add(userStorage.findUserById(friendId).get());
+            }
+        }
+        return friendList;
     }
 
-    public static Collection<Long> findSharedFriend(UserStorage userStorage, Long userId, Long otherId) {
+    public static Collection<User> findSharedFriend(UserStorage userStorage, Long userId, Long otherId) {
         if (userStorage.findUserById(userId).isEmpty()) {
             ExceptionService.throwNotFoundException("Пользователь с айди " + userId + " не существует");
         }
@@ -78,11 +85,17 @@ public class UserService {
         if (user.equals(friend)) {
             ExceptionService.throwValidationException("Для сравнения нужны два разных пользователя");
         }
-        Set<Long> sharedFriends = user.getFriends().stream()
+        Set<Long> sharedFriendsId = user.getFriends().stream()
                 .filter(friend.getFriends()::contains)
                 .collect(Collectors.toSet());
+        Set<User> sharedFriends = new HashSet<>();
+        for (Long friendId : sharedFriendsId) {
+            if (userStorage.findUserById(friendId).isPresent()) {
+                sharedFriends.add(userStorage.findUserById(friendId).get());
+            }
+        }
         log.trace("У пользователя {} и пользователя {} {} общих друзей",
-                user.getName(), friend.getName(), sharedFriends.size());
+                user.getName(), friend.getName(), sharedFriendsId.size());
         return sharedFriends;
     }
 }
