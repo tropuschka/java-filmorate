@@ -17,7 +17,7 @@ public class FilmService {
     public static Film likeFilm(FilmStorage filmStorage, Long filmId, Long userId) {
         Optional<Film> optionalFilm = filmStorage.findFilmById(filmId);
         if (optionalFilm.isEmpty()) {
-            ExceptionService.throwNotFoundException("Фильм не найден");
+            throw new ConditionsNotMetException("Фильм не найден");
         }
         Film film = optionalFilm.get();
         film.like(userId);
