@@ -34,7 +34,7 @@ class FilmorateApplicationTests {
 	static User sharedFriend = new User();
 	static FilmStorage filmStorage = new InMemoryFilmStorage();
 	static UserStorage userStorage = new InMemoryUserStorage();
-	static FilmController filmController = new FilmController(filmStorage);
+	static FilmController filmController = new FilmController(filmStorage, userStorage);
 	static UserController userController = new UserController(userStorage);
 	static Film topFilm1 = new Film();
 	static Film topFilm2 = new Film();
@@ -46,7 +46,7 @@ class FilmorateApplicationTests {
 	static Film topFilm8 = new Film();
 	static Film topFilm9 = new Film();
 	static FilmStorage topFilmStorage = new InMemoryFilmStorage();
-	static FilmController topFilmController = new FilmController(topFilmStorage);
+	static FilmController topFilmController = new FilmController(topFilmStorage, userStorage);
 
 
 	@BeforeAll
@@ -295,19 +295,19 @@ class FilmorateApplicationTests {
 		assertEquals(0, likeFilm.getLikes().size());
 		assertFalse(likeFilm.getLikes().contains(me.getId()));
 	}
-/*
+
 	@Test
-	void likeFilmDouble() {
-		Film likeFilm = new Film();
-		likeFilm.setName("Double Liked Film");
-		filmController.create(likeFilm);
-		filmController.like(likeFilm.getId(), me.getId());
-		int likeAmount = likeFilm.getLikes().size();
-		DuplicatedDataException duplicatedDataException = assertThrows(DuplicatedDataException.class,
-				() -> filmController.like(likeFilm.getId(), me.getId()));
-		assertEquals("Лайк уже поставлен", duplicatedDataException.getMessage());
-		assertEquals(likeAmount, likeFilm.getLikes().size());
-	} */
+	void likeFilmNoUser() {
+		User likeUser = new User();
+		likeUser.setId((long) userStorage.findAll().size() + 1);
+		likeUser.setEmail("like-film-no-user@mail.ru");
+		int likeAmount = topFilm1.likeAmount();
+		NotFoundException notFoundException = assertThrows(NotFoundException.class,
+				() -> topFilmController.like(topFilm1.getId(), likeUser.getId()));
+		assertEquals("Пользователь не найден", notFoundException.getMessage());
+		assertEquals(likeAmount, topFilm1.getLikes().size());
+		assertFalse(topFilm1.getLikes().contains(likeUser.getId()));
+	}
 
 	@Test
 	void dislikeFilm() {
@@ -329,16 +329,19 @@ class FilmorateApplicationTests {
 		assertEquals(0, dislikeNoFilm.getLikes().size());
 	}
 
-/*	@Test
-	void dislikeNotLikedFilm() {
-		int likeAmount = dislikeFilm.getLikes().size();
-		ConditionsNotMetException conditionsNotMetException = assertThrows(ConditionsNotMetException.class,
-				() -> filmController.dislike(dislikeFilm.getId(), myFriend.getId()));
-		assertEquals("Пользователь с айди " + myFriend.getId() + " не оценивал фильм " + dislikeFilm.getName(),
-				conditionsNotMetException.getMessage());
-		assertEquals(likeAmount, dislikeFilm.getLikes().size());
+	@Test
+	void dislikeFilmNoUser() {
+		User likeUser = new User();
+		likeUser.setId((long) userStorage.findAll().size() + 1);
+		likeUser.setEmail("like-film-no-user@mail.ru");
+		int likeAmount = topFilm1.likeAmount();
+		NotFoundException notFoundException = assertThrows(NotFoundException.class,
+				() -> topFilmController.dislike(topFilm1.getId(), likeUser.getId()));
+		assertEquals("Пользователь не найден", notFoundException.getMessage());
+		assertEquals(likeAmount, topFilm1.getLikes().size());
+		assertFalse(topFilm1.getLikes().contains(likeUser.getId()));
 	}
-*/
+
 	@Test
 	void getFilmTop9() {
 		List<Film> filmTop = (List<Film>) topFilmController.getTop(10);
@@ -351,7 +354,7 @@ class FilmorateApplicationTests {
 	@Test
 	void getFilmTop10() {
 		FilmStorage top10FilmStorage = new InMemoryFilmStorage();
-		FilmController top10FilmController = new FilmController(top10FilmStorage);
+		FilmController top10FilmController = new FilmController(top10FilmStorage, userStorage);
 		for (Film film : topFilmStorage.findAll()) {
 			top10FilmController.create(film);
 		}
@@ -366,7 +369,7 @@ class FilmorateApplicationTests {
 	@Test
 	void getFilmTop11() {
 		FilmStorage top11FilmStorage = new InMemoryFilmStorage();
-		FilmController top11FilmController = new FilmController(top11FilmStorage);
+		FilmController top11FilmController = new FilmController(top11FilmStorage, userStorage);
 		for (Film film : topFilmStorage.findAll()) {
 			top11FilmController.create(film);
 		}
@@ -408,7 +411,7 @@ class FilmorateApplicationTests {
 	@Test
 	void getEmptyTop() {
 		FilmStorage emptyFilmStorage = new InMemoryFilmStorage();
-		FilmController emptyFilmController = new FilmController(emptyFilmStorage);
+		FilmController emptyFilmController = new FilmController(emptyFilmStorage, userStorage);
 		List<Film> filmTop = (List<Film>) emptyFilmController.getTop(10);
 		assertEquals(0, filmTop.size());
 	}
