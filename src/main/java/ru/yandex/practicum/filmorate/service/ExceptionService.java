@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -16,9 +17,9 @@ import java.util.Map;
 public class ExceptionService {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> throwValidationException(final ConditionsNotMetException e) {
+    public ErrorResponse throwValidationException(final ConditionsNotMetException e) {
         log.error(e.getMessage());
-        return Map.of("ConditionsNotMetException", e.getMessage());
+        return ErrorResponse.create(e, HttpStatus.BAD_REQUEST, e.getMessage());
     }
 
     @ExceptionHandler(value = NotFoundException.class)
