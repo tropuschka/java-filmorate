@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.Collection;
+import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -23,6 +24,11 @@ public class UserController {
     @GetMapping
     public Collection<User> findAll() {
         return userStorage.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public Optional<User> findById(@PathVariable Long id) {
+        return userStorage.findUserById(id);
     }
 
     @PostMapping

@@ -2,12 +2,11 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
-import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -15,15 +14,9 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class FilmService {
-    public static Film likeFilm(FilmStorage filmStorage, UserStorage userStorage, Long filmId, Long userId) {
-        Optional<Film> optionalFilm = filmStorage.findFilmById(filmId);
-        if (optionalFilm.isEmpty()) {
-            throw new NotFoundException("Фильм не найден");
-        }
-        Optional<User> optionalUser = userStorage.findUserById(userId);
-        if (optionalUser.isEmpty()) {
-            throw new NotFoundException("Пользователь не найден");
-        }
+    public static Film likeFilm(FilmStorage filmStorage, UserController userController, Long filmId, Long userId) {
+        Optional<Film> optionalFilm = Optional.of(filmStorage.findFilmById(filmId).orElseThrow());
+        Optional<User> optionalUser = Optional.of(userController.findById(userId).orElseThrow());
         Film film = optionalFilm.get();
         film.like(userId);
         log.trace("Пользователь с айди {} оценил фильм с айди {} (количество лайков: {})",
@@ -31,17 +24,13 @@ public class FilmService {
         return film;
     }
 
-    public static Film dislikeFilm(FilmStorage filmStorage, UserStorage userStorage, Long filmId, Long userId) {
-        Optional<Film> optionalFilm = filmStorage.findFilmById(filmId);
-        if (optionalFilm.isEmpty()) {
-            throw new NotFoundException("Фильм не найден");
-        }
-        Optional<User> optionalUser = userStorage.findUserById(userId);
-        if (optionalUser.isEmpty()) {
-            throw new NotFoundException("Пользователь не найден");
-        }
+    public static Film dislikeFilm(FilmStorage filmStorage, UserController userController, Long filmId, Long userId) {
+        Optional<Film> optionalFilm = Optional.of(filmStorage.findFilmById(filmId).orElseThrow());
+        Optional<User> optionalUser = Optional.of(userController.findById(userId).orElseThrow());
         Film film = optionalFilm.get();
         film.dislike(userId);
+        log.trace("Пользователь с айди {} снял отметку \"нравится\" с фильма с айди {} (количество лайков: {})",
+                userId, filmId, film.getLikes().size());
         return film;
     }
 

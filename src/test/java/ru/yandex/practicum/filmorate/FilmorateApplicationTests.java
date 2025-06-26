@@ -20,6 +20,7 @@ import java.time.Month;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -34,8 +35,8 @@ class FilmorateApplicationTests {
 	static User sharedFriend = new User();
 	static FilmStorage filmStorage = new InMemoryFilmStorage();
 	static UserStorage userStorage = new InMemoryUserStorage();
-	static FilmController filmController = new FilmController(filmStorage, userStorage);
 	static UserController userController = new UserController(userStorage);
+	static FilmController filmController = new FilmController(filmStorage, userController);
 	static Film topFilm1 = new Film();
 	static Film topFilm2 = new Film();
 	static Film topFilm3 = new Film();
@@ -46,7 +47,7 @@ class FilmorateApplicationTests {
 	static Film topFilm8 = new Film();
 	static Film topFilm9 = new Film();
 	static FilmStorage topFilmStorage = new InMemoryFilmStorage();
-	static FilmController topFilmController = new FilmController(topFilmStorage, userStorage);
+	static FilmController topFilmController = new FilmController(topFilmStorage, userController);
 
 
 	@BeforeAll
@@ -289,9 +290,9 @@ class FilmorateApplicationTests {
 		Film likeFilm = new Film();
 		likeFilm.setName("No Film");
 		likeFilm.setId((long) filmController.findAll().size() + 1);
-		NotFoundException notFoundException = assertThrows(NotFoundException.class,
+		NoSuchElementException notFoundException = assertThrows(NoSuchElementException.class,
 				() -> filmController.like(likeFilm.getId(), me.getId()));
-		assertEquals("Фильм не найден", notFoundException.getMessage());
+		assertEquals("No value present", notFoundException.getMessage());
 		assertEquals(0, likeFilm.getLikes().size());
 		assertFalse(likeFilm.getLikes().contains(me.getId()));
 	}
@@ -302,9 +303,9 @@ class FilmorateApplicationTests {
 		likeUser.setId((long) userStorage.findAll().size() + 1);
 		likeUser.setEmail("like-film-no-user@mail.ru");
 		int likeAmount = topFilm1.likeAmount();
-		NotFoundException notFoundException = assertThrows(NotFoundException.class,
+		NoSuchElementException notFoundException = assertThrows(NoSuchElementException.class,
 				() -> topFilmController.like(topFilm1.getId(), likeUser.getId()));
-		assertEquals("Пользователь не найден", notFoundException.getMessage());
+		assertEquals("No value present", notFoundException.getMessage());
 		assertEquals(likeAmount, topFilm1.getLikes().size());
 		assertFalse(topFilm1.getLikes().contains(likeUser.getId()));
 	}
@@ -323,9 +324,9 @@ class FilmorateApplicationTests {
 		dislikeNoFilm.setName("No Film");
 		Long filmId = (long) filmController.findAll().size() + 1;
 		dislikeNoFilm.setId(filmId);
-		NotFoundException notFoundException = assertThrows(NotFoundException.class,
+		NoSuchElementException notFoundException = assertThrows(NoSuchElementException.class,
 				() -> filmController.dislike(dislikeNoFilm.getId(), me.getId()));
-		assertEquals("Фильм не найден", notFoundException.getMessage());
+		assertEquals("No value present", notFoundException.getMessage());
 		assertEquals(0, dislikeNoFilm.getLikes().size());
 	}
 
@@ -335,9 +336,9 @@ class FilmorateApplicationTests {
 		likeUser.setId((long) userStorage.findAll().size() + 1);
 		likeUser.setEmail("like-film-no-user@mail.ru");
 		int likeAmount = topFilm1.likeAmount();
-		NotFoundException notFoundException = assertThrows(NotFoundException.class,
+		NoSuchElementException notFoundException = assertThrows(NoSuchElementException.class,
 				() -> topFilmController.dislike(topFilm1.getId(), likeUser.getId()));
-		assertEquals("Пользователь не найден", notFoundException.getMessage());
+		assertEquals("No value present", notFoundException.getMessage());
 		assertEquals(likeAmount, topFilm1.getLikes().size());
 		assertFalse(topFilm1.getLikes().contains(likeUser.getId()));
 	}
@@ -354,7 +355,7 @@ class FilmorateApplicationTests {
 	@Test
 	void getFilmTop10() {
 		FilmStorage top10FilmStorage = new InMemoryFilmStorage();
-		FilmController top10FilmController = new FilmController(top10FilmStorage, userStorage);
+		FilmController top10FilmController = new FilmController(top10FilmStorage, userController);
 		for (Film film : topFilmStorage.findAll()) {
 			top10FilmController.create(film);
 		}
@@ -369,7 +370,7 @@ class FilmorateApplicationTests {
 	@Test
 	void getFilmTop11() {
 		FilmStorage top11FilmStorage = new InMemoryFilmStorage();
-		FilmController top11FilmController = new FilmController(top11FilmStorage, userStorage);
+		FilmController top11FilmController = new FilmController(top11FilmStorage, userController);
 		for (Film film : topFilmStorage.findAll()) {
 			top11FilmController.create(film);
 		}
@@ -411,7 +412,7 @@ class FilmorateApplicationTests {
 	@Test
 	void getEmptyTop() {
 		FilmStorage emptyFilmStorage = new InMemoryFilmStorage();
-		FilmController emptyFilmController = new FilmController(emptyFilmStorage, userStorage);
+		FilmController emptyFilmController = new FilmController(emptyFilmStorage, userController);
 		List<Film> filmTop = (List<Film>) emptyFilmController.getTop(10);
 		assertEquals(0, filmTop.size());
 	}
@@ -758,18 +759,6 @@ class FilmorateApplicationTests {
 				notFoundException.getMessage());
 	}
 
-	/*	@Test
-        void deleteNotAFriend() {
-            User friend = new User();
-            friend.setLogin("Delete_Not_A_Friend");
-            friend.setEmail("delete-not-a-friend@mail.ru");
-            userController.create(friend);
-            NotFoundException notFoundException = assertThrows(NotFoundException.class,
-                    () -> userController.deleteFriend(me.getId(), friend.getId()));
-            assertEquals("Пользователя " + friend.getName() + " нет в друзьях пользователя " + me.getName(),
-                    notFoundException.getMessage());
-        }
-    */
 	@Test
 	void deleteSelfFriend() {
 		ConditionsNotMetException conditionsNotMetException = assertThrows(ConditionsNotMetException.class,

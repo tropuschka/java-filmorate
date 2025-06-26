@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.Collection;
 
@@ -15,12 +14,12 @@ import java.util.Collection;
 @RequestMapping("/films")
 public class FilmController {
     private final FilmStorage filmStorage;
-    private final UserStorage userStorage;
+    private final UserController userController;
 
     @Autowired
-    public FilmController(FilmStorage filmStorage, UserStorage userStorage) {
+    public FilmController(FilmStorage filmStorage, UserController userController) {
         this.filmStorage = filmStorage;
-        this.userStorage = userStorage;
+        this.userController = userController;
     }
 
     @GetMapping
@@ -40,12 +39,12 @@ public class FilmController {
 
     @PutMapping("/{id}/like/{userId}")
     public Film like(@PathVariable Long id, @PathVariable Long userId) {
-        return FilmService.likeFilm(filmStorage, userStorage, id, userId);
+        return FilmService.likeFilm(filmStorage, userController, id, userId);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
     public Film dislike(@PathVariable Long id, @PathVariable Long userId) {
-        return FilmService.dislikeFilm(filmStorage, userStorage, id, userId);
+        return FilmService.dislikeFilm(filmStorage, userController, id, userId);
     }
 
     @GetMapping("/popular")

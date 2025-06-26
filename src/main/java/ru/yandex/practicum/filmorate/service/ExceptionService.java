@@ -9,6 +9,8 @@ import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
 import ru.yandex.practicum.filmorate.exceptions.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 
+import java.util.NoSuchElementException;
+
 @Slf4j
 @RestControllerAdvice
 public class ExceptionService {
@@ -20,6 +22,12 @@ public class ExceptionService {
 
     @ExceptionHandler(value = NotFoundException.class)
     public ErrorResponse throwNotFoundException(final NotFoundException e) {
+        log.error(e.getMessage());
+        return ErrorResponse.create(e, HttpStatus.NOT_FOUND, e.getMessage());
+    }
+
+    @ExceptionHandler(value = NoSuchElementException.class)
+    public ErrorResponse throwNoSuchElementException(final NoSuchElementException e) {
         log.error(e.getMessage());
         return ErrorResponse.create(e, HttpStatus.NOT_FOUND, e.getMessage());
     }
