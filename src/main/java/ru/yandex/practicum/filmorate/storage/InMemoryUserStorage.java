@@ -6,7 +6,6 @@ import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
 import ru.yandex.practicum.filmorate.exceptions.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.ExceptionService;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -18,7 +17,6 @@ import java.util.Optional;
 @Component
 public class InMemoryUserStorage implements UserStorage {
     private Map<Long, User> userList = new HashMap<>();
-    private static final ExceptionService exceptionService = new ExceptionService();
 
     @Override
     public Collection<User> findAll() {
