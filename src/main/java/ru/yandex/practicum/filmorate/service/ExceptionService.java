@@ -14,7 +14,7 @@ import java.util.NoSuchElementException;
 @Slf4j
 @RestControllerAdvice
 public class ExceptionService {
-    @ExceptionHandler
+    @ExceptionHandler(value = ConditionsNotMetException.class)
     public ErrorResponse throwValidationException(final ConditionsNotMetException e) {
         log.error(e.getMessage());
         return ErrorResponse.create(e, HttpStatus.BAD_REQUEST, e.getMessage());

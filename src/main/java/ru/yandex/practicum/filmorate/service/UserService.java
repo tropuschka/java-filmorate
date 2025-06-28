@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
 import ru.yandex.practicum.filmorate.exceptions.DuplicatedDataException;
-import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -18,14 +17,8 @@ import java.util.stream.Collectors;
 public class UserService {
 
     public static Collection<Long> addUserFriend(UserStorage userStorage, Long userId, Long friendId) {
-        if (userStorage.findUserById(userId).isEmpty()) {
-            throw new NotFoundException("Пользователь с айди " + userId + " не существует");
-        }
-        if (userStorage.findUserById(friendId).isEmpty()) {
-            throw new NotFoundException("Пользователь с айди " + friendId + " не существует");
-        }
-        User user = userStorage.findUserById(userId).get();
-        User friend = userStorage.findUserById(friendId).get();
+        User user = userStorage.findUserById(userId);
+        User friend = userStorage.findUserById(friendId);
         if (user.equals(friend)) {
             throw new ConditionsNotMetException("Нельзя добавить в друзья себя");
         }
@@ -43,14 +36,8 @@ public class UserService {
     }
 
     public static Collection<Long> deleteUserFriend(UserStorage userStorage, Long userId, Long friendId) {
-        if (userStorage.findUserById(userId).isEmpty()) {
-            throw new NotFoundException("Пользователь с айди " + userId + " не существует");
-        }
-        if (userStorage.findUserById(friendId).isEmpty()) {
-            throw new NotFoundException("Пользователь с айди " + friendId + " не существует");
-        }
-        User user = userStorage.findUserById(userId).get();
-        User friend = userStorage.findUserById(friendId).get();
+        User user = userStorage.findUserById(userId);
+        User friend = userStorage.findUserById(friendId);
         if (user.equals(friend)) {
             throw new ConditionsNotMetException("Нельзя удалить из друзей себя");
         }
@@ -61,28 +48,17 @@ public class UserService {
     }
 
     public static Collection<User> getFriends(UserStorage userStorage, Long userId) {
-        if (userStorage.findUserById(userId).isEmpty()) {
-            throw new NotFoundException("Пользователь с айди " + userId + " не существует");
-        }
-        User user = userStorage.findUserById(userId).get();
+        User user = userStorage.findUserById(userId);
         Set<User> friendList = new HashSet<>();
         for (Long friendId : user.getFriends()) {
-            if (userStorage.findUserById(friendId).isPresent()) {
-                friendList.add(userStorage.findUserById(friendId).get());
-            }
+            friendList.add(userStorage.findUserById(friendId));
         }
         return friendList;
     }
 
     public static Collection<User> findSharedFriend(UserStorage userStorage, Long userId, Long otherId) {
-        if (userStorage.findUserById(userId).isEmpty()) {
-            throw new NotFoundException("Пользователь с айди " + userId + " не существует");
-        }
-        if (userStorage.findUserById(otherId).isEmpty()) {
-            throw new NotFoundException("Пользователь с айди " + otherId + " не существует");
-        }
-        User user = userStorage.findUserById(userId).get();
-        User friend = userStorage.findUserById(otherId).get();
+        User user = userStorage.findUserById(userId);
+        User friend = userStorage.findUserById(otherId);
         if (user.equals(friend)) {
             throw  new ConditionsNotMetException("Для сравнения нужны два разных пользователя");
         }
@@ -91,9 +67,7 @@ public class UserService {
                 .collect(Collectors.toSet());
         Set<User> sharedFriends = new HashSet<>();
         for (Long friendId : sharedFriendsId) {
-            if (userStorage.findUserById(friendId).isPresent()) {
-                sharedFriends.add(userStorage.findUserById(friendId).get());
-            }
+            sharedFriends.add(userStorage.findUserById(friendId));
         }
         log.trace("У пользователя {} и пользователя {} {} общих друзей",
                 user.getName(), friend.getName(), sharedFriendsId.size());

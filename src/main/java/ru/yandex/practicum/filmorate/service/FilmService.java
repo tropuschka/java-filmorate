@@ -15,9 +15,8 @@ import java.util.stream.Collectors;
 @Service
 public class FilmService {
     public static Film likeFilm(FilmStorage filmStorage, UserController userController, Long filmId, Long userId) {
-        Optional<Film> optionalFilm = Optional.of(filmStorage.findFilmById(filmId).orElseThrow());
-        Optional<User> optionalUser = Optional.of(userController.findById(userId).orElseThrow());
-        Film film = optionalFilm.get();
+        User optionalUser = userController.findById(userId);
+        Film film = filmStorage.findFilmById(filmId);
         film.like(userId);
         log.trace("Пользователь с айди {} оценил фильм с айди {} (количество лайков: {})",
                 userId, filmId, film.getLikes().size());
@@ -25,9 +24,8 @@ public class FilmService {
     }
 
     public static Film dislikeFilm(FilmStorage filmStorage, UserController userController, Long filmId, Long userId) {
-        Optional<Film> optionalFilm = Optional.of(filmStorage.findFilmById(filmId).orElseThrow());
-        Optional<User> optionalUser = Optional.of(userController.findById(userId).orElseThrow());
-        Film film = optionalFilm.get();
+        User optionalUser = userController.findById(userId);
+        Film film = filmStorage.findFilmById(filmId);
         film.dislike(userId);
         log.trace("Пользователь с айди {} снял отметку \"нравится\" с фильма с айди {} (количество лайков: {})",
                 userId, filmId, film.getLikes().size());
