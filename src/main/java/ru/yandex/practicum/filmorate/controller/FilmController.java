@@ -14,12 +14,12 @@ import java.util.Collection;
 @RequestMapping("/films")
 public class FilmController {
     private final FilmStorage filmStorage;
-    private final UserController userController;
+    private final FilmService filmService;
 
     @Autowired
-    public FilmController(FilmStorage filmStorage, UserController userController) {
+    public FilmController(FilmStorage filmStorage, FilmService filmService) {
         this.filmStorage = filmStorage;
-        this.userController = userController;
+        this.filmService = filmService;
     }
 
     @GetMapping
@@ -39,16 +39,16 @@ public class FilmController {
 
     @PutMapping("/{id}/like/{userId}")
     public Film like(@PathVariable Long id, @PathVariable Long userId) {
-        return FilmService.likeFilm(filmStorage, userController, id, userId);
+        return filmService.likeFilm(id, userId);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
     public Film dislike(@PathVariable Long id, @PathVariable Long userId) {
-        return FilmService.dislikeFilm(filmStorage, userController, id, userId);
+        return filmService.dislikeFilm(id, userId);
     }
 
     @GetMapping("/popular")
     public Collection<Film> getTop(@RequestParam(defaultValue = "10") int count) {
-        return FilmService.getTop(filmStorage, count);
+        return filmService.getTop(count);
     }
 }

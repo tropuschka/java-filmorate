@@ -6,6 +6,8 @@ import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
@@ -20,8 +22,10 @@ class FilmorateApplicationTests {
 	static User user = new User();
 	static FilmStorage filmStorage = new InMemoryFilmStorage();
 	static UserStorage userStorage = new InMemoryUserStorage();
-	static UserController userController = new UserController(userStorage);
-	static FilmController filmController = new FilmController(filmStorage, userController);
+	static UserService userService = new UserService(userStorage);
+	static FilmService filmService = new FilmService(userStorage, filmStorage);
+	static UserController userController = new UserController(userStorage, userService);
+	static FilmController filmController = new FilmController(filmStorage, filmService);
 
 	@BeforeAll
 	static void prepare() {

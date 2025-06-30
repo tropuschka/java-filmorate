@@ -1,9 +1,11 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
 import ru.yandex.practicum.filmorate.exceptions.DuplicatedDataException;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -15,10 +17,18 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class UserService {
+    final private UserStorage userStorage;
 
-    public static Collection<Long> addUserFriend(UserStorage userStorage, Long userId, Long friendId) {
-        User user = userStorage.findUserById(userId);
-        User friend = userStorage.findUserById(friendId);
+    @Autowired
+    public UserService(UserStorage userStorage) {
+        this.userStorage = userStorage;
+    }
+
+    public Collection<Long> addUserFriend(Long userId, Long friendId) {
+        User user = userStorage.findUserById(userId)
+                .orElseThrow(() -> new NotFoundException("Пользователь с айди " + userId + " не найден"));
+        User friend = userStorage.findUserById(friendId)
+                .orElseThrow(() -> new NotFoundException("Пользователь с айди " + friendId + " не найден"));
         if (user.equals(friend)) {
             throw new ConditionsNotMetException("Нельзя добавить в друзья себя");
         }
@@ -35,9 +45,11 @@ public class UserService {
         return user.getFriends();
     }
 
-    public static Collection<Long> deleteUserFriend(UserStorage userStorage, Long userId, Long friendId) {
-        User user = userStorage.findUserById(userId);
-        User friend = userStorage.findUserById(friendId);
+    public Collection<Long> deleteUserFriend(Long userId, Long friendId) {
+        User user = userStorage.findUserById(userId)
+                .orElseThrow(() -> new NotFoundException("Пользователь с айди " + userId + " не найден"));
+        User friend = userStorage.findUserById(friendId)
+                .orElseThrow(() -> new NotFoundException("Пользователь с айди " + friendId + " не найден"));
         if (user.equals(friend)) {
             throw new ConditionsNotMetException("Нельзя удалить из друзей себя");
         }
@@ -47,18 +59,23 @@ public class UserService {
         return user.getFriends();
     }
 
-    public static Collection<User> getFriends(UserStorage userStorage, Long userId) {
-        User user = userStorage.findUserById(userId);
+    public Collection<User> getFriends(Long userId) {
+        User user = userStorage.findUserById(userId)
+                .orElseThrow(() -> new NotFoundException("Пользователь с айди " + userId + " не найден"));
         Set<User> friendList = new HashSet<>();
         for (Long friendId : user.getFriends()) {
-            friendList.add(userStorage.findUserById(friendId));
+            if (userStorage.findUserById(friendId).get() != null) {
+                friendList.add(userStorage.findUserById(friendId).get());
+            }
         }
         return friendList;
     }
 
-    public static Collection<User> findSharedFriend(UserStorage userStorage, Long userId, Long otherId) {
-        User user = userStorage.findUserById(userId);
-        User friend = userStorage.findUserById(otherId);
+    public Collection<User> findSharedFriend(Long userId, Long otherId) {
+        User user = userStorage.findUserById(userId)
+                .orElseThrow(() -> new NotFoundException("Пользователь с айди " + userId + " не найден"));
+        User friend = userStorage.findUserById(otherId)
+                .orElseThrow(() -> new NotFoundException("Пользователь с айди " + otherId + " не найден"));
         if (user.equals(friend)) {
             throw  new ConditionsNotMetException("Для сравнения нужны два разных пользователя");
         }
@@ -67,7 +84,9 @@ public class UserService {
                 .collect(Collectors.toSet());
         Set<User> sharedFriends = new HashSet<>();
         for (Long friendId : sharedFriendsId) {
-            sharedFriends.add(userStorage.findUserById(friendId));
+            if (userStorage.findUserById(friendId).get() != null) {
+                sharedFriends.add(userStorage.findUserById(friendId).get());
+            }
         }
         log.trace("У пользователя {} и пользователя {} {} общих друзей",
                 user.getName(), friend.getName(), sharedFriendsId.size());
