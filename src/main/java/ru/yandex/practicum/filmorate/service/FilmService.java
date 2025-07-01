@@ -88,9 +88,9 @@ public class FilmService {
             newFilm.setReleaseDate(oldFilm.getReleaseDate());
         }
 
-        filmStorage.update(newFilm);
-        log.trace("Данные фильма {}, айди {}, обновлены", newFilm.getName(), newFilm.getId());
-        return newFilm;
+        Film updateFilm = filmStorage.update(newFilm);
+        log.trace("Данные фильма {}, айди {}, обновлены", updateFilm.getName(), updateFilm.getId());
+        return updateFilm;
     }
 
     public Film findFilmById(Long id) {

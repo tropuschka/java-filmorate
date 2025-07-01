@@ -2,12 +2,8 @@ package ru.yandex.practicum.filmorate.storage;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
-import ru.yandex.practicum.filmorate.exceptions.DuplicatedDataException;
-import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,89 +21,15 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User create(User user) {
-        if (user.getEmail() == null || user.getEmail().isBlank()) {
-            throw new ConditionsNotMetException("Имейл должен быть указан");
-        }
-        if (!(user.getEmail().contains("@"))) {
-            throw new ConditionsNotMetException("Указан некорректный имейл");
-        }
-        if (duplicateMail(user.getEmail())) {
-            throw new DuplicatedDataException("Имейл уже используется");
-        }
-        if (user.getLogin() == null || user.getLogin().isBlank()) {
-            throw new ConditionsNotMetException("Введите логин");
-        }
-        if (user.getLogin().contains(" ")) {
-            throw new ConditionsNotMetException("В логине не должно быть пробелов");
-        }
-        if (duplicateLogin(user.getLogin())) {
-            throw new DuplicatedDataException("Логин уже используется");
-        }
-        if (user.getName() == null || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
-        if (user.getBirthday() != null && user.getBirthday().isAfter(LocalDate.now())) {
-            throw new ConditionsNotMetException("Указана некорректная дата рождения");
-        }
-
         user.setId(getNextId());
         userList.put(user.getId(), user);
-        log.trace("Создан пользователь {}, айди {}", user.getLogin(), user.getId());
         return user;
     }
 
     @Override
     public User update(User user) {
-        if (user.getId() == null) {
-            throw new ConditionsNotMetException("Id должен быть указан");
-        }
-        User oldUser = userList.get(user.getId());
-        if (oldUser == null) {
-            throw new NotFoundException("Пользователь не найден");
-        }
-        User newUser = new User();
-        newUser.setId(user.getId());
-
-        if (user.getName() != null && !user.getName().isBlank()) {
-            newUser.setName(user.getName());
-        } else {
-            newUser.setName(oldUser.getName());
-        }
-        if (user.getBirthday() != null) {
-            if (user.getBirthday().isAfter(LocalDate.now())) {
-                throw new ConditionsNotMetException("Указана некорректная дата рождения");
-            }
-            newUser.setBirthday(user.getBirthday());
-        } else {
-            newUser.setBirthday(oldUser.getBirthday());
-        }
-        if (user.getLogin() != null && !user.getLogin().isBlank()) {
-            if (user.getLogin().contains(" ")) {
-                throw new ConditionsNotMetException("В логине не должно быть пробелов");
-            }
-            if (duplicateLogin(user.getLogin()) && !(oldUser.getLogin().equals(user.getLogin()))) {
-                throw new DuplicatedDataException("Логин уже используется");
-            }
-
-            newUser.setLogin(user.getLogin());
-        } else {
-            newUser.setLogin(oldUser.getLogin());
-        }
-        if (user.getEmail() != null) {
-            if (!(user.getEmail().contains("@"))) {
-                throw new ConditionsNotMetException("Указан некорректный имейл");
-            }
-            if (duplicateMail(user.getEmail()) && !(oldUser.getEmail().equals(user.getEmail()))) {
-                throw new DuplicatedDataException("Имейл уже используется");
-            }
-            newUser.setEmail(user.getEmail());
-        } else {
-            newUser.setEmail(oldUser.getEmail());
-        }
-
-        userList.put(user.getId(), newUser);
-        log.trace("Данные пользователя {}, айди {}, обновлены", newUser.getLogin(), newUser.getId());
-        return newUser;
+        userList.put(user.getId(), user);
+        return user;
     }
 
     @Override
@@ -121,13 +43,5 @@ public class InMemoryUserStorage implements UserStorage {
                 .max()
                 .orElse(0);
         return ++maxId;
-    }
-
-    private boolean duplicateMail(String data) {
-        return userList.values().stream().map(User::getEmail).anyMatch(m -> m.equals(data));
-    }
-
-    private boolean duplicateLogin(String data) {
-        return userList.values().stream().map(User::getLogin).anyMatch(m -> m.equals(data));
     }
 }

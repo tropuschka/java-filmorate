@@ -24,7 +24,7 @@ class FilmorateApplicationTests {
 	static UserStorage userStorage = new InMemoryUserStorage();
 	static UserService userService = new UserService(userStorage);
 	static FilmService filmService = new FilmService(userStorage, filmStorage);
-	static UserController userController = new UserController(userStorage, userService);
+	static UserController userController = new UserController(userService);
 	static FilmController filmController = new FilmController(filmService);
 
 	@BeforeAll
