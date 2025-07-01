@@ -10,6 +10,8 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -25,10 +27,81 @@ public class FilmService {
         this.filmStorage = filmStorage;
     }
 
+    public Collection<Film> findAll() {
+        return filmStorage.findAll();
+    }
+
+    public Film create(Film film) {
+        if (film.getName() == null || film.getName().isBlank()) {
+            throw new ConditionsNotMetException("Название должно быть указано");
+        }
+        if (film.getDescription() != null && film.getDescription().length() > 200) {
+            throw new ConditionsNotMetException("Описание не должно быть длиннее 200 символов");
+        }
+        if (film.getReleaseDate() != null && film.getReleaseDate().isBefore(LocalDate.of(1895, Month.DECEMBER, 28))) {
+            throw new ConditionsNotMetException("Дата релиза не может быть раньше 28 декабря 1885 года");
+        }
+        if (film.getDuration() != null && !(film.getDuration() > 0)) {
+            throw new ConditionsNotMetException("Длительность фильма должна быть положительной");
+        }
+        Film createdFilm = filmStorage.create(film);
+        log.trace("Фильм {}, айди {}, добавлен", createdFilm.getName(), createdFilm.getId());
+        return createdFilm;
+    }
+
+    public Film update(Film film) {
+        if (film.getId() == null) {
+            throw new ConditionsNotMetException("Id должен быть указан");
+        }
+        Film oldFilm = filmStorage.findFilmById(film.getId())
+                .orElseThrow(() -> new NotFoundException("Фильм не найден"));
+        Film newFilm = new Film();
+        newFilm.setId(film.getId());
+
+        if (film.getName() != null && !film.getName().isBlank()) {
+            newFilm.setName(film.getName());
+        } else {
+            newFilm.setName(oldFilm.getName());
+        }
+        if (film.getDescription() != null) {
+            if (film.getDescription().length() > 200) {
+                throw new ConditionsNotMetException("Описание не должно быть длиннее 200 символов");
+            }
+            newFilm.setDescription(film.getDescription());
+        } else {
+            newFilm.setDescription(oldFilm.getDescription());
+        }
+        if (film.getDuration() != null) {
+            if (!(film.getDuration() > 0)) {
+                throw new ConditionsNotMetException("Длительность фильма должна быть положительной");
+            }
+            newFilm.setDuration(film.getDuration());
+        } else {
+            newFilm.setDuration(oldFilm.getDuration());
+        }
+        if (film.getReleaseDate() != null) {
+            if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
+                throw new ConditionsNotMetException("Дата релиза не может быть раньше 28 декабря 1885 года");
+            }
+            newFilm.setReleaseDate(film.getReleaseDate());
+        } else {
+            newFilm.setReleaseDate(oldFilm.getReleaseDate());
+        }
+
+        filmStorage.update(newFilm);
+        log.trace("Данные фильма {}, айди {}, обновлены", newFilm.getName(), newFilm.getId());
+        return newFilm;
+    }
+
+    public Film findFilmById(Long id) {
+        return filmStorage.findFilmById(id).orElseThrow(() -> new NotFoundException("Фильм не найден"));
+    }
+
     public Film likeFilm(Long filmId, Long userId) {
         User optionalUser = userStorage.findUserById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь с айди " + userId + " не найден"));
-        Film film = filmStorage.findFilmById(filmId);
+        Film film = filmStorage.findFilmById(filmId)
+                .orElseThrow(() -> new NotFoundException("Фильм не найден"));
         film.like(userId);
         log.trace("Пользователь с айди {} оценил фильм с айди {} (количество лайков: {})",
                 userId, filmId, film.getLikes().size());
@@ -38,7 +111,8 @@ public class FilmService {
     public Film dislikeFilm(Long filmId, Long userId) {
         User optionalUser = userStorage.findUserById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь с айди " + userId + " не найден"));
-        Film film = filmStorage.findFilmById(filmId);
+        Film film = filmStorage.findFilmById(filmId)
+                .orElseThrow(() -> new NotFoundException("Фильм не найден"));
         film.dislike(userId);
         log.trace("Пользователь с айди {} снял отметку \"нравится\" с фильма с айди {} (количество лайков: {})",
                 userId, filmId, film.getLikes().size());

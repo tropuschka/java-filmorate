@@ -25,7 +25,7 @@ class FilmorateApplicationTests {
 	static UserService userService = new UserService(userStorage);
 	static FilmService filmService = new FilmService(userStorage, filmStorage);
 	static UserController userController = new UserController(userStorage, userService);
-	static FilmController filmController = new FilmController(filmStorage, filmService);
+	static FilmController filmController = new FilmController(filmService);
 
 	@BeforeAll
 	static void prepare() {
