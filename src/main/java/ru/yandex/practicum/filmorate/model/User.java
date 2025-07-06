@@ -14,10 +14,10 @@ public class User {
     private String login;
     private String name;
     private LocalDate birthday;
-    private Map<Long, FriendshipStatus> friends = new HashMap<>();
+    private Map<Long, Boolean> friends = new HashMap<>();
 
     public Set<Long> addFriend(User user) {
-        friends.put(user.getId(), FriendshipStatus.UNCONFIRMED);
+        friends.put(user.getId(), false);
         return friends.keySet();
     }
 
