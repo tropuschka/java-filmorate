@@ -192,3 +192,4 @@ public class UserService {
         return userStorage.findAll().stream().map(User::getLogin).anyMatch(m -> m.equals(data));
     }
 }
+
