@@ -19,4 +19,22 @@ public class FilmDbStorage implements FilmStorage{
         String query = "SELECT * FROM films;";
         return jdbc.query(query, filmMapper);
     }
+
+    @Override
+    public Film create(Film film) {
+        StringBuilder query = new StringBuilder("INSERT INTO films " +
+                "(id, name, description, release_date, duration, age_rating) VALUES ?, ?, ?, ?, ?, ?;");
+        for (Integer genre_id:film.getGenres()) {
+            query.append("INSERT INTO film_genres (film_id, genre_id) VALUES ").append(film.getId()).append(", ")
+                    .append(genre_id).append(";");
+        }
+        for (Long user_id:film.getLikes()) {
+            query.append("INSERT INTO film_likes (film_id, user_id) VALUES ").append(film.getId()).append(", ")
+                    .append(user_id).append(";");
+        }
+        jdbc.update(query.toString(), film.getId(), film.getName(), film.getDescription(), film.getReleaseDate(),
+                film.getDuration(), film.getAgeRatingId());
+        String control = "SELECT * FROM films WHERE id = " + film.getId();
+        return jdbc.queryForObject(control, filmMapper);
+    }
 }
