@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
-@Component
+@Component("InMemoryUserStorage")
 public class InMemoryUserStorage implements UserStorage {
     private Map<Long, User> userList = new HashMap<>();
 

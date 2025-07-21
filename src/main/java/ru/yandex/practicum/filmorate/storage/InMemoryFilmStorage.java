@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
-@Component
+@Component("InMemoryFilmStorage")
 public class InMemoryFilmStorage implements FilmStorage {
     private Map<Long, Film> filmList = new HashMap<>();
 
