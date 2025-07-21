@@ -20,3 +20,10 @@ IF NOT EXISTS CREATE TABLE films (
     duration integer,
     age_rating integer
 );
+
+IF NOT EXISTS CREATE TABLE film_likes (
+    film_id integer,
+    user_id integer
+);
+
+
