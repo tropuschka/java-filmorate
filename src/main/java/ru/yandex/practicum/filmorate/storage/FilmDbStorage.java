@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.mappers.FilmDbMapper;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.Collection;
+import java.util.Optional;
 
 @Repository("FilmDbMapper")
 @RequiredArgsConstructor
@@ -46,5 +47,11 @@ public class FilmDbStorage implements FilmStorage{
                 film.getDuration(), film.getAgeRatingId());
         String control = "SELECT * FROM films WHERE id = " + film.getId();
         return jdbc.queryForObject(control, filmMapper);
+    }
+
+    @Override
+    public Optional<Film> findFilmById(Long id) {
+        String query = "SELECT * FROM films WHERE id = " + id + ";";
+        return Optional.ofNullable(jdbc.queryForObject(query, filmMapper));
     }
 }
