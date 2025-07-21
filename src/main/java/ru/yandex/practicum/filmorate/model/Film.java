@@ -14,7 +14,7 @@ public class Film {
     private LocalDate releaseDate;
     private Integer duration;
     private Set<Integer> genres = new HashSet<>();
-    private Integer age_rating_id;
+    private Integer ageRatingId;
     private Set<Long> likes = new HashSet<>();
 
     public void like(Long userId) {
