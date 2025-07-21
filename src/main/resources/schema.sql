@@ -5,3 +5,9 @@ IF NOT EXISTS CREATE TABLE users (
     name varchar,
     birthday date
 );
+
+IF NOT EXISTS CREATE TABLE friends (
+    user_id integer,
+    friend_id integer,
+    confirmed boolean
+);
