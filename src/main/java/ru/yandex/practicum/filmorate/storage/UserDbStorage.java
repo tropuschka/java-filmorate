@@ -16,7 +16,19 @@ public class UserDbStorage implements  UserStorage {
 
     @Override
     public Collection<User> findAll() {
-        String query = "SELECT * FROM users";
+        String query = "SELECT * FROM users;";
         return jdbc.query(query, userMapper);
+    }
+
+    @Override
+    public User create(User user) {
+        String query = ("INSERT INTO users (id, email, login, name, birthday) VALUES ?, ?, ?, ?, ?;");
+        for (Long friend_id:user.getFriends().keySet()) {
+            query = query + "INSERT INTO users (user_id, friend_id, confirmed) VALUES " + user.getId() + ", " +
+                    friend_id + ", " + user.getFriends().get(friend_id) + ";";
+        }
+        jdbc.update(query);
+        String control = "SELECT * FROM users WHERE id=" + user.getId();
+        return jdbc.queryForObject(control, userMapper);
     }
 }
