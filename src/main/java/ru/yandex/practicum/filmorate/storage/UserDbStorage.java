@@ -22,13 +22,23 @@ public class UserDbStorage implements  UserStorage {
 
     @Override
     public User create(User user) {
-        String query = ("INSERT INTO users (id, email, login, name, birthday) VALUES ?, ?, ?, ?, ?;");
+        StringBuilder query = new StringBuilder(("INSERT INTO users (id, email, login, name, birthday) " +
+                "VALUES ?, ?, ?, ?, ?;"));
         for (Long friend_id:user.getFriends().keySet()) {
-            query = query + "INSERT INTO users (user_id, friend_id, confirmed) VALUES " + user.getId() + ", " +
-                    friend_id + ", " + user.getFriends().get(friend_id) + ";";
+            query.append("INSERT INTO users (user_id, friend_id, confirmed) VALUES ").append(user.getId()).append(", ")
+                    .append(friend_id).append(", ").append(user.getFriends().get(friend_id)).append(";");
         }
-        jdbc.update(query);
-        String control = "SELECT * FROM users WHERE id=" + user.getId();
+        jdbc.update(query.toString(),
+                user.getId(), user.getEmail(), user.getLogin(), user.getName(), user.getBirthday());
+        String control = "SELECT * FROM users WHERE = " + user.getId() + ";";
+        return jdbc.queryForObject(control, userMapper);
+    }
+
+    @Override
+    public User update(User user) {
+        String query = ("UPDATE users SET email = ?, login = ?, name = ?, birthday = ? WHERE id = ?;");
+        jdbc.update(query, user.getEmail(), user.getLogin(), user.getName(), user.getBirthday(), user.getId());
+        String control = "SELECT * FROM users WHERE = " + user.getId() + ";";
         return jdbc.queryForObject(control, userMapper);
     }
 }
