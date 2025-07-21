@@ -9,7 +9,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import java.util.Collection;
 import java.util.Optional;
 
-@Repository("FilmDbMapper")
+@Repository("FilmDbStorage")
 @RequiredArgsConstructor
 public class FilmDbStorage implements FilmStorage{
     private final JdbcTemplate jdbc;
