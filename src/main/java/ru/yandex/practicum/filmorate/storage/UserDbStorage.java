@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.mappers.UserDbMapper;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.Collection;
+import java.util.Optional;
 
 @Repository("UserDbStorage")
 @RequiredArgsConstructor
@@ -40,5 +41,11 @@ public class UserDbStorage implements  UserStorage {
         jdbc.update(query, user.getEmail(), user.getLogin(), user.getName(), user.getBirthday(), user.getId());
         String control = "SELECT * FROM users WHERE = " + user.getId() + ";";
         return jdbc.queryForObject(control, userMapper);
+    }
+
+    @Override
+    public Optional<User> findUserById(Long id) {
+        String query = ("SELECT * FROM users WHERE id = " + id +";");
+        return Optional.ofNullable(jdbc.queryForObject(query, userMapper));
     }
 }
