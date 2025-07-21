@@ -124,8 +124,8 @@ public class UserService {
             throw new ConditionsNotMetException("Нельзя добавить в друзья себя");
         }
         if (user.getFriends() != null && friend.getFriends() != null) {
-            if (user.getFriends().contains(friend.getId()) // сделала &&, чтобы в случае, если дружба односторонняя,
-                    && friend.getFriends().contains(user.getId())) { // она обновлялась до двусторонней
+            if (user.getFriends().keySet().contains(friend.getId()) // сделала &&, чтобы в случае, если дружба односторонняя,
+                    && friend.getFriends().keySet().contains(user.getId())) { // она обновлялась до двусторонней
             throw new DuplicatedDataException("Пользователь " + friend.getName()
                         + " уже есть в списке друзей пользователя " + user.getName());
             }
@@ -133,7 +133,7 @@ public class UserService {
         user.addFriend(friend);
         friend.addFriend(user);
         log.trace("Пользователь {} добавлен в список друзей пользователя {}", friend.getName(), user.getName());
-        return user.getFriends();
+        return user.getFriends().keySet();
     }
 
     public Collection<Long> deleteUserFriend(Long userId, Long friendId) {
@@ -144,17 +144,17 @@ public class UserService {
         if (user.equals(friend)) {
             throw new ConditionsNotMetException("Нельзя удалить из друзей себя");
         }
-        if (user.getFriends().contains(friend.getId())) user.deleteFriend(friend);
-        if (friend.getFriends().contains(user.getId())) friend.deleteFriend(user);
+        if (user.getFriends().keySet().contains(friend.getId())) user.deleteFriend(friend);
+        if (friend.getFriends().keySet().contains(user.getId())) friend.deleteFriend(user);
         log.trace("Пользователь {} удален из списка друзей пользователя {}", friend.getName(), user.getName());
-        return user.getFriends();
+        return user.getFriends().keySet();
     }
 
     public Collection<User> getFriends(Long userId) {
         User user = userStorage.findUserById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь с айди " + userId + " не найден"));
         Set<User> friendList = new HashSet<>();
-        for (Long friendId : user.getFriends()) {
+        for (Long friendId : user.getFriends().keySet()) {
             if (userStorage.findUserById(friendId).get() != null) {
                 friendList.add(userStorage.findUserById(friendId).get());
             }
@@ -170,8 +170,8 @@ public class UserService {
         if (user.equals(friend)) {
             throw  new ConditionsNotMetException("Для сравнения нужны два разных пользователя");
         }
-        Set<Long> sharedFriendsId = user.getFriends().stream()
-                .filter(friend.getFriends()::contains)
+        Set<Long> sharedFriendsId = user.getFriends().keySet().stream()
+                .filter(friend.getFriends().keySet()::contains)
                 .collect(Collectors.toSet());
         Set<User> sharedFriends = new HashSet<>();
         for (Long friendId : sharedFriendsId) {
