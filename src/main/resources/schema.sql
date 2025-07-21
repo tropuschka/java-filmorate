@@ -26,4 +26,7 @@ IF NOT EXISTS CREATE TABLE film_likes (
     user_id integer
 );
 
-
+IF NOT EXISTS CREATE TABLE film_genres (
+    film_id integer,
+    genre_id integer
+);
