@@ -37,4 +37,14 @@ public class FilmDbStorage implements FilmStorage{
         String control = "SELECT * FROM films WHERE id = " + film.getId();
         return jdbc.queryForObject(control, filmMapper);
     }
+
+    @Override
+    public Film update(Film film) {
+        String query = "INSERT INTO films (id, name, description, release_date, duration, age_rating) " +
+                "VALUES ?, ?, ?, ?, ?, ?;";
+        jdbc.update(query, film.getId(), film.getName(), film.getDescription(), film.getReleaseDate(),
+                film.getDuration(), film.getAgeRatingId());
+        String control = "SELECT * FROM films WHERE id = " + film.getId();
+        return jdbc.queryForObject(control, filmMapper);
+    }
 }
