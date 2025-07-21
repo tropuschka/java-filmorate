@@ -13,6 +13,8 @@ public class Film {
     private String description;
     private LocalDate releaseDate;
     private Integer duration;
+    private Set<Integer> genres;
+    private Integer age_rating_id;
     private Set<Long> likes = new HashSet<>();
 
     public void like(Long userId) {
