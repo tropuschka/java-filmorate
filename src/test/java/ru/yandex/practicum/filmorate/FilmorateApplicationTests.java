@@ -9,7 +9,7 @@ import ru.yandex.practicum.filmorate.mappers.UserDbMapper;
 import ru.yandex.practicum.filmorate.storage.*;
 
 @JdbcTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @Import({UserDbStorage.class, UserDbMapper.class})
 class FilmorateApplicationTests {

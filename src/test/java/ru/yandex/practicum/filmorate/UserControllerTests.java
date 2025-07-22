@@ -5,19 +5,21 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class UserControllerTests extends FilmorateApplicationTests {
     @Test
     public void testFindUserById() {
-        Optional<User> userOptional = userStorage.findUserById(0);
+        Optional<User> userOptional = userStorage.findUserById(1);
 
         assertThat(userOptional)
                 .isPresent()
                 .hasValueSatisfying(user ->
-                        assertThat(user).hasFieldOrPropertyWithValue("id", 0)
+                        assertThat(user).hasFieldOrPropertyWithValue("id", 1)
                 );
     }
 
@@ -40,7 +42,7 @@ public class UserControllerTests extends FilmorateApplicationTests {
     @Test
     public void testUpdateUser() {
         User user = new User();
-        user.setId(0);
+        user.setId(1);
         user.setName("Nina");
         Optional<User> userOptional = Optional.of(userStorage.update(user));
         assertThat(userOptional)
@@ -48,5 +50,11 @@ public class UserControllerTests extends FilmorateApplicationTests {
                 .hasValueSatisfying(dbUuser ->
                         assertThat(user).hasFieldOrPropertyWithValue("name", "Nina")
                 );
+    }
+
+    @Test
+    public void testGetAllUsers() {
+        List<User> dbUserList = (List<User>) userStorage.findAll();
+        assertEquals(1, dbUserList.size());
     }
 }
