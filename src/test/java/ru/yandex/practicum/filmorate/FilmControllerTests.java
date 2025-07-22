@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate;
 
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -31,9 +32,9 @@ public class FilmControllerTests extends FilmorateApplicationTests {
 
     @Test
     public void testFindFilmById() {
-        Optional<Film> userOptional = filmStorage.findFilmById(1);
+        Optional<Film> filmOptional = filmStorage.findFilmById(1);
 
-        assertThat(userOptional)
+        assertThat(filmOptional)
                 .isPresent()
                 .hasValueSatisfying(film ->
                         assertThat(film).hasFieldOrPropertyWithValue("id", 1)
@@ -57,5 +58,22 @@ public class FilmControllerTests extends FilmorateApplicationTests {
     public void testGetAllFilms() {
         List<Film> dbFilmList = (List<Film>) filmStorage.findAll();
         assertEquals(1, dbFilmList.size());
+    }
+
+    @Test
+    public void testGetAllGenres() {
+        List<Genre> dbGenreList = (List<Genre>) genreStorage.findAll();
+        assertEquals(1, dbGenreList.size());
+    }
+
+    @Test
+    public void testFindGenreById() {
+        Optional<Genre> genreOptional = genreStorage.findGenreById(1);
+
+        assertThat(genreOptional)
+                .isPresent()
+                .hasValueSatisfying(genre ->
+                        assertThat(genre).hasFieldOrPropertyWithValue("id", 1)
+                );
     }
 }
