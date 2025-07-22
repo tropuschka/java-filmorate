@@ -6,9 +6,11 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FilmControllerTests extends FilmorateApplicationTests {
     @Test
@@ -50,5 +52,11 @@ public class FilmControllerTests extends FilmorateApplicationTests {
                 .hasValueSatisfying(dbFilm ->
                         assertThat(film).hasFieldOrPropertyWithValue("name", "Nina")
                 );
+    }
+
+    @Test
+    public void testGetAllFilms() {
+        List<Film> dbFilmList = (List<Film>) filmStorage.findAll();
+        assertEquals(1, dbFilmList.size());
     }
 }
