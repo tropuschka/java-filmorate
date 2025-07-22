@@ -27,4 +27,15 @@ public class FilmControllerTests extends FilmorateApplicationTests {
                         assertThat(film).hasFieldOrPropertyWithValue("name", "Test")
                 );
     }
+
+    @Test
+    public void testFindFilmById() {
+        Optional<Film> userOptional = filmStorage.findFilmById(1);
+
+        assertThat(userOptional)
+                .isPresent()
+                .hasValueSatisfying(film ->
+                        assertThat(film).hasFieldOrPropertyWithValue("id", 1)
+                );
+    }
 }
