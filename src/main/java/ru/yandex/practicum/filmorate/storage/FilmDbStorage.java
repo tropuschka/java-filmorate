@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @Repository("FilmDbStorage")
 @RequiredArgsConstructor
-public class FilmDbStorage implements FilmStorage{
+public class FilmDbStorage implements FilmStorage {
     @Autowired
     private final JdbcTemplate jdbc;
     @Autowired
