@@ -35,7 +35,7 @@ public class FilmDbMapper implements RowMapper<Film> {
                 .collect(Collectors.toSet());
         film.setGenres(genres);
 
-        String likesSql = "SELECT user_id FROM film_likes WHERE film_id = ?;" ;
+        String likesSql = "SELECT user_id FROM film_likes WHERE film_id = ?;";
         Set<Integer> likes = jdbc.queryForList(likesSql, Integer.class, film.getId()).stream().collect(Collectors.toSet());
         film.setLikes(likes);
 
