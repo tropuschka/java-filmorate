@@ -22,12 +22,12 @@ public class AgeRatingDbStorage implements AgeRatingStorage {
     public Collection<AgeRating> findAll() {
         String query = "SELECT * FROM age_ratings;";
         return jdbc.query(query, ageRatingMapper);
-    };
+    }
 
     @Override
     public Optional<AgeRating> findAgeRatingById(int id) {
         String query = "SELECT * FROM age_ratings;";
         return Optional.ofNullable(jdbc.queryForObject(query, ageRatingMapper));
-    };
+    }
 
 }
