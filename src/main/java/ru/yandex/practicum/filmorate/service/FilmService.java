@@ -89,6 +89,16 @@ public class FilmService {
         } else {
             newFilm.setReleaseDate(oldFilm.getReleaseDate());
         }
+        if (film.getGenres() != null) {
+            newFilm.setGenres(film.getGenres());
+        } else {
+            newFilm.setGenres(oldFilm.getGenres());
+        }
+        if (film.getAgeRatingId() != null) {
+            newFilm.setAgeRatingId(film.getAgeRatingId());
+        } else {
+            newFilm.setAgeRatingId(oldFilm.getAgeRatingId());
+        }
 
         Film updateFilm = filmStorage.update(newFilm);
         log.trace("Данные фильма {}, айди {}, обновлены", updateFilm.getName(), updateFilm.getId());
@@ -105,6 +115,7 @@ public class FilmService {
         Film film = filmStorage.findFilmById(filmId)
                 .orElseThrow(() -> new NotFoundException("Фильм не найден"));
         film.like(userId);
+        update(film);
         log.trace("Пользователь с айди {} оценил фильм с айди {} (количество лайков: {})",
                 userId, filmId, film.getLikes().size());
         return film;
@@ -116,6 +127,7 @@ public class FilmService {
         Film film = filmStorage.findFilmById(filmId)
                 .orElseThrow(() -> new NotFoundException("Фильм не найден"));
         film.dislike(userId);
+        update(film);
         log.trace("Пользователь с айди {} снял отметку \"нравится\" с фильма с айди {} (количество лайков: {})",
                 userId, filmId, film.getLikes().size());
         return film;
