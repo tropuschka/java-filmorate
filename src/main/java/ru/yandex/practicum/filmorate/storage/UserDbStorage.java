@@ -57,9 +57,9 @@ public class UserDbStorage implements  UserStorage {
     }
 
     private void updateFriends(User user) {
-        for (Integer friend_id:user.getFriends().keySet()) {
+        for (Integer friendId:user.getFriends().keySet()) {
             String friendQuery = "INSERT INTO friends (user_id, friend_id, confirmed) VALUES ( ?, ?, ?);";
-            jdbc.update(friendQuery, user.getId(), friend_id, user.getFriends().get(friend_id));
+            jdbc.update(friendQuery, user.getId(), friendId, user.getFriends().get(friendId));
         }
     }
 }
