@@ -29,8 +29,10 @@ public class UserDbMapper implements RowMapper<User> {
         user.setLogin(resultSet.getString("login"));
         user.setName(resultSet.getString("name"));
 
-        LocalDate birthday = resultSet.getDate("birthday").toLocalDate();
-        user.setBirthday(birthday);
+        if (resultSet.getDate("birthday") != null) {
+            LocalDate birthday = resultSet.getDate("birthday").toLocalDate();
+            user.setBirthday(birthday);
+        }
 
         String friendsSql = "SELECT friend_id, confirmed FROM friends WHERE user_id = ?;";
         ResultSetExtractor friendsExtractor = new ResultSetExtractor() {

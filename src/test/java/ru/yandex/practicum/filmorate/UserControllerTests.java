@@ -36,4 +36,17 @@ public class UserControllerTests extends FilmorateApplicationTests {
                         assertThat(user).hasFieldOrPropertyWithValue("email", "nana@mail.com")
                 );
     }
+
+    @Test
+    public void testUpdateUser() {
+        User user = new User();
+        user.setId(0);
+        user.setName("Nina");
+        Optional<User> userOptional = Optional.of(userStorage.update(user));
+        assertThat(userOptional)
+                .isPresent()
+                .hasValueSatisfying(dbUuser ->
+                        assertThat(user).hasFieldOrPropertyWithValue("name", "Nina")
+                );
+    }
 }
