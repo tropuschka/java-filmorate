@@ -10,7 +10,7 @@ import java.sql.SQLException;
 
 @Component("AgeRatingMapper")
 @RequiredArgsConstructor
-public class AgeRatingMapper implements RowMapper<AgeRating> {
+public class AgeRatingDbMapper implements RowMapper<AgeRating> {
     @Override
     public AgeRating mapRow(ResultSet resultSet, int rowNum) throws SQLException {
         AgeRating ageRating = new AgeRating();
