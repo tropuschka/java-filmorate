@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.mappers.UserDbMapper;
@@ -12,7 +13,9 @@ import java.util.Optional;
 @Repository("UserDbStorage")
 @RequiredArgsConstructor
 public class UserDbStorage implements  UserStorage {
+    @Autowired
     private final JdbcTemplate jdbc;
+    @Autowired
     private final UserDbMapper userMapper;
 
     @Override
@@ -23,29 +26,39 @@ public class UserDbStorage implements  UserStorage {
 
     @Override
     public User create(User user) {
-        StringBuilder query = new StringBuilder(("INSERT INTO users (id, email, login, name, birthday) " +
-                "VALUES ?, ?, ?, ?, ?;"));
-        for (Long friend_id:user.getFriends().keySet()) {
-            query.append("INSERT INTO users (user_id, friend_id, confirmed) VALUES ").append(user.getId()).append(", ")
-                    .append(friend_id).append(", ").append(user.getFriends().get(friend_id)).append(";");
-        }
-        jdbc.update(query.toString(),
+        String query = "INSERT INTO users (id, email, login, name, birthday) VALUES (?, ?, ?, ?, ?);";
+        jdbc.update(query,
                 user.getId(), user.getEmail(), user.getLogin(), user.getName(), user.getBirthday());
-        String control = "SELECT * FROM users WHERE = " + user.getId() + ";";
-        return jdbc.queryForObject(control, userMapper);
+        updateFriends(user);
+
+        String control = "SELECT * FROM users WHERE id = ?;";
+        return jdbc.queryForObject(control, userMapper, user.getId());
     }
 
     @Override
     public User update(User user) {
-        String query = ("UPDATE users SET email = ?, login = ?, name = ?, birthday = ? WHERE id = ?;");
+        String query = "UPDATE users SET email = ?, login = ?, name = ?, birthday = ? WHERE id = ?;";
         jdbc.update(query, user.getEmail(), user.getLogin(), user.getName(), user.getBirthday(), user.getId());
-        String control = "SELECT * FROM users WHERE = " + user.getId() + ";";
-        return jdbc.queryForObject(control, userMapper);
+
+        String friendQueryDelete = "DELETE FROM friends WHERE user_id = ?;";
+        jdbc.update(friendQueryDelete, user.getId());
+        updateFriends(user);
+
+        String control = "SELECT * FROM users WHERE id = ?;";
+        return jdbc.queryForObject(control, userMapper, user.getId());
     }
 
     @Override
-    public Optional<User> findUserById(Long id) {
-        String query = ("SELECT * FROM users WHERE id = " + id +";");
-        return Optional.ofNullable(jdbc.queryForObject(query, userMapper));
+    public Optional<User> findUserById(int id) {
+        String query = ("SELECT * FROM users WHERE id = ?;");
+        Optional<User> optUser = Optional.ofNullable(jdbc.queryForObject(query, userMapper, id));
+        return optUser;
+    }
+
+    private void updateFriends(User user) {
+        for (Integer friend_id:user.getFriends().keySet()) {
+            String friendQuery = "INSERT INTO friends (user_id, friend_id, confirmed) VALUES ( ?, ?, ?);";
+            jdbc.update(friendQuery, user.getId(), friend_id, user.getFriends().get(friend_id));
+        }
     }
 }

@@ -14,5 +14,5 @@ public interface FilmStorage {
 
     Film update(Film film);
 
-   Optional<Film> findFilmById(Long id);
+   Optional<Film> findFilmById(int id);
 }

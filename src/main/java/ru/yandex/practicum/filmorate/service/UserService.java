@@ -22,7 +22,7 @@ public class UserService {
     private final UserStorage userStorage;
 
     @Autowired
-    public UserService(@Qualifier("InMemoryUserStorage") UserStorage userStorage) {
+    public UserService(@Qualifier("UserDbStorage") UserStorage userStorage) {
         this.userStorage = userStorage;
     }
 
@@ -30,7 +30,7 @@ public class UserService {
         return userStorage.findAll();
     }
 
-    public User findById(Long id) {
+    public User findById(int id) {
         return userStorage.findUserById(id).orElseThrow(() -> new NotFoundException("Пользователь не найден"));
     }
 
@@ -116,7 +116,7 @@ public class UserService {
         return updateUser;
     }
 
-    public Collection<Long> addUserFriend(Long userId, Long friendId) {
+    public Collection<Integer> addUserFriend(int userId, int friendId) {
         User user = userStorage.findUserById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь с айди " + userId + " не найден"));
         User friend = userStorage.findUserById(friendId)
@@ -137,7 +137,7 @@ public class UserService {
         return user.getFriends().keySet();
     }
 
-    public Collection<Long> deleteUserFriend(Long userId, Long friendId) {
+    public Collection<Integer> deleteUserFriend(int userId, int friendId) {
         User user = userStorage.findUserById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь с айди " + userId + " не найден"));
         User friend = userStorage.findUserById(friendId)
@@ -151,11 +151,11 @@ public class UserService {
         return user.getFriends().keySet();
     }
 
-    public Collection<User> getFriends(Long userId) {
+    public Collection<User> getFriends(int userId) {
         User user = userStorage.findUserById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь с айди " + userId + " не найден"));
         Set<User> friendList = new HashSet<>();
-        for (Long friendId : user.getFriends().keySet()) {
+        for (int friendId : user.getFriends().keySet()) {
             if (userStorage.findUserById(friendId).get() != null) {
                 friendList.add(userStorage.findUserById(friendId).get());
             }
@@ -163,7 +163,7 @@ public class UserService {
         return friendList;
     }
 
-    public Collection<User> findSharedFriend(Long userId, Long otherId) {
+    public Collection<User> findSharedFriend(int userId, int otherId) {
         User user = userStorage.findUserById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь с айди " + userId + " не найден"));
         User friend = userStorage.findUserById(otherId)
@@ -171,11 +171,11 @@ public class UserService {
         if (user.equals(friend)) {
             throw  new ConditionsNotMetException("Для сравнения нужны два разных пользователя");
         }
-        Set<Long> sharedFriendsId = user.getFriends().keySet().stream()
+        Set<Integer> sharedFriendsId = user.getFriends().keySet().stream()
                 .filter(friend.getFriends().keySet()::contains)
                 .collect(Collectors.toSet());
         Set<User> sharedFriends = new HashSet<>();
-        for (Long friendId : sharedFriendsId) {
+        for (int friendId : sharedFriendsId) {
             if (userStorage.findUserById(friendId).get() != null) {
                 sharedFriends.add(userStorage.findUserById(friendId).get());
             }

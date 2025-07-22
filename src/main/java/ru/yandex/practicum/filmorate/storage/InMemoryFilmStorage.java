@@ -12,7 +12,7 @@ import java.util.Optional;
 @Slf4j
 @Component("InMemoryFilmStorage")
 public class InMemoryFilmStorage implements FilmStorage {
-    private Map<Long, Film> filmList = new HashMap<>();
+    private Map<Integer, Film> filmList = new HashMap<>();
 
     @Override
     public Collection<Film> findAll() {
@@ -33,13 +33,13 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Optional<Film> findFilmById(Long id) {
+    public Optional<Film> findFilmById(int id) {
         return Optional.ofNullable(filmList.get(id));
     }
 
-    private Long getNextId() {
-        long maxId = filmList.keySet().stream()
-                .mapToLong(id -> id)
+    private int getNextId() {
+        int maxId = filmList.keySet().stream()
+                .mapToInt(id -> id)
                 .max()
                 .orElse(0);
         return ++maxId;

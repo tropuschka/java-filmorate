@@ -23,8 +23,8 @@ public class FilmService {
     private final FilmStorage filmStorage;
 
     @Autowired
-    public FilmService(@Qualifier("InMemoryUserStorage") UserStorage userStorage,
-                       @Qualifier("InMemoryFilmStorage") FilmStorage filmStorage) {
+    public FilmService(@Qualifier("UserDbStorage") UserStorage userStorage,
+                       @Qualifier("FilmDbStorage") FilmStorage filmStorage) {
         this.userStorage = userStorage;
         this.filmStorage = filmStorage;
     }
@@ -95,11 +95,11 @@ public class FilmService {
         return updateFilm;
     }
 
-    public Film findFilmById(Long id) {
+    public Film findFilmById(int id) {
         return filmStorage.findFilmById(id).orElseThrow(() -> new NotFoundException("Фильм не найден"));
     }
 
-    public Film likeFilm(Long filmId, Long userId) {
+    public Film likeFilm(int filmId, int userId) {
         User optionalUser = userStorage.findUserById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь с айди " + userId + " не найден"));
         Film film = filmStorage.findFilmById(filmId)
@@ -110,7 +110,7 @@ public class FilmService {
         return film;
     }
 
-    public Film dislikeFilm(Long filmId, Long userId) {
+    public Film dislikeFilm(int filmId, int userId) {
         User optionalUser = userStorage.findUserById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь с айди " + userId + " не найден"));
         Film film = filmStorage.findFilmById(filmId)

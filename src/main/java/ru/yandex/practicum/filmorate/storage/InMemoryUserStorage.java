@@ -12,7 +12,7 @@ import java.util.Optional;
 @Slf4j
 @Component("InMemoryUserStorage")
 public class InMemoryUserStorage implements UserStorage {
-    private Map<Long, User> userList = new HashMap<>();
+    private Map<Integer, User> userList = new HashMap<>();
 
     @Override
     public Collection<User> findAll() {
@@ -33,13 +33,13 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public Optional<User> findUserById(Long id) {
+    public Optional<User> findUserById(int id) {
         return Optional.ofNullable(userList.get(id));
     }
 
-    private Long getNextId() {
-        long maxId = userList.keySet().stream()
-                .mapToLong(id -> id)
+    private int getNextId() {
+        int maxId = userList.keySet().stream()
+                .mapToInt(id -> id)
                 .max()
                 .orElse(0);
         return ++maxId;
