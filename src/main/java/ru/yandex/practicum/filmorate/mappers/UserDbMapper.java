@@ -39,10 +39,10 @@ public class UserDbMapper implements RowMapper<User> {
             @Override
             public Object extractData(ResultSet rs) throws SQLException, DataAccessException {
                 Map<Long, Boolean> friendList = new HashMap<>();
-                while(rs.next()) {
-                    Long friend_id = rs.getLong("friend_id");
+                while (rs.next()) {
+                    Long friendId = rs.getLong("friend_id");
                     Boolean status = rs.getBoolean("confirmed");
-                    friendList.put(friend_id, status);
+                    friendList.put(friendId, status);
                 }
                 return friendList;
             }
