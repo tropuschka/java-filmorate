@@ -66,16 +66,16 @@ public class FilmDbStorage implements FilmStorage{
     }
 
     private void updatedGenres(Film film) {
-        for (Integer genre_id:film.getGenres()) {
+        for (Integer genreId :film.getGenres()) {
             String genreQuery = "INSERT INTO film_genres (film_id, genre_id) VALUES ( ?, ?);";
-            jdbc.update(genreQuery, film.getId(), genre_id);
+            jdbc.update(genreQuery, film.getId(), genreId);
         }
     }
 
     private void updateLikes(Film film) {
-        for (Integer user_id:film.getLikes()) {
+        for (Integer userId:film.getLikes()) {
             String likeQuery = "INSERT INTO film_likes (film_id, user_id) VALUES ( ?, ?);";
-            jdbc.update(likeQuery, film.getId(), user_id);
+            jdbc.update(likeQuery, film.getId(), userId);
         }
     }
 }
