@@ -24,7 +24,9 @@ public class FilmDbMapper implements RowMapper<Film> {
         film.setId(resultSet.getInt("id"));
         film.setName(resultSet.getString("name"));
         film.setDescription(resultSet.getString("description"));
-        film.setReleaseDate(resultSet.getDate("release_date").toLocalDate());
+        if (resultSet.getDate("release_date") != null) {
+            film.setReleaseDate(resultSet.getDate("release_date").toLocalDate());
+        }
         film.setDuration(resultSet.getInt("duration"));
         film.setAgeRatingId(resultSet.getInt("age_rating"));
 
