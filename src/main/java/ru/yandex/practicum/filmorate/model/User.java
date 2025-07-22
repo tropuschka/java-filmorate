@@ -30,4 +30,9 @@ public class User {
         friends.put(user.getId(), true);
         return friends.keySet();
     }
+
+    public Set<Integer> unconfirmFriendship(User user) {
+        friends.put(user.getId(), false);
+        return friends.keySet();
+    }
 }

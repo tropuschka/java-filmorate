@@ -110,7 +110,11 @@ public class UserService {
         } else {
             newUser.setEmail(oldUser.getEmail());
         }
-
+        if (user.getFriends() != null) {
+            newUser.setFriends(user.getFriends());
+        } else {
+            newUser.setFriends(oldUser.getFriends());
+        }
         User updateUser = userStorage.update(newUser);
         log.trace("Данные пользователя {}, айди {}, обновлены", updateUser.getLogin(), updateUser.getId());
         return updateUser;
@@ -134,7 +138,9 @@ public class UserService {
         if (friend.getFriends().keySet().contains(user.getId())) {
             user.confirmFriendship(friend);
             friend.confirmFriendship(user);
+            update(friend);
         }
+        update(user);
         log.trace("Пользователь {} добавлен в список друзей пользователя {}", friend.getName(), user.getName());
         return user.getFriends().keySet();
     }
@@ -147,8 +153,14 @@ public class UserService {
         if (user.equals(friend)) {
             throw new ConditionsNotMetException("Нельзя удалить из друзей себя");
         }
-        if (user.getFriends().keySet().contains(friend.getId())) user.deleteFriend(friend);
-        if (friend.getFriends().keySet().contains(user.getId())) friend.deleteFriend(user);
+        if (user.getFriends().keySet().contains(friend.getId())) {
+            user.deleteFriend(friend);
+            update(user);
+        }
+        if (friend.getFriends().keySet().contains(user.getId())) {
+            friend.unconfirmFriendship(user);
+            update(friend);
+        }
         log.trace("Пользователь {} удален из списка друзей пользователя {}", friend.getName(), user.getName());
         return user.getFriends().keySet();
     }
