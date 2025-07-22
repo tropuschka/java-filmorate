@@ -17,4 +17,10 @@ public class GenreDbStorage implements GenreStorage {
     private final JdbcTemplate jdbc;
     @Autowired
     private final GenreDbMapper genreMapper;
+
+    @Override
+    public Collection<Genre> findAll() {
+        String query = "SELECT * FROM genres;";
+        return jdbc.query(query, genreMapper);
+    };
 }
