@@ -23,4 +23,10 @@ public class GenreDbStorage implements GenreStorage {
         String query = "SELECT * FROM genres;";
         return jdbc.query(query, genreMapper);
     };
+
+    @Override
+    public Optional<Genre> findGenreById(int id) {
+        String query = "SELECT * FROM genres;";
+        return Optional.ofNullable(jdbc.queryForObject(query, genreMapper));
+    };
 }

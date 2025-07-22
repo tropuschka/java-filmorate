@@ -53,8 +53,7 @@ public class UserDbStorage implements  UserStorage {
     @Override
     public Optional<User> findUserById(int id) {
         String query = ("SELECT * FROM users WHERE id = ?;");
-        Optional<User> optUser = Optional.ofNullable(jdbc.queryForObject(query, userMapper, id));
-        return optUser;
+        return Optional.ofNullable(jdbc.queryForObject(query, userMapper, id));
     }
 
     private void updateFriends(User user) {
