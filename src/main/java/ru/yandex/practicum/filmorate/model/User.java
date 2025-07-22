@@ -25,4 +25,9 @@ public class User {
         friends.remove(user.getId());
         return friends.keySet();
     }
+
+    public Set<Integer> confirmFriendship(User user) {
+        friends.put(user.getId(), true);
+        return friends.keySet();
+    }
 }

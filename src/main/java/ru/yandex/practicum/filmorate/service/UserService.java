@@ -125,14 +125,16 @@ public class UserService {
             throw new ConditionsNotMetException("Нельзя добавить в друзья себя");
         }
         if (user.getFriends() != null && friend.getFriends() != null) {
-            if (user.getFriends().keySet().contains(friend.getId()) // сделала &&, чтобы в случае, если дружба односторонняя,
-                    && friend.getFriends().keySet().contains(user.getId())) { // она обновлялась до двусторонней
+            if (user.getFriends().keySet().contains(friend.getId())) {
             throw new DuplicatedDataException("Пользователь " + friend.getName()
                         + " уже есть в списке друзей пользователя " + user.getName());
             }
         }
         user.addFriend(friend);
-        friend.addFriend(user);
+        if (friend.getFriends().keySet().contains(user.getId())) {
+            user.confirmFriendship(friend);
+            friend.confirmFriendship(user);
+        }
         log.trace("Пользователь {} добавлен в список друзей пользователя {}", friend.getName(), user.getName());
         return user.getFriends().keySet();
     }
