@@ -27,14 +27,18 @@ public class FilmDbStorage implements FilmStorage{
     @Override
     public Film create(Film film) {
         StringBuilder query = new StringBuilder("INSERT INTO films " +
-                "(id, name, description, release_date, duration, age_rating) VALUES (?, ?, ?, ?, ?, ?);");
-        jdbc.update(query.toString(), film.getId(), film.getName(), film.getDescription(), film.getReleaseDate(),
+                "(name, description, release_date, duration, age_rating) VALUES (?, ?, ?, ?, ?);");
+        jdbc.update(query.toString(), film.getName(), film.getDescription(), film.getReleaseDate(),
                 film.getDuration(), film.getAgeRatingId());
         updatedGenres(film);
         updateLikes(film);
 
+        Integer filmDbId = jdbc.queryForObject("SELECT id FROM films WHERE name = ?, description = ?, " +
+                        "release_date = ?, duration = ?, age_rating = ?;", Integer.class,
+                film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(), film.getAgeRatingId());
+
         String control = "SELECT * FROM films WHERE id = ?;";
-        return jdbc.queryForObject(control, filmMapper, film.getId());
+        return jdbc.queryForObject(control, filmMapper, filmDbId);
     }
 
     @Override

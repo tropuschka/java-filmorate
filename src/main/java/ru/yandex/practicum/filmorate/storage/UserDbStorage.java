@@ -26,13 +26,15 @@ public class UserDbStorage implements  UserStorage {
 
     @Override
     public User create(User user) {
-        String query = "INSERT INTO users (id, email, login, name, birthday) VALUES (?, ?, ?, ?, ?);";
-        jdbc.update(query,
-                user.getId(), user.getEmail(), user.getLogin(), user.getName(), user.getBirthday());
+        String query = "INSERT INTO users (email, login, name, birthday) VALUES (?, ?, ?, ?);";
+        jdbc.update(query, user.getEmail(), user.getLogin(), user.getName(), user.getBirthday());
         updateFriends(user);
 
+        Integer userDbId = jdbc.queryForObject("SELECT id FROM users WHERE email = ?;",
+                Integer.class, user.getEmail());
+
         String control = "SELECT * FROM users WHERE id = ?;";
-        return jdbc.queryForObject(control, userMapper, user.getId());
+        return jdbc.queryForObject(control, userMapper, userDbId);
     }
 
     @Override
