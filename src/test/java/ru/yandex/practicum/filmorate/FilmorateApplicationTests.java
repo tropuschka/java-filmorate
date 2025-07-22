@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.Import;
+import ru.yandex.practicum.filmorate.mappers.AgeRatingDbMapper;
 import ru.yandex.practicum.filmorate.mappers.FilmDbMapper;
 import ru.yandex.practicum.filmorate.mappers.GenreDbMapper;
 import ru.yandex.practicum.filmorate.mappers.UserDbMapper;
@@ -15,7 +16,8 @@ import ru.yandex.practicum.filmorate.storage.*;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @Import({UserDbStorage.class, UserDbMapper.class,
 		FilmDbStorage.class, FilmDbMapper.class,
-		GenreDbStorage.class, GenreDbMapper.class})
+		GenreDbStorage.class, GenreDbMapper.class,
+		AgeRatingDbStorage.class, AgeRatingDbMapper.class})
 class FilmorateApplicationTests {
 	@Autowired
 	protected UserDbStorage userStorage;
@@ -23,4 +25,6 @@ class FilmorateApplicationTests {
 	protected FilmDbStorage filmStorage;
 	@Autowired
 	protected GenreDbStorage genreStorage;
+	@Autowired
+	protected AgeRatingDbStorage ageRatingStorage;
 }

@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate;
 
 import org.junit.jupiter.api.Test;
+import ru.yandex.practicum.filmorate.model.AgeRating;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 
@@ -74,6 +75,23 @@ public class FilmControllerTests extends FilmorateApplicationTests {
                 .isPresent()
                 .hasValueSatisfying(genre ->
                         assertThat(genre).hasFieldOrPropertyWithValue("id", 1)
+                );
+    }
+
+    @Test
+    public void testGetAllMpa() {
+        List<AgeRating> dbMpaList = (List<AgeRating>) ageRatingStorage.findAll();
+        assertEquals(1, dbMpaList.size());
+    }
+
+    @Test
+    public void testFindMpaById() {
+        Optional<AgeRating> mpaOptional = ageRatingStorage.findAgeRatingById(1);
+
+        assertThat(mpaOptional)
+                .isPresent()
+                .hasValueSatisfying(mpa ->
+                        assertThat(mpa).hasFieldOrPropertyWithValue("id", 1)
                 );
     }
 }
