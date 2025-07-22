@@ -33,9 +33,8 @@ public class FilmDbStorage implements FilmStorage{
         updatedGenres(film);
         updateLikes(film);
 
-        Integer filmDbId = jdbc.queryForObject("SELECT id FROM films WHERE name = ?, description = ?, " +
-                        "release_date = ?, duration = ?, age_rating = ?;", Integer.class,
-                film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(), film.getAgeRatingId());
+        Integer filmDbId = jdbc.queryForObject("SELECT id FROM films WHERE name = ? AND description = ?;",
+                Integer.class, film.getName(), film.getDescription());
 
         String control = "SELECT * FROM films WHERE id = ?;";
         return jdbc.queryForObject(control, filmMapper, filmDbId);
