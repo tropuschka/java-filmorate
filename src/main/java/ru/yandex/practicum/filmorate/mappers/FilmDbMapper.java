@@ -46,7 +46,7 @@ public class FilmDbMapper implements RowMapper<Film> {
             }
         }
 
-        String genresSql = "SELECT genre_id FROM film_genres WHERE film_id = ?;";
+        String genresSql = "SELECT genre_id FROM film_genres WHERE film_id = ? ORDER BY genre_id;";
         Set<Integer> genresIds = jdbc.queryForList(genresSql, Integer.class, film.getId()).stream()
                 .collect(Collectors.toSet());
         Set<Genre> genres = new HashSet<>();
