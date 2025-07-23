@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component("FilmDbMapper")
 @RequiredArgsConstructor
@@ -30,11 +31,12 @@ public class FilmDbMapper implements RowMapper<Film> {
         film.setMpa(resultSet.getInt("age_rating"));
 
         String genresSql = "SELECT genre_id FROM film_genres WHERE film_id = ?;";
-        Set<Integer> genres = new HashSet<>(jdbc.queryForList(genresSql, Integer.class, film.getId()));
+        Set<Integer> genres = jdbc.queryForList(genresSql, Integer.class, film.getId()).stream()
+                .collect(Collectors.toSet());
         film.setGenres(genres);
 
         String likesSql = "SELECT user_id FROM film_likes WHERE film_id = ?;";
-        Set<Integer> likes = new HashSet<>(jdbc.queryForList(likesSql, Integer.class, film.getId()));
+        Set<Integer> likes = jdbc.queryForList(likesSql, Integer.class, film.getId()).stream().collect(Collectors.toSet());
         film.setLikes(likes);
 
         return film;
