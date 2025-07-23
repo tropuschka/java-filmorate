@@ -47,8 +47,12 @@ public class UserDbMapper implements RowMapper<User> {
                 return friendList;
             }
         };
-        Map<Integer, Boolean> friends = (Map<Integer, Boolean>) jdbc.query(friendsSql, friendsExtractor, user.getId());
-        user.setFriends(new HashMap<>(friends));
+        if (jdbc.query(friendsSql, friendsExtractor, user.getId()) != null) {
+            Map<Integer, Boolean> friends = (Map<Integer, Boolean>) jdbc.query(friendsSql, friendsExtractor, user.getId());
+            user.setFriends(new HashMap<>(friends));
+        } else {
+            user.setFriends(new HashMap<>());
+        }
 
         return user;
     }

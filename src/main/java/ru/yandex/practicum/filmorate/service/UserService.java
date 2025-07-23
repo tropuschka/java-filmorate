@@ -135,13 +135,14 @@ public class UserService {
             }
         }
         user.addFriend(friend);
+        update(user);
+        log.trace("Пользователь {} добавлен в список друзей пользователя {}", friend.getName(), user.getName());
         if (friend.getFriends().keySet().contains(user.getId())) {
             user.confirmFriendship(friend);
             friend.confirmFriendship(user);
             update(friend);
+            log.trace("Дружба между пользователями {} и {} подтверждена", friend.getName(), user.getName());
         }
-        update(user);
-        log.trace("Пользователь {} добавлен в список друзей пользователя {}", friend.getName(), user.getName());
         return user.getFriends().keySet();
     }
 
