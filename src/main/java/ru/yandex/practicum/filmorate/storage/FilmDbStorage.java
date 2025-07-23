@@ -7,7 +7,6 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.mappers.FilmDbMapper;
 import ru.yandex.practicum.filmorate.model.Film;
 
-import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Optional;
 
