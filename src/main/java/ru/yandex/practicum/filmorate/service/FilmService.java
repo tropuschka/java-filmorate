@@ -55,15 +55,15 @@ public class FilmService {
         if (film.getDuration() != null && !(film.getDuration() > 0)) {
             throw new ConditionsNotMetException("Длительность фильма должна быть положительной");
         }
-   /*     if (film.getMpa() == null) {
+        if (film.getMpa() == null) {
             throw new ConditionsNotMetException("Возрастной рейтинг должен быть указан");
         }
-        if (ageRatingStorage.findAgeRatingById(film.getId()).isEmpty()) {
+    /*    if (ageRatingStorage.findAgeRatingById(film.getId()).isEmpty()) {
             throw new NotFoundException("Возрастная категория не найдена");
         }
         if (!film.getGenres().isEmpty()) {
             for (Genre genre:film.getGenres()) {
-                genreStorage.findGenreById(genre.getId()).orElseThrow(() -> new NotFoundException("Жанр не найден"));
+                genreStorage.findGenreById(genre.getId()).orElseThrow(() -> new NotFoundException("&#x416;&#x430;&#x43D;&#x440; &#x43D;&#x435; &#x43D;&#x430;&#x439;&#x434;&#x435;&#x43D;"));
             }
         } */
         Film createdFilm = filmStorage.create(film);

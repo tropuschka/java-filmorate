@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.mappers.AgeRatingDbMapper;
@@ -27,10 +28,13 @@ public class AgeRatingDbStorage implements AgeRatingStorage {
 
     @Override
     public Optional<AgeRating> findAgeRatingById(int id) {
-        String query = "SELECT * FROM age_ratings WHERE id = ?;";
-        List<AgeRating> mpas = jdbc.query(query, ageRatingMapper, id);
-        if (mpas.isEmpty()) return Optional.empty();
-        return Optional.ofNullable(mpas.getFirst());
+        try {
+            String query = "SELECT * FROM age_ratings WHERE id = ?;";
+            AgeRating result = jdbc.queryForObject(query, ageRatingMapper, id);
+            return Optional.of(result);
+        } catch (EmptyResultDataAccessException ignored) {
+            return Optional.empty();
+        }
     }
 
 }
