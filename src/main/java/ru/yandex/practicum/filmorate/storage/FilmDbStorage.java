@@ -63,9 +63,7 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Optional<Film> findFilmById(int id) {
-        String control = "SELECT * FROM films;";
-        Collection<Film> check = jdbc.query(control, filmMapper);
-        control = "SELECT * FROM films WHERE id = ?;";
+        String control = "SELECT * FROM films WHERE id = ?;";
         Film film = jdbc.queryForObject(control, filmMapper, id);
         Optional<Film> optFilm = Optional.ofNullable(film);
         return optFilm;
