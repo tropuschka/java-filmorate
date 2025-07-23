@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
+import ru.yandex.practicum.filmorate.model.AgeRating;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 
@@ -37,7 +38,12 @@ public class FilmDbMapper implements RowMapper<Film> {
 
         if (resultSet.getInt("age_rating") != 0) {
             String mpaSql = "SELECT id, name, description FROM age_ratings WHERE id = ?;";
-            film.setMpa(jdbc.queryForObject(mpaSql, ageRatingMapper, resultSet.getInt("age_rating")));
+            List<AgeRating> mpas = jdbc.query(mpaSql, ageRatingMapper, resultSet.getInt("age_rating"));
+            if (mpas.isEmpty()) {
+                film.setMpa(null);
+            } else {
+                film.setMpa(mpas.getFirst());
+            }
         }
 
         String genresSql = "SELECT genre_id FROM film_genres WHERE film_id = ?;";
