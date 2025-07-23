@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.mappers.UserDbMapper;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 @Repository("UserDbStorage")
@@ -53,6 +54,8 @@ public class UserDbStorage implements  UserStorage {
     @Override
     public Optional<User> findUserById(int id) {
         String query = ("SELECT * FROM users WHERE id = ?;");
+        List<User> users = jdbc.query(query, userMapper, id);
+        if (users.isEmpty()) return Optional.empty();
         return Optional.ofNullable(jdbc.queryForObject(query, userMapper, id));
     }
 

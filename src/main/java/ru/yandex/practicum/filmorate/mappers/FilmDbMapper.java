@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.model.AgeRating;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 
@@ -36,7 +37,12 @@ public class FilmDbMapper implements RowMapper<Film> {
 
         if (resultSet.getInt("age_rating") != 0) {
             String mpaSql = "SELECT id, name, description FROM age_ratings WHERE id = ?;";
-            film.setMpa(jdbc.queryForObject(mpaSql, ageRatingMapper, resultSet.getInt("age_rating")));
+            List<AgeRating> mpas = jdbc.query(mpaSql, ageRatingMapper, resultSet.getInt("age_rating"));
+            if (mpas.isEmpty()) {
+                film.setMpa(null);
+            } else {
+                film.setMpa(jdbc.queryForObject(mpaSql, ageRatingMapper, resultSet.getInt("age_rating")));
+            }
         }
 
         String genresSql = "SELECT genre_id FROM film_genres WHERE film_id = ?;";
@@ -45,8 +51,11 @@ public class FilmDbMapper implements RowMapper<Film> {
         Set<Genre> genres = new HashSet<>();
         for (Integer genreId:genresIds) {
             String genreSql = "SELECT * FROM genres WHERE id = ?;";
-            Genre genre = jdbc.queryForObject(genreSql, genreMapper, genreId);
-            genres.add(genre);
+            List<Genre> genreList = jdbc.query(genreSql, genreMapper, genreId);
+            if (!genreList.isEmpty()) {
+                Genre genre = jdbc.queryForObject(genreSql, genreMapper, genreId);
+                genres.add(genre);
+            }
         }
         film.setGenres(genres);
 

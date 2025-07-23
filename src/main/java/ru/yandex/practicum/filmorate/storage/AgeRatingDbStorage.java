@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.mappers.AgeRatingDbMapper;
 import ru.yandex.practicum.filmorate.model.AgeRating;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 @Repository("AgeRatingDbStorage")
@@ -26,8 +27,10 @@ public class AgeRatingDbStorage implements AgeRatingStorage {
 
     @Override
     public Optional<AgeRating> findAgeRatingById(int id) {
-        String query = "SELECT * FROM age_ratings;";
-        return Optional.ofNullable(jdbc.queryForObject(query, ageRatingMapper));
+        String query = "SELECT * FROM age_ratings WHERE id = ?;";
+        List<AgeRating> mpas = jdbc.query(query, ageRatingMapper, id);
+        if (mpas.isEmpty()) return Optional.empty();
+        return Optional.ofNullable(jdbc.queryForObject(query, ageRatingMapper, id));
     }
 
 }

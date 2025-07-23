@@ -13,6 +13,7 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -77,9 +78,12 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Optional<Film> findFilmById(int id) {
         String control = "SELECT id, name, description, release_date, duration, age_rating FROM films WHERE id = ?;";
-        Film film = jdbc.queryForObject(control, filmMapper, id);
-        Optional<Film> optFilm = Optional.ofNullable(film);
-        return optFilm;
+        List<Film> films = jdbc.query(control, filmMapper, id);
+        if (films.isEmpty()) {
+            return Optional.empty();
+        } else {
+            return Optional.ofNullable(jdbc.queryForObject(control, filmMapper, id));
+        }
     }
 
     private void updatedGenres(Film film) {

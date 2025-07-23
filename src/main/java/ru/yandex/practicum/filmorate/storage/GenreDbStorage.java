@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.mappers.GenreDbMapper;
 import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 @Repository("GenreDbStorage")
@@ -26,7 +27,9 @@ public class GenreDbStorage implements GenreStorage {
 
     @Override
     public Optional<Genre> findGenreById(int id) {
-        String query = "SELECT * FROM genres;";
-        return Optional.ofNullable(jdbc.queryForObject(query, genreMapper));
+        String query = "SELECT * FROM genres WHERE id = ?;";
+        List<Genre> genres = jdbc.query(query, genreMapper, id);
+        if (genres.isEmpty()) return Optional.empty();
+        return Optional.ofNullable(jdbc.queryForObject(query, genreMapper, id));
     }
 }
