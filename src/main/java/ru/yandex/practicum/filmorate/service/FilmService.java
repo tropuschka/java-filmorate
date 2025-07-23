@@ -144,6 +144,7 @@ public class FilmService {
                 .orElseThrow(() -> new NotFoundException("Фильм не найден"));
         film.like(userId);
         update(film);
+        filmStorage.addLike(filmId, userId);
         log.trace("Пользователь с айди {} оценил фильм с айди {} (количество лайков: {})",
                 userId, filmId, film.getLikes().size());
         return film;
@@ -156,6 +157,7 @@ public class FilmService {
                 .orElseThrow(() -> new NotFoundException("Фильм не найден"));
         film.dislike(userId);
         update(film);
+        filmStorage.deleteLike(filmId, userId);
         log.trace("Пользователь с айди {} снял отметку \"нравится\" с фильма с айди {} (количество лайков: {})",
                 userId, filmId, film.getLikes().size());
         return film;
@@ -165,7 +167,11 @@ public class FilmService {
         if (amount <= 0) {
             throw new ConditionsNotMetException("Количество позиций в топе не может быть меньше 1");
         }
-        ArrayList<Film> filmTop = (ArrayList<Film>) filmStorage.getTop(amount);
+        ArrayList<Film> filmTop = filmStorage.getTop(amount).stream()
+                .sorted(Comparator.comparing(Film::likeAmount).reversed())
+                .distinct()
+                .collect(Collectors.toCollection(ArrayList::new));
+
         return filmTop;
     }
 }

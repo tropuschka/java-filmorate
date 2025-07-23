@@ -85,9 +85,24 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     public Collection<Film> getTop(int amount) {
-        String sql = "SELECT f.* FROM films f LEFT JOIN film_likes fl ON f.id = fl.film_id " +
-                "GROUP BY f.id ORDER BY COUNT(fl.user_id) DESC LIMIT ?;";
+        String sql = "SELECT f.* FROM films f " +
+                "LEFT JOIN (SELECT film_id,count(*) AS film_rate FROM film_likes " +
+                "GROUP BY film_id) AS Rate " +
+                "ON f.id=Rate.Film_id " +
+                "ORDER BY Rate.Film_rate DESC, f.id LIMIT ?;";
         return jdbc.query(sql, filmMapper, amount);
+    }
+
+    @Override
+    public void addLike(Integer filmId, Integer userId) {
+        String likeQuery = "INSERT INTO film_likes (film_id, user_id) VALUES ( ?, ?);";
+        jdbc.update(likeQuery, filmId, userId);
+    }
+
+    @Override
+    public void deleteLike(Integer filmId, Integer userId) {
+        String likesQueryDelete = "DELETE FROM film_likes WHERE film_id = ? AND user_id = ?;";
+        jdbc.update(likesQueryDelete, filmId, userId);
     }
 
     private void updatedGenres(Film film) {
