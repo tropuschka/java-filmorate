@@ -58,14 +58,14 @@ public class FilmService {
         if (film.getMpa() == null) {
             throw new ConditionsNotMetException("Возрастной рейтинг должен быть указан");
         }
-    /*    if (ageRatingStorage.findAgeRatingById(film.getId()).isEmpty()) {
+        if (ageRatingStorage.findAgeRatingById(film.getMpa().getId()).isEmpty()) {
             throw new NotFoundException("Возрастная категория не найдена");
         }
         if (!film.getGenres().isEmpty()) {
             for (Genre genre:film.getGenres()) {
-                genreStorage.findGenreById(genre.getId()).orElseThrow(() -> new NotFoundException("&#x416;&#x430;&#x43D;&#x440; &#x43D;&#x435; &#x43D;&#x430;&#x439;&#x434;&#x435;&#x43D;"));
+                genreStorage.findGenreById(genre.getId()).orElseThrow(() -> new NotFoundException("Жанр не найден"));
             }
-        } */
+        }
         Film createdFilm = filmStorage.create(film);
         log.trace("Фильм {}, айди {}, добавлен", createdFilm.getName(), createdFilm.getId());
         return createdFilm;
@@ -120,9 +120,9 @@ public class FilmService {
             newFilm.setGenres(oldFilm.getGenres());
         }
         if (film.getMpa() != null) {
-    /*        if (ageRatingStorage.findAgeRatingById(film.getId()).isEmpty()) {
+            if (ageRatingStorage.findAgeRatingById(film.getMpa().getId()).isEmpty()) {
                 throw new NotFoundException("Возрастная категория не найдена");
-            } */
+            }
             newFilm.setMpa(film.getMpa());
         } else {
             newFilm.setMpa(oldFilm.getMpa());
