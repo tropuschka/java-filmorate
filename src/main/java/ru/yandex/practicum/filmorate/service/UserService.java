@@ -120,7 +120,7 @@ public class UserService {
         return updateUser;
     }
 
-    public Collection<Integer> addUserFriend(int userId, int friendId) {
+    public Collection<User> addUserFriend(int userId, int friendId) {
         User user = userStorage.findUserById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь с айди " + userId + " не найден"));
         User friend = userStorage.findUserById(friendId)
@@ -143,10 +143,10 @@ public class UserService {
             update(friend);
             log.trace("Дружба между пользователями {} и {} подтверждена", friend.getName(), user.getName());
         }
-        return user.getFriends().keySet();
+        return getFriends(user.getId());
     }
 
-    public Collection<Integer> deleteUserFriend(int userId, int friendId) {
+    public Collection<User> deleteUserFriend(int userId, int friendId) {
         User user = userStorage.findUserById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь с айди " + userId + " не найден"));
         User friend = userStorage.findUserById(friendId)
@@ -163,7 +163,7 @@ public class UserService {
             update(friend);
         }
         log.trace("Пользователь {} удален из списка друзей пользователя {}", friend.getName(), user.getName());
-        return user.getFriends().keySet();
+        return getFriends(user.getId());
     }
 
     public Collection<User> getFriends(int userId) {
