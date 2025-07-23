@@ -15,4 +15,6 @@ public interface FilmStorage {
     Film update(Film film);
 
    Optional<Film> findFilmById(int id);
+
+   Collection<Film> getTop(int amount);
 }

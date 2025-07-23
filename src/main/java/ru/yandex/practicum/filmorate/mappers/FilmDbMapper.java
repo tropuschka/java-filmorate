@@ -44,15 +44,15 @@ public class FilmDbMapper implements RowMapper<Film> {
             }
         }
 
-        String genresSql = "SELECT * FROM genres WHERE id IN (" +
-                "SELECT genre_id FROM film_genres WHERE film_id = ?) ORDER BY ID;";
+        String genresSql = "SELECT * FROM genres WHERE id IN " +
+                "(SELECT genre_id FROM film_genres WHERE film_id = ?) ORDER BY id;";
         List<Genre> genres = jdbc.query(genresSql, genreMapper, film.getId());
         Set<Genre> genreSet = new HashSet<>();
         genreSet.addAll(genres);
         film.setGenres(genreSet);
 
         String likesSql = "SELECT user_id FROM film_likes WHERE film_id = ?;";
-        List<Integer> likeList = jdbc.queryForList(likesSql, Integer.class, resultSet.getInt("id"));
+        List<Integer> likeList = jdbc.queryForList(likesSql, Integer.class, film.getId());
         Set<Integer> likes = new HashSet<>();
         likes.addAll(likeList);
         film.setLikes(likes);

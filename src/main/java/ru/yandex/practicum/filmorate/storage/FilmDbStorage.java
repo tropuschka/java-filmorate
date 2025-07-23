@@ -84,6 +84,12 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
+    public Collection<Film> getTop(int amount) {
+        String sql = "SELECT f.* FROM films f LEFT JOIN film_likes fl ON f.id = fl.film_id " +
+                "GROUP BY f.id ORDER BY COUNT(fl.user_id) DESC LIMIT ?;";
+        return jdbc.query(sql, filmMapper, amount);
+    }
+
     private void updatedGenres(Film film) {
         for (Genre genre:film.getGenres()) {
             Integer genreId = genre.getId();

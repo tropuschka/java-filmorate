@@ -165,16 +165,7 @@ public class FilmService {
         if (amount <= 0) {
             throw new ConditionsNotMetException("Количество позиций в топе не может быть меньше 1");
         }
-        ArrayList<Film> filmTop = filmStorage.findAll().stream()
-                .sorted(Comparator.comparing(Film::likeAmount).reversed())
-                .distinct()
-                .collect(Collectors.toCollection(ArrayList::new));
-        List<Film> top10 = new ArrayList<>();
-        if (!filmTop.isEmpty()) {
-            for (int i = 0; i < amount && i < filmTop.size(); i++) {
-                top10.add(filmTop.get(i));
-            }
-        }
-        return top10;
+        ArrayList<Film> filmTop = (ArrayList<Film>) filmStorage.getTop(amount);
+        return filmTop;
     }
 }
