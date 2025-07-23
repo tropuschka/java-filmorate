@@ -20,7 +20,6 @@ public class FilmControllerTests extends FilmorateApplicationTests {
         film.setName("Test");
         film.setDescription("Some test film");
         film.setDuration(45);
-        film.setMpa(2);
         film.setReleaseDate(LocalDate.of(2000, Month.JANUARY, 1));
 
         Optional<Film> filmOptional = Optional.of(filmStorage.create(film));

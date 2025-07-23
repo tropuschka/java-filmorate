@@ -28,8 +28,10 @@ public class FilmDbStorage implements FilmStorage {
     public Film create(Film film) {
         StringBuilder query = new StringBuilder("INSERT INTO films " +
                 "(name, description, release_date, duration, age_rating) VALUES (?, ?, ?, ?, ?);");
+        Integer mpaId = null;
+        if (film.getMpa() != null) mpaId = film.getMpa().getId();
         jdbc.update(query.toString(), film.getName(), film.getDescription(), film.getReleaseDate(),
-                film.getDuration(), film.getMpa());
+                film.getDuration(), mpaId);
         updatedGenres(film);
         updateLikes(film);
 
