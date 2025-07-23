@@ -46,18 +46,10 @@ public class FilmDbMapper implements RowMapper<Film> {
             }
         }
 
-        String genresSql = "SELECT genre_id FROM film_genres WHERE film_id = ? ORDER BY genre_id;";
-        Set<Integer> genresIds = jdbc.queryForList(genresSql, Integer.class, film.getId()).stream()
-                .collect(Collectors.toSet());
-        Set<Genre> genres = new HashSet<>();
-        for (Integer genreId:genresIds) {
-            String genreSql = "SELECT * FROM genres WHERE id = ?;";
-            List<Genre> genreList = jdbc.query(genreSql, genreMapper, genreId);
-            if (!genreList.isEmpty()) {
-                genres.add(genreList.getFirst());
-            } else throw new NotFoundException("Жанр не найден");
-        }
-        film.setGenres(genres);
+        String genresSql = "SELECT * FROM genres WHERE id IN (" +
+                "SELECT genre_id FROM film_genres WHERE film_id = ?) ORDER BY ID;";
+        List<Genre> genres = jdbc.query(genresSql, genreMapper, film.getId());
+        film.setGenres((Set<Genre>) genres);
 
         String likesSql = "SELECT user_id FROM film_likes WHERE film_id = ?;";
         Set<Integer> likes = jdbc.queryForList(likesSql, Integer.class, film.getId()).stream().collect(Collectors.toSet());
