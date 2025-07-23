@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.model.AgeRating;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.sql.ResultSet;
@@ -28,7 +29,9 @@ public class FilmDbMapper implements RowMapper<Film> {
             film.setReleaseDate(resultSet.getDate("release_date").toLocalDate());
         }
         film.setDuration(resultSet.getInt("duration"));
-        film.setMpa(resultSet.getInt("age_rating"));
+
+        String mpaSql = "SELECT * FROM age_ratings WHERE id = ?;";
+        film.setMpa(jdbc.queryForObject(mpaSql, AgeRating.class, resultSet.getInt("age_rating")));
 
         String genresSql = "SELECT genre_id FROM film_genres WHERE film_id = ?;";
         Set<Integer> genres = jdbc.queryForList(genresSql, Integer.class, film.getId()).stream()
