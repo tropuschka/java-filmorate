@@ -66,7 +66,7 @@ public class FilmControllerTests extends FilmorateApplicationTests {
     @Test
     public void testGetAllGenres() {
         List<Genre> dbGenreList = (List<Genre>) genreStorage.findAll();
-        assertEquals(1, dbGenreList.size());
+        assertEquals(6, dbGenreList.size());
     }
 
     @Test
@@ -83,7 +83,7 @@ public class FilmControllerTests extends FilmorateApplicationTests {
     @Test
     public void testGetAllMpa() {
         List<AgeRating> dbMpaList = (List<AgeRating>) ageRatingStorage.findAll();
-        assertEquals(1, dbMpaList.size());
+        assertEquals(5, dbMpaList.size());
     }
 
     @Test
