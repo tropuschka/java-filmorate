@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.mappers;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Component;
@@ -14,7 +13,6 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
-
 @Component("UserDbMapper")
 @RequiredArgsConstructor
 public class UserDbMapper implements RowMapper<User> {
@@ -35,20 +33,17 @@ public class UserDbMapper implements RowMapper<User> {
         }
 
         String friendsSql = "SELECT friend_id, confirmed FROM friends WHERE user_id = ?;";
-        ResultSetExtractor friendsExtractor = new ResultSetExtractor() {
-            @Override
-            public Object extractData(ResultSet rs) throws SQLException, DataAccessException {
-                Map<Long, Boolean> friendList = new HashMap<>();
-                while (rs.next()) {
-                    Long friendId = rs.getLong("friend_id");
-                    Boolean status = rs.getBoolean("confirmed");
-                    friendList.put(friendId, status);
-                }
-                return friendList;
+        ResultSetExtractor<Map<Integer, Boolean>> friendsExtractor = rs -> {
+            Map<Integer, Boolean> friendList = new HashMap<>();
+            while (rs.next()) {
+                long friendId = rs.getLong("friend_id");
+                Boolean status = rs.getBoolean("confirmed");
+                friendList.put((int) friendId, status);
             }
+            return friendList;
         };
-        if (jdbc.query(friendsSql, friendsExtractor, user.getId()) != null) {
-            Map<Integer, Boolean> friends = (Map<Integer, Boolean>) jdbc.query(friendsSql, friendsExtractor, user.getId());
+        Map<Integer, Boolean> friends = jdbc.query(friendsSql, friendsExtractor, user.getId());
+        if (friends != null) {
             user.setFriends(new HashMap<>(friends));
         } else {
             user.setFriends(new HashMap<>());
