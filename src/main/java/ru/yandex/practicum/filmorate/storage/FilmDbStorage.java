@@ -82,7 +82,7 @@ public class FilmDbStorage implements FilmStorage {
         if (films.isEmpty()) {
             return Optional.empty();
         } else {
-            return Optional.ofNullable(jdbc.queryForObject(control, filmMapper, id));
+            return Optional.of(films.getFirst());
         }
     }
 

@@ -41,7 +41,7 @@ public class FilmDbMapper implements RowMapper<Film> {
             if (mpas.isEmpty()) {
                 film.setMpa(null);
             } else {
-                film.setMpa(jdbc.queryForObject(mpaSql, ageRatingMapper, resultSet.getInt("age_rating")));
+                film.setMpa(mpas.getFirst());
             }
         }
 
@@ -53,8 +53,7 @@ public class FilmDbMapper implements RowMapper<Film> {
             String genreSql = "SELECT * FROM genres WHERE id = ?;";
             List<Genre> genreList = jdbc.query(genreSql, genreMapper, genreId);
             if (!genreList.isEmpty()) {
-                Genre genre = jdbc.queryForObject(genreSql, genreMapper, genreId);
-                genres.add(genre);
+                genres.add(genreList.getFirst());
             }
         }
         film.setGenres(genres);

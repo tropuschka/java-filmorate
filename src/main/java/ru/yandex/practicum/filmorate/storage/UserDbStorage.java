@@ -56,7 +56,7 @@ public class UserDbStorage implements  UserStorage {
         String query = ("SELECT * FROM users WHERE id = ?;");
         List<User> users = jdbc.query(query, userMapper, id);
         if (users.isEmpty()) return Optional.empty();
-        return Optional.ofNullable(jdbc.queryForObject(query, userMapper, id));
+        return Optional.ofNullable(users.getFirst());
     }
 
     private void updateFriends(User user) {

@@ -30,6 +30,6 @@ public class GenreDbStorage implements GenreStorage {
         String query = "SELECT * FROM genres WHERE id = ?;";
         List<Genre> genres = jdbc.query(query, genreMapper, id);
         if (genres.isEmpty()) return Optional.empty();
-        return Optional.ofNullable(jdbc.queryForObject(query, genreMapper, id));
+        return Optional.ofNullable(genres.getFirst());
     }
 }

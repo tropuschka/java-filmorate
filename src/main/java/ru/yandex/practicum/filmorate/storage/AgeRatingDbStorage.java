@@ -30,7 +30,7 @@ public class AgeRatingDbStorage implements AgeRatingStorage {
         String query = "SELECT * FROM age_ratings WHERE id = ?;";
         List<AgeRating> mpas = jdbc.query(query, ageRatingMapper, id);
         if (mpas.isEmpty()) return Optional.empty();
-        return Optional.ofNullable(jdbc.queryForObject(query, ageRatingMapper, id));
+        return Optional.ofNullable(mpas.getFirst());
     }
 
 }
