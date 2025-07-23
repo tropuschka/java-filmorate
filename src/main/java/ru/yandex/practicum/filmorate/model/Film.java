@@ -3,10 +3,8 @@ package ru.yandex.practicum.filmorate.model;
 import lombok.Data;
 
 import java.time.LocalDate;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.TreeSet;
 
 @Data
 public class Film {
@@ -15,7 +13,7 @@ public class Film {
     private String description;
     private LocalDate releaseDate;
     private Integer duration;
-    private Set<Genre> genres = new TreeSet<>(Comparator.comparingInt(Genre::getId));
+    private Set<Genre> genres = new HashSet<>();
     private AgeRating mpa;
     private Set<Integer> likes = new HashSet<>();
 
