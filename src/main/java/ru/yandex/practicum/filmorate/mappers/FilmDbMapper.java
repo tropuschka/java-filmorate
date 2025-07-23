@@ -48,7 +48,9 @@ public class FilmDbMapper implements RowMapper<Film> {
         String genresSql = "SELECT * FROM genres WHERE id IN (" +
                 "SELECT genre_id FROM film_genres WHERE film_id = ?) ORDER BY ID;";
         List<Genre> genres = jdbc.query(genresSql, genreMapper, film.getId());
-        film.setGenres((Set<Genre>) genres);
+        Set<Genre> genreSet = new HashSet<>();
+        genreSet.addAll(genres);
+        film.setGenres(genreSet);
 
         String likesSql = "SELECT user_id FROM film_likes WHERE film_id = ?;";
         Set<Integer> likes = jdbc.queryForList(likesSql, Integer.class, film.getId()).stream().collect(Collectors.toSet());
