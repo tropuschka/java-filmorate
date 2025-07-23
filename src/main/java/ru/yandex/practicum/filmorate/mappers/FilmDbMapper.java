@@ -59,7 +59,7 @@ public class FilmDbMapper implements RowMapper<Film> {
         }
         List<Genre> toSort = new ArrayList<>();
         toSort.addAll(genres);
-        toSort.sort(Comparator.comparingInt(Genre::getId));
+        toSort.sort(Comparator.comparingInt(Genre::getId).reversed());
         Set<Genre> sortedGenres = new HashSet<>();
         sortedGenres.addAll(toSort);
         film.setGenres(sortedGenres);
