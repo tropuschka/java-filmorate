@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.mappers.FilmDbMapper;
 import ru.yandex.practicum.filmorate.model.Film;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -26,20 +27,20 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film create(Film film) {
+        String queryNext = "VALUES NEXT VALUE FOR film_sequence;";
+        Integer newId = jdbc.queryForObject(queryNext, Integer.class);
         StringBuilder query = new StringBuilder("INSERT INTO films " +
-                "(name, description, release_date, duration, age_rating) VALUES (?, ?, ?, ?, ?);");
+                "(id,name, description, release_date, duration, age_rating) VALUES (?,?, ?, ?, ?, ?);");
         Integer mpaId = null;
         if (film.getMpa() != null) mpaId = film.getMpa().getId();
-        jdbc.update(query.toString(), film.getName(), film.getDescription(), film.getReleaseDate(),
+        jdbc.update(query.toString(), newId, film.getName(), film.getDescription(), film.getReleaseDate(),
                 film.getDuration(), mpaId);
         updatedGenres(film);
         updateLikes(film);
 
-        Integer filmDbId = jdbc.queryForObject("SELECT id FROM films WHERE name = ? AND description = ?;",
-                Integer.class, film.getName(), film.getDescription());
-
         String control = "SELECT * FROM films WHERE id = ?;";
-        return jdbc.queryForObject(control, filmMapper, filmDbId);
+        Film dbFilm = jdbc.queryForObject(control, filmMapper, newId);
+        return dbFilm;
     }
 
     @Override
@@ -63,8 +64,12 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Optional<Film> findFilmById(int id) {
-        String query = "SELECT * FROM films WHERE id = ?;";
-        return Optional.ofNullable(jdbc.queryForObject(query, filmMapper, id));
+        String control = "SELECT * FROM films;";
+        Collection<Film> check = jdbc.query(control, filmMapper);
+        control = "SELECT * FROM films WHERE id = ?;";
+        Film film = jdbc.queryForObject(control, filmMapper, id);
+        Optional<Film> optFilm = Optional.ofNullable(film);
+        return optFilm;
     }
 
     private void updatedGenres(Film film) {

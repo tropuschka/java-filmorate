@@ -30,8 +30,10 @@ public class FilmDbMapper implements RowMapper<Film> {
         }
         film.setDuration(resultSet.getInt("duration"));
 
-        String mpaSql = "SELECT * FROM age_ratings WHERE id = ?;";
-        film.setMpa(jdbc.queryForObject(mpaSql, AgeRating.class, resultSet.getInt("age_rating")));
+        if (resultSet.getInt("age_rating") != 0) {
+            String mpaSql = "SELECT * FROM age_ratings WHERE id = ?;";
+            film.setMpa(jdbc.queryForObject(mpaSql, AgeRating.class, resultSet.getInt("age_rating")));
+        }
 
         String genresSql = "SELECT genre_id FROM film_genres WHERE film_id = ?;";
         Set<Integer> genres = jdbc.queryForList(genresSql, Integer.class, film.getId()).stream()
