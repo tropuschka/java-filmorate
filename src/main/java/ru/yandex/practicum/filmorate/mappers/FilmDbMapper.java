@@ -57,11 +57,8 @@ public class FilmDbMapper implements RowMapper<Film> {
                 genres.add(genreList.getFirst());
             } else throw new NotFoundException("Жанр не найден");
         }
-        List<Genre> toSort = new ArrayList<>();
-        toSort.addAll(genres);
-        toSort.sort(Comparator.comparingInt(Genre::getId).reversed());
-        Set<Genre> sortedGenres = new HashSet<>();
-        sortedGenres.addAll(toSort);
+        TreeSet<Genre> sortedGenres = new TreeSet<>();
+        sortedGenres.addAll(genres);
         film.setGenres(sortedGenres);
 
         String likesSql = "SELECT user_id FROM film_likes WHERE film_id = ?;";
