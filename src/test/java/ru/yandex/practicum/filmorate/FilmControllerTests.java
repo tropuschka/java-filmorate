@@ -49,6 +49,9 @@ public class FilmControllerTests extends FilmorateApplicationTests {
         Film film = new Film();
         film.setId(1);
         film.setName("Nina");
+        AgeRating mpa = new AgeRating();
+        mpa.setId(1);
+        film.setMpa(mpa);
         Optional<Film> filmOptional = Optional.of(filmStorage.update(film));
         assertThat(filmOptional)
                 .isPresent()
