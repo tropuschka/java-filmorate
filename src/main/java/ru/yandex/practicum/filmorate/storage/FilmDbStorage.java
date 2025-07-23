@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.mappers.FilmDbMapper;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -24,10 +23,6 @@ public class FilmDbStorage implements FilmStorage {
     private final JdbcTemplate jdbc;
     @Autowired
     private final FilmDbMapper filmMapper;
-    @Autowired
-    private final GenreDbStorage genreStorage;
-    @Autowired
-    private final AgeRatingDbStorage mpaStorage;
 
     @Override
     public Collection<Film> findAll() {
@@ -37,11 +32,6 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film create(Film film) {
-        if (film.getMpa() == null) throw new NotFoundException("Возрастной рейтинг фильма не указан");
-        for (Genre genre:film.getGenres()) {
-            genreStorage.findGenreById(genre.getId()).orElseThrow(() -> new NotFoundException("Жанр не найден"));
-        }
-
         GeneratedKeyHolder newId = new GeneratedKeyHolder();
         String query = "INSERT INTO films " +
                 "(name, description, release_date, duration, age_rating) VALUES (?, ?, ?, ?, ?);";
@@ -66,12 +56,6 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film update(Film film) {
-        for (Genre genre:film.getGenres()) {
-            genreStorage.findGenreById(genre.getId()).orElseThrow(() -> new NotFoundException("Жанр не найден"));
-        }
-        mpaStorage.findAgeRatingById(film.getMpa().getId())
-                .orElseThrow(() -> new NotFoundException("Возрастная категория не найдена"));
-
         String query = "UPDATE films SET name = ?, description = ?, release_date = ?, duration = ?, " +
                 "age_rating = ? WHERE id = ?;";
         jdbc.update(query, film.getName(), film.getDescription(), film.getReleaseDate(),
@@ -103,7 +87,6 @@ public class FilmDbStorage implements FilmStorage {
     private void updatedGenres(Film film) {
         for (Genre genre:film.getGenres()) {
             Integer genreId = genre.getId();
-            genreStorage.findGenreById(genre.getId()).orElseThrow(() -> new NotFoundException("Жанр не найден"));
             String genreQuery = "INSERT INTO film_genres (film_id, genre_id) VALUES ( ?, ?);";
             jdbc.update(genreQuery, film.getId(), genreId);
         }
