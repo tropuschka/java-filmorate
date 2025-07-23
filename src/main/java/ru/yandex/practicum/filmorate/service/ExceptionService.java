@@ -45,9 +45,9 @@ public class ExceptionService {
     }
 
     @ExceptionHandler(value = SQLException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse throwSQLException(final SQLException e) {
         log.error(e.getMessage());
-        return ErrorResponse.create(e, HttpStatus.BAD_REQUEST, e.getMessage());
+        return ErrorResponse.create(e, HttpStatus.NOT_FOUND, e.getMessage());
     }
 }
