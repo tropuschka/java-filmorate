@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
 import ru.yandex.practicum.filmorate.exceptions.DuplicatedDataException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 
+import java.sql.SQLException;
 import java.util.NoSuchElementException;
 
 @Slf4j
@@ -39,6 +40,13 @@ public class ExceptionService {
     @ExceptionHandler(value = DuplicatedDataException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse throwDuplicationException(final DuplicatedDataException e) {
+        log.error(e.getMessage());
+        return ErrorResponse.create(e, HttpStatus.BAD_REQUEST, e.getMessage());
+    }
+
+    @ExceptionHandler(value = SQLException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse throwSQLException(final SQLException e) {
         log.error(e.getMessage());
         return ErrorResponse.create(e, HttpStatus.BAD_REQUEST, e.getMessage());
     }
