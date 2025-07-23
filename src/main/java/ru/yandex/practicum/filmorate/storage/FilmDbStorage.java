@@ -3,12 +3,17 @@ package ru.yandex.practicum.filmorate.storage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.mappers.FilmDbMapper;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Optional;
 
 @Repository("FilmDbStorage")
@@ -27,19 +32,26 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film create(Film film) {
-        String queryNext = "VALUES NEXT VALUE FOR film_sequence;";
-        Integer newId = jdbc.queryForObject(queryNext, Integer.class);
-        StringBuilder query = new StringBuilder("INSERT INTO films " +
-                "(id,name, description, release_date, duration, age_rating) VALUES (?,?, ?, ?, ?, ?);");
-        Integer mpaId = null;
-        if (film.getMpa() != null) mpaId = film.getMpa().getId();
-        jdbc.update(query.toString(), newId, film.getName(), film.getDescription(), film.getReleaseDate(),
-                film.getDuration(), mpaId);
+        if (film.getMpa() == null) throw new NotFoundException("Возрастной рейтинг фильма не указан");
+        GeneratedKeyHolder newId = new GeneratedKeyHolder();
+        String query = "INSERT INTO films " +
+                "(name, description, release_date, duration, age_rating) VALUES (?, ?, ?, ?, ?);";
+        jdbc.update(conection -> {
+            PreparedStatement ps = conection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+            ps.setObject(1, film.getName());
+            ps.setObject(2, film.getDescription());
+            ps.setObject(3, film.getReleaseDate());
+            ps.setObject(4, film.getDuration());
+            ps.setLong(5, film.getMpa().getId());
+            return ps;
+        }, newId);
+        Integer filmId = Objects.requireNonNull(newId.getKey()).intValue();
+        film.setId(filmId);
         updatedGenres(film);
         updateLikes(film);
 
         String control = "SELECT * FROM films WHERE id = ?;";
-        Film dbFilm = jdbc.queryForObject(control, filmMapper, newId);
+        Film dbFilm = jdbc.queryForObject(control, filmMapper, filmId);
         return dbFilm;
     }
 

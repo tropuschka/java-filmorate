@@ -21,6 +21,9 @@ public class FilmControllerTests extends FilmorateApplicationTests {
         film.setDescription("Some test film");
         film.setDuration(45);
         film.setReleaseDate(LocalDate.of(2000, Month.JANUARY, 1));
+        AgeRating mpa = new AgeRating();
+        mpa.setId(1);
+        film.setMpa(mpa);
 
         Optional<Film> filmOptional = Optional.of(filmStorage.create(film));
         assertThat(filmOptional)
