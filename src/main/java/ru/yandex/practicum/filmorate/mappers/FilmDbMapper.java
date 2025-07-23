@@ -52,7 +52,7 @@ public class FilmDbMapper implements RowMapper<Film> {
         film.setGenres(genreSet);
 
         String likesSql = "SELECT user_id FROM film_likes WHERE film_id = ?;";
-        Set<Integer> likes = new HashSet<>(jdbc.queryForList(likesSql, Integer.class, film.getId()));
+        Set<Integer> likes = new HashSet<>(jdbc.queryForList(likesSql, Integer.class, resultSet.getInt("id")));
         film.setLikes(likes);
 
         return film;
