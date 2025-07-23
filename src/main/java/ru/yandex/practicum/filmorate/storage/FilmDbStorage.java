@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.mappers.FilmDbMapper;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -63,14 +64,15 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Optional<Film> findFilmById(int id) {
-        String control = "SELECT * FROM films WHERE id = ?;";
+        String control = "SELECT id, name, description, release_date, duration, age_rating FROM films WHERE id = ?;";
         Film film = jdbc.queryForObject(control, filmMapper, id);
         Optional<Film> optFilm = Optional.ofNullable(film);
         return optFilm;
     }
 
     private void updatedGenres(Film film) {
-        for (Integer genreId :film.getGenres()) {
+        for (Genre genre :film.getGenres()) {
+            Integer genreId = genre.getId();
             String genreQuery = "INSERT INTO film_genres (film_id, genre_id) VALUES ( ?, ?);";
             jdbc.update(genreQuery, film.getId(), genreId);
         }
