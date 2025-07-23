@@ -143,7 +143,6 @@ public class FilmService {
         Film film = filmStorage.findFilmById(filmId)
                 .orElseThrow(() -> new NotFoundException("Фильм не найден"));
         film.like(userId);
-        update(film);
         filmStorage.addLike(filmId, userId);
         log.trace("Пользователь с айди {} оценил фильм с айди {} (количество лайков: {})",
                 userId, filmId, film.getLikes().size());
@@ -156,7 +155,6 @@ public class FilmService {
         Film film = filmStorage.findFilmById(filmId)
                 .orElseThrow(() -> new NotFoundException("Фильм не найден"));
         film.dislike(userId);
-        update(film);
         filmStorage.deleteLike(filmId, userId);
         log.trace("Пользователь с айди {} снял отметку \"нравится\" с фильма с айди {} (количество лайков: {})",
                 userId, filmId, film.getLikes().size());
