@@ -27,7 +27,7 @@ public class FilmDbMapper implements RowMapper<Film> {
             film.setReleaseDate(resultSet.getDate("release_date").toLocalDate());
         }
         film.setDuration(resultSet.getInt("duration"));
-        film.setAgeRatingId(resultSet.getInt("age_rating"));
+        film.setMpa(resultSet.getInt("age_rating"));
 
         String genresSql = "SELECT genre_id FROM film_genres WHERE film_id = ?;";
         Set<Integer> genres = new HashSet<>(jdbc.queryForList(genresSql, Integer.class, film.getId()));

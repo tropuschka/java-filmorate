@@ -94,10 +94,10 @@ public class FilmService {
         } else {
             newFilm.setGenres(oldFilm.getGenres());
         }
-        if (film.getAgeRatingId() != null) {
-            newFilm.setAgeRatingId(film.getAgeRatingId());
+        if (film.getMpa() != null) {
+            newFilm.setMpa(film.getMpa());
         } else {
-            newFilm.setAgeRatingId(oldFilm.getAgeRatingId());
+            newFilm.setMpa(oldFilm.getMpa());
         }
 
         Film updateFilm = filmStorage.update(newFilm);

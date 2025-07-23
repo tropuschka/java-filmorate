@@ -29,7 +29,7 @@ public class FilmDbStorage implements FilmStorage {
         StringBuilder query = new StringBuilder("INSERT INTO films " +
                 "(name, description, release_date, duration, age_rating) VALUES (?, ?, ?, ?, ?);");
         jdbc.update(query.toString(), film.getName(), film.getDescription(), film.getReleaseDate(),
-                film.getDuration(), film.getAgeRatingId());
+                film.getDuration(), film.getMpa());
         updatedGenres(film);
         updateLikes(film);
 
@@ -45,7 +45,7 @@ public class FilmDbStorage implements FilmStorage {
         String query = "UPDATE films SET name = ?, description = ?, release_date = ?, duration = ?, " +
                 "age_rating = ? WHERE id = ?;";
         jdbc.update(query, film.getName(), film.getDescription(), film.getReleaseDate(),
-                film.getDuration(), film.getAgeRatingId(), film.getId());
+                film.getDuration(), film.getMpa(), film.getId());
 
         String genreQueryDelete = "DELETE FROM film_genres WHERE film_id = ?;";
         jdbc.update(genreQueryDelete, film.getId());
