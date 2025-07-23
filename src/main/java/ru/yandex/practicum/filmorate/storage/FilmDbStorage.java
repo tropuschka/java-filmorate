@@ -36,8 +36,8 @@ public class FilmDbStorage implements FilmStorage {
         GeneratedKeyHolder newId = new GeneratedKeyHolder();
         String query = "INSERT INTO films " +
                 "(name, description, release_date, duration, age_rating) VALUES (?, ?, ?, ?, ?);";
-        jdbc.update(conection -> {
-            PreparedStatement ps = conection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+        jdbc.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
             ps.setObject(1, film.getName());
             ps.setObject(2, film.getDescription());
             ps.setObject(3, film.getReleaseDate());
