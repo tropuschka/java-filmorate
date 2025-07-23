@@ -41,6 +41,12 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Film create(Film film) {
         if (film.getMpa() == null) throw new NotFoundException("Возрастной рейтинг фильма не указан");
+        for (Genre genre:film.getGenres()) {
+            String genreQuery = "SELECT * FROM genres WHERE id = ?;";
+            List<Genre> genres = jdbc.query(genreQuery, genreMapper, genre.getId());
+            if (genres.isEmpty()) throw new NotFoundException("Жанр не найден");
+        }
+
         GeneratedKeyHolder newId = new GeneratedKeyHolder();
         String query = "INSERT INTO films " +
                 "(name, description, release_date, duration, age_rating) VALUES (?, ?, ?, ?, ?);";
@@ -105,6 +111,9 @@ public class FilmDbStorage implements FilmStorage {
     private void updatedGenres(Film film) {
         for (Genre genre:film.getGenres()) {
             Integer genreId = genre.getId();
+            String genreCheckQuery = "SELECT * FROM genres WHERE id = ?;";
+            List<Genre> genres = jdbc.query(genreCheckQuery, genreMapper, genreId);
+            if (genres.isEmpty()) throw new NotFoundException("Жанр не найден");
             String genreQuery = "INSERT INTO film_genres (film_id, genre_id) VALUES ( ?, ?);";
             jdbc.update(genreQuery, film.getId(), genreId);
         }

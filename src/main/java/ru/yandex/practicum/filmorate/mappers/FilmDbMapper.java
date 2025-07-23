@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.AgeRating;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -39,7 +40,7 @@ public class FilmDbMapper implements RowMapper<Film> {
             String mpaSql = "SELECT id, name, description FROM age_ratings WHERE id = ?;";
             List<AgeRating> mpas = jdbc.query(mpaSql, ageRatingMapper, resultSet.getInt("age_rating"));
             if (mpas.isEmpty()) {
-                film.setMpa(null);
+                throw new NotFoundException("Возрастная категория не найдена");
             } else {
                 film.setMpa(mpas.getFirst());
             }
@@ -54,7 +55,7 @@ public class FilmDbMapper implements RowMapper<Film> {
             List<Genre> genreList = jdbc.query(genreSql, genreMapper, genreId);
             if (!genreList.isEmpty()) {
                 genres.add(genreList.getFirst());
-            }
+            } else throw new NotFoundException("Жанр не найден");
         }
         film.setGenres(genres);
 
