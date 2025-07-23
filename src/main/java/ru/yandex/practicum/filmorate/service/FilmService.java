@@ -55,7 +55,7 @@ public class FilmService {
         if (film.getDuration() != null && !(film.getDuration() > 0)) {
             throw new ConditionsNotMetException("Длительность фильма должна быть положительной");
         }
-        if (film.getMpa() == null) {
+   /*     if (film.getMpa() == null) {
             throw new ConditionsNotMetException("Возрастной рейтинг должен быть указан");
         }
         if (ageRatingStorage.findAgeRatingById(film.getId()).isEmpty()) {
@@ -65,7 +65,7 @@ public class FilmService {
             for (Genre genre:film.getGenres()) {
                 genreStorage.findGenreById(genre.getId()).orElseThrow(() -> new NotFoundException("Жанр не найден"));
             }
-        }
+        } */
         Film createdFilm = filmStorage.create(film);
         log.trace("Фильм {}, айди {}, добавлен", createdFilm.getName(), createdFilm.getId());
         return createdFilm;
