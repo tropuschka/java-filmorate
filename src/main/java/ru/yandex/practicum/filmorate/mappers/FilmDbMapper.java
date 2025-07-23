@@ -38,12 +38,7 @@ public class FilmDbMapper implements RowMapper<Film> {
 
         if (resultSet.getInt("age_rating") != 0) {
             String mpaSql = "SELECT id, name, description FROM age_ratings WHERE id = ?;";
-            List<AgeRating> mpas = jdbc.query(mpaSql, ageRatingMapper, resultSet.getInt("age_rating"));
-            if (mpas.isEmpty()) {
-                throw new NotFoundException("Возрастная категория не найдена");
-            } else {
-                film.setMpa(mpas.getFirst());
-            }
+            film.setMpa(jdbc.queryForObject(mpaSql, ageRatingMapper, resultSet.getInt("age_rating")));
         }
 
         String genresSql = "SELECT genre_id FROM film_genres WHERE film_id = ?;";
