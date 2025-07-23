@@ -9,7 +9,6 @@ import ru.yandex.practicum.filmorate.mappers.AgeRatingDbMapper;
 import ru.yandex.practicum.filmorate.model.AgeRating;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 
 @Repository("AgeRatingDbStorage")
