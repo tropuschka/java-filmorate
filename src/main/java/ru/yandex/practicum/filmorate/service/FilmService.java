@@ -120,9 +120,9 @@ public class FilmService {
             newFilm.setGenres(oldFilm.getGenres());
         }
         if (film.getMpa() != null) {
-            if (ageRatingStorage.findAgeRatingById(film.getId()).isEmpty()) {
+    /*        if (ageRatingStorage.findAgeRatingById(film.getId()).isEmpty()) {
                 throw new NotFoundException("Возрастная категория не найдена");
-            }
+            } */
             newFilm.setMpa(film.getMpa());
         } else {
             newFilm.setMpa(oldFilm.getMpa());
