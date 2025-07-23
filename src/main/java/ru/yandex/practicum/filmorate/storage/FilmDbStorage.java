@@ -6,7 +6,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
+import ru.yandex.practicum.filmorate.mappers.AgeRatingDbMapper;
 import ru.yandex.practicum.filmorate.mappers.FilmDbMapper;
+import ru.yandex.practicum.filmorate.mappers.GenreDbMapper;
+import ru.yandex.practicum.filmorate.model.AgeRating;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 
@@ -24,6 +27,10 @@ public class FilmDbStorage implements FilmStorage {
     private final JdbcTemplate jdbc;
     @Autowired
     private final FilmDbMapper filmMapper;
+    @Autowired
+    private final GenreDbMapper genreMapper;
+    @Autowired
+    private final AgeRatingDbMapper ageRatingMapper;
 
     @Override
     public Collection<Film> findAll() {
@@ -58,6 +65,15 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film update(Film film) {
+        for (Genre genre:film.getGenres()) {
+            String genreQuery = "SELECT * FROM genres WHERE id = ?;";
+            List<Genre> genres = jdbc.query(genreQuery, genreMapper, genre.getId());
+            if (genres.isEmpty()) throw new NotFoundException("Жанр не найден");
+        }
+        String mpaQuery = "SELECT * FROM age_ratings WHERE id = ?;";
+        List<AgeRating> mpas = jdbc.query(mpaQuery, ageRatingMapper, film.getMpa().getId());
+        if (mpas.isEmpty()) throw new NotFoundException("Возрастная категория не найдена");
+
         String query = "UPDATE films SET name = ?, description = ?, release_date = ?, duration = ?, " +
                 "age_rating = ? WHERE id = ?;";
         jdbc.update(query, film.getName(), film.getDescription(), film.getReleaseDate(),
@@ -87,7 +103,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     private void updatedGenres(Film film) {
-        for (Genre genre :film.getGenres()) {
+        for (Genre genre:film.getGenres()) {
             Integer genreId = genre.getId();
             String genreQuery = "INSERT INTO film_genres (film_id, genre_id) VALUES ( ?, ?);";
             jdbc.update(genreQuery, film.getId(), genreId);
