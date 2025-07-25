@@ -4,15 +4,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
-@Component
+@Component("InMemoryFilmStorage")
 public class InMemoryFilmStorage implements FilmStorage {
-    private Map<Long, Film> filmList = new HashMap<>();
+    private Map<Integer, Film> filmList = new HashMap<>();
 
     @Override
     public Collection<Film> findAll() {
@@ -33,13 +31,38 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Optional<Film> findFilmById(Long id) {
+    public Optional<Film> findFilmById(int id) {
         return Optional.ofNullable(filmList.get(id));
     }
 
-    private Long getNextId() {
-        long maxId = filmList.keySet().stream()
-                .mapToLong(id -> id)
+    @Override
+    public Collection<Film> getTop(int amount) {
+        ArrayList<Film> filmTop = filmList.values().stream()
+                .sorted(Comparator.comparing(Film::likeAmount).reversed())
+                .distinct()
+                .collect(Collectors.toCollection(ArrayList::new));
+        List<Film> top = new ArrayList<>();
+        if (!filmTop.isEmpty()) {
+            for (int i = 0; i < amount && i < filmTop.size(); i++) {
+                top.add(filmTop.get(i));
+            }
+        }
+        return top;
+    }
+
+    @Override
+    public void addLike(Integer filmId, Integer userId) {
+        filmList.get(filmId).like(userId);
+    }
+
+    @Override
+    public void deleteLike(Integer filmId, Integer userId) {
+        filmList.get(filmId).dislike(userId);
+    }
+
+    private int getNextId() {
+        int maxId = filmList.keySet().stream()
+                .mapToInt(id -> id)
                 .max()
                 .orElse(0);
         return ++maxId;

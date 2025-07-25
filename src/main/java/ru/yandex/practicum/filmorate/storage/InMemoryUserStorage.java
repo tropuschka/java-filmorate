@@ -10,9 +10,9 @@ import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
-@Component
+@Component("InMemoryUserStorage")
 public class InMemoryUserStorage implements UserStorage {
-    private Map<Long, User> userList = new HashMap<>();
+    private Map<Integer, User> userList = new HashMap<>();
 
     @Override
     public Collection<User> findAll() {
@@ -33,13 +33,38 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public Optional<User> findUserById(Long id) {
+    public Optional<User> findUserById(int id) {
         return Optional.ofNullable(userList.get(id));
     }
 
-    private Long getNextId() {
-        long maxId = userList.keySet().stream()
-                .mapToLong(id -> id)
+    @Override
+    public void addFriend(Integer userId, Integer friendId, Boolean confirmed) {
+        User user = userList.get(userId);
+        User friend = userList.get(friendId);
+        user.addFriend(friend);
+        if (confirmed == true) {
+            user.confirmFriendship(friend);
+            friend.confirmFriendship(user);
+            update(friend);
+        }
+        update(user);
+    }
+
+    @Override
+    public void removeFriend(Integer userId, Integer friendId, Boolean confirmed) {
+        User user = userList.get(userId);
+        User friend = userList.get(friendId);
+        user.deleteFriend(friend);
+        update(user);
+        if (confirmed == true) {
+            friend.unconfirmFriendship(user);
+            update(friend);
+        }
+    }
+
+    private int getNextId() {
+        int maxId = userList.keySet().stream()
+                .mapToInt(id -> id)
                 .max()
                 .orElse(0);
         return ++maxId;
