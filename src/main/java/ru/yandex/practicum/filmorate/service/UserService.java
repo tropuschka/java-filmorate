@@ -129,20 +129,18 @@ public class UserService {
             throw new ConditionsNotMetException("Нельзя добавить в друзья себя");
         }
         if (user.getFriends() != null && friend.getFriends() != null) {
-            if (user.getFriends().keySet().contains(friend.getId())) {
+            if (user.getFriends().containsKey(friend.getId())) {
             throw new DuplicatedDataException("Пользователь " + friend.getName()
                         + " уже есть в списке друзей пользователя " + user.getName());
             }
         }
-        user.addFriend(friend);
-        update(user);
-        log.trace("Пользователь {} добавлен в список друзей пользователя {}", friend.getName(), user.getName());
-        if (friend.getFriends().keySet().contains(user.getId())) {
-            user.confirmFriendship(friend);
-            friend.confirmFriendship(user);
-            update(friend);
+        boolean confirmed = false;
+        if (friend.getFriends().containsKey(user.getId())) {
+            confirmed = true;
             log.trace("Дружба между пользователями {} и {} подтверждена", friend.getName(), user.getName());
         }
+        userStorage.addFriend(userId, friendId, confirmed);
+        log.trace("Пользователь {} добавлен в список друзей пользователя {}", friend.getName(), user.getName());
         return getFriends(user.getId());
     }
 
@@ -154,14 +152,11 @@ public class UserService {
         if (user.equals(friend)) {
             throw new ConditionsNotMetException("Нельзя удалить из друзей себя");
         }
-        if (user.getFriends().keySet().contains(friend.getId())) {
-            user.deleteFriend(friend);
-            update(user);
+        boolean confirmed = false;
+        if (friend.getFriends().containsKey(user.getId())) {
+            confirmed = true;
         }
-        if (friend.getFriends().keySet().contains(user.getId())) {
-            friend.unconfirmFriendship(user);
-            update(friend);
-        }
+        userStorage.removeFriend(userId, friendId, confirmed);
         log.trace("Пользователь {} удален из списка друзей пользователя {}", friend.getName(), user.getName());
         return getFriends(user.getId());
     }

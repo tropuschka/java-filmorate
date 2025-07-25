@@ -29,7 +29,6 @@ public class UserDbStorage implements  UserStorage {
     public User create(User user) {
         String query = "INSERT INTO users (email, login, name, birthday) VALUES (?, ?, ?, ?);";
         jdbc.update(query, user.getEmail(), user.getLogin(), user.getName(), user.getBirthday());
-        updateFriends(user);
 
         Integer userDbId = jdbc.queryForObject("SELECT id FROM users WHERE email = ?;",
                 Integer.class, user.getEmail());
@@ -43,10 +42,6 @@ public class UserDbStorage implements  UserStorage {
         String query = "UPDATE users SET email = ?, login = ?, name = ?, birthday = ? WHERE id = ?;";
         jdbc.update(query, user.getEmail(), user.getLogin(), user.getName(), user.getBirthday(), user.getId());
 
-        String friendQueryDelete = "DELETE FROM friends WHERE user_id = ?;";
-        jdbc.update(friendQueryDelete, user.getId());
-        updateFriends(user);
-
         String control = "SELECT * FROM users WHERE id = ?;";
         return jdbc.queryForObject(control, userMapper, user.getId());
     }
@@ -59,10 +54,24 @@ public class UserDbStorage implements  UserStorage {
         return Optional.ofNullable(users.getFirst());
     }
 
-    private void updateFriends(User user) {
-        for (Integer friendId:user.getFriends().keySet()) {
-            String friendQuery = "INSERT INTO friends (user_id, friend_id, confirmed) VALUES ( ?, ?, ?);";
-            jdbc.update(friendQuery, user.getId(), friendId, user.getFriends().get(friendId));
+    @Override
+    public void addFriend(Integer userId, Integer friendId, Boolean confirmed) {
+        String friendQuery = "INSERT INTO friends (user_id, friend_id, confirmed) VALUES ( ?, ?, ?);";
+        jdbc.update(friendQuery, userId, friendId, confirmed);
+        if (confirmed == true) {
+            String unconfirmQuery = "UPDATE friends SET confirmed = true WHERE user_id = ? AND friend_id = ?;";
+            jdbc.update(unconfirmQuery, friendId, userId);
         }
     }
+
+    @Override
+    public void removeFriend(Integer userId, Integer friendId, Boolean confirmed) {
+        String deleteQuery = "DELETE FROM friends WHERE user_id = ? AND friend_id = ?;";
+        jdbc.update(deleteQuery, userId, friendId);
+        if (confirmed == true) {
+            String unconfirmQuery = "UPDATE friends SET confirmed = false WHERE user_id = ? AND friend_id = ?;";
+            jdbc.update(unconfirmQuery, friendId, userId);
+        }
+    }
+
 }

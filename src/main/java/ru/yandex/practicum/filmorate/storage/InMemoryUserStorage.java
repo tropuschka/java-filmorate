@@ -37,6 +37,31 @@ public class InMemoryUserStorage implements UserStorage {
         return Optional.ofNullable(userList.get(id));
     }
 
+    @Override
+    public void addFriend(Integer userId, Integer friendId, Boolean confirmed) {
+        User user = userList.get(userId);
+        User friend = userList.get(friendId);
+        user.addFriend(friend);
+        if (confirmed == true) {
+            user.confirmFriendship(friend);
+            friend.confirmFriendship(user);
+            update(friend);
+        }
+        update(user);
+    }
+
+    @Override
+    public void removeFriend(Integer userId, Integer friendId, Boolean confirmed) {
+        User user = userList.get(userId);
+        User friend = userList.get(friendId);
+        user.deleteFriend(friend);
+        update(user);
+        if (confirmed == true) {
+            friend.unconfirmFriendship(user);
+            update(friend);
+        }
+    }
+
     private int getNextId() {
         int maxId = userList.keySet().stream()
                 .mapToInt(id -> id)
