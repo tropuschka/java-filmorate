@@ -62,8 +62,13 @@ public class FilmService {
             throw new NotFoundException("Возрастная категория не найдена");
         }
         if (!film.getGenres().isEmpty()) {
+            List<Genre> dbGenreList = (List<Genre>) genreStorage.findAll();
+            List<Integer> dbGenreId = new ArrayList<>();
+            for (Genre genre:dbGenreList) {
+                dbGenreId.add(genre.getId());
+            }
             for (Genre genre:film.getGenres()) {
-                genreStorage.findGenreById(genre.getId()).orElseThrow(() -> new NotFoundException("Жанр не найден"));
+                if (!dbGenreId.contains(genre.getId())) throw new NotFoundException("Жанр не найден");
             }
         }
         Film createdFilm = filmStorage.create(film);
@@ -111,8 +116,13 @@ public class FilmService {
         }
         if (film.getGenres() != null) {
             if (!film.getGenres().isEmpty()) {
+                List<Genre> dbGenreList = (List<Genre>) genreStorage.findAll();
+                List<Integer> dbGenreId = new ArrayList<>();
+                for (Genre genre:dbGenreList) {
+                    dbGenreId.add(genre.getId());
+                }
                 for (Genre genre:film.getGenres()) {
-                    genreStorage.findGenreById(genre.getId()).orElseThrow(() -> new NotFoundException("Жанр не найден"));
+                    if (!dbGenreId.contains(genre.getId())) throw new NotFoundException("Жанр не найден");
                 }
             }
             newFilm.setGenres(film.getGenres());
