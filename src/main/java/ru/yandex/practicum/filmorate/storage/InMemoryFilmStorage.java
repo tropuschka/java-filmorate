@@ -41,13 +41,13 @@ public class InMemoryFilmStorage implements FilmStorage {
                 .sorted(Comparator.comparing(Film::likeAmount).reversed())
                 .distinct()
                 .collect(Collectors.toCollection(ArrayList::new));
-        List<Film> top10 = new ArrayList<>();
+        List<Film> top = new ArrayList<>();
         if (!filmTop.isEmpty()) {
             for (int i = 0; i < amount && i < filmTop.size(); i++) {
-                top10.add(filmTop.get(i));
+                top.add(filmTop.get(i));
             }
         }
-        return top10;
+        return top;
     }
 
     @Override
