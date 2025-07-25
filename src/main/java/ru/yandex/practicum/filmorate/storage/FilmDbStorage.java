@@ -26,7 +26,10 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Collection<Film> findAll() {
-        String query = "SELECT * FROM films;";
+        String query = "SELECT f.id id, f.name name, f.description description, " +
+                "f.release_date release_date, f.duration duration, " +
+                "mpa.id mpa_id, mpa.name mpa_name, mpa.description mpa_description FROM films f " +
+                "LEFT JOIN age_ratings mpa ON f.age_rating = mpa.id;";
         return jdbc.query(query, filmMapper);
     }
 
@@ -47,9 +50,11 @@ public class FilmDbStorage implements FilmStorage {
         Integer filmId = Objects.requireNonNull(newId.getKey()).intValue();
         film.setId(filmId);
         updatedGenres(film);
-        updateLikes(film);
 
-        String control = "SELECT * FROM films WHERE id = ?;";
+        String control = "SELECT f.id id, f.name name, f.description description, " +
+                "f.release_date release_date, f.duration duration, " +
+                "mpa.id mpa_id, mpa.name mpa_name, mpa.description mpa_description FROM films f " +
+                "LEFT JOIN age_ratings mpa ON f.age_rating = mpa.id WHERE f.id = ?;";
         Film dbFilm = jdbc.queryForObject(control, filmMapper, filmId);
         return dbFilm;
     }
@@ -65,17 +70,19 @@ public class FilmDbStorage implements FilmStorage {
         jdbc.update(genreQueryDelete, film.getId());
         updatedGenres(film);
 
-        String likesQueryDelete = "DELETE FROM film_likes WHERE film_id = ?;";
-        jdbc.update(likesQueryDelete, film.getId());
-        updateLikes(film);
-
-        String control = "SELECT * FROM films WHERE id = ?;";
+        String control = "SELECT f.id id, f.name name, f.description description, " +
+                "f.release_date release_date, f.duration duration, " +
+                "mpa.id mpa_id, mpa.name mpa_name, mpa.description mpa_description FROM films f " +
+                "LEFT JOIN age_ratings mpa ON f.age_rating = mpa.id WHERE f.id = ?;";
         return jdbc.queryForObject(control, filmMapper, film.getId());
     }
 
     @Override
     public Optional<Film> findFilmById(int id) {
-        String control = "SELECT id, name, description, release_date, duration, age_rating FROM films WHERE id = ?;";
+        String control = "SELECT f.id id, f.name name, f.description description, " +
+                "f.release_date release_date, f.duration duration, " +
+                "mpa.id mpa_id, mpa.name mpa_name, mpa.description mpa_description FROM films f " +
+                "LEFT JOIN age_ratings mpa ON f.age_rating = mpa.id WHERE f.id = ?;";
         List<Film> films = jdbc.query(control, filmMapper, id);
         if (films.isEmpty()) {
             return Optional.empty();
@@ -85,11 +92,14 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     public Collection<Film> getTop(int amount) {
-        String sql = "SELECT f.* FROM films f " +
-                "LEFT JOIN (SELECT film_id,count(*) AS film_rate FROM film_likes " +
-                "GROUP BY film_id) AS Rate " +
-                "ON f.id=Rate.Film_id " +
-                "ORDER BY Rate.Film_rate DESC, f.id LIMIT ?;";
+        String sql = "SELECT f.id id, f.name name, f.description description, " +
+                "f.release_date release_date, f.duration duration, " +
+                "mpa.id mpa_id, mpa.name mpa_name, mpa.description mpa_description FROM films f " +
+                "LEFT JOIN age_ratings mpa ON f.age_rating = mpa.id " +
+                "LEFT JOIN (SELECT film_id, COUNT(user_id) film_rate FROM film_likes " +
+                "GROUP BY film_id) rate " +
+                "ON f.id=rate.film_id " +
+                "ORDER BY rate.film_rate DESC, f.id LIMIT ?;";
         return jdbc.query(sql, filmMapper, amount);
     }
 
@@ -110,13 +120,6 @@ public class FilmDbStorage implements FilmStorage {
             Integer genreId = genre.getId();
             String genreQuery = "INSERT INTO film_genres (film_id, genre_id) VALUES ( ?, ?);";
             jdbc.update(genreQuery, film.getId(), genreId);
-        }
-    }
-
-    private void updateLikes(Film film) {
-        for (Integer userId:film.getLikes()) {
-            String likeQuery = "INSERT INTO film_likes (film_id, user_id) VALUES ( ?, ?);";
-            jdbc.update(likeQuery, film.getId(), userId);
         }
     }
 }

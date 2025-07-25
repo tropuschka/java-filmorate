@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.mappers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.AgeRating;
@@ -34,14 +35,12 @@ public class FilmDbMapper implements RowMapper<Film> {
         }
         film.setDuration(resultSet.getInt("duration"));
 
-        if (resultSet.getInt("age_rating") != 0) {
-            String mpaSql = "SELECT id, name, description FROM age_ratings WHERE id = ?;";
-            List<AgeRating> mpas = jdbc.query(mpaSql, ageRatingMapper, resultSet.getInt("age_rating"));
-            if (mpas.isEmpty()) {
-                film.setMpa(null);
-            } else {
-                film.setMpa(mpas.getFirst());
-            }
+        if (resultSet.getInt("mpa_id") != 0) {
+            AgeRating ageRating = new AgeRating();
+            ageRating.setId(resultSet.getInt("mpa_id"));
+            ageRating.setName(resultSet.getString("mpa_name"));
+            ageRating.setDescription(resultSet.getString("mpa_description"));
+            film.setMpa(ageRating);
         }
 
         String genresSql = "SELECT * FROM genres WHERE id IN " +
@@ -50,12 +49,6 @@ public class FilmDbMapper implements RowMapper<Film> {
         Set<Genre> genreSet = new TreeSet<>(Comparator.comparing(Genre::getId));
         genreSet.addAll(genres);
         film.setGenres(genreSet);
-
-        String likesSql = "SELECT user_id FROM film_likes WHERE film_id = ?;";
-        List<Integer> likeList = jdbc.queryForList(likesSql, Integer.class, film.getId());
-        Set<Integer> likes = new HashSet<>();
-        likes.addAll(likeList);
-        film.setLikes(likes);
 
         return film;
     }
