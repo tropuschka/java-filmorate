@@ -15,7 +15,7 @@ import java.util.Collection;
 @RestController
 @RequestMapping("/mpa")
 public class MpaController {
-    AgeRatingService ageRatingService;
+    private final AgeRatingService ageRatingService;
 
     @Autowired
     public MpaController(AgeRatingService ageRatingService) {
