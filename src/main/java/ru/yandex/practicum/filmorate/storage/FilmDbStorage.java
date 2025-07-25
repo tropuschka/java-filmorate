@@ -11,10 +11,7 @@ import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Repository("FilmDbStorage")
 @RequiredArgsConstructor
@@ -116,10 +113,10 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     private void updatedGenres(Film film) {
-        for (Genre genre:film.getGenres()) {
-            Integer genreId = genre.getId();
-            String genreQuery = "INSERT INTO film_genres (film_id, genre_id) VALUES ( ?, ?);";
-            jdbc.update(genreQuery, film.getId(), genreId);
-        }
+        String genreQuery = "INSERT INTO film_genres (film_id, genre_id) VALUES ( ?, ?);";
+        jdbc.batchUpdate(genreQuery, film.getGenres(), film.getId(), (PreparedStatement ps, Genre genre) -> {
+            ps.setInt(1, film.getId());
+            ps.setInt(2, genre.getId());
+        });
     }
 }
