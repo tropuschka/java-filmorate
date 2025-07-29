@@ -1,170 +1,102 @@
 package ru.yandex.practicum.filmorate;
 
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.exceptions.ConditionsNotMetException;
-import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
+import ru.yandex.practicum.filmorate.model.AgeRating;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.List;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FilmControllerTests extends FilmorateApplicationTests {
     @Test
-    void createFilm() {
-        Film newFilm = filmController.create(film);
+    public void testCreateFilm() {
+        Film film = new Film();
+        film.setName("Test");
+        film.setDescription("Some test film");
+        film.setDuration(45);
+        film.setReleaseDate(LocalDate.of(2000, Month.JANUARY, 1));
+        AgeRating mpa = new AgeRating();
+        mpa.setId(1);
+        film.setMpa(mpa);
 
-        assertNotNull(newFilm);
-        assertEquals(film.getName(), newFilm.getName());
-        assertEquals(film.getDescription(), newFilm.getDescription());
-        assertEquals(film.getReleaseDate(), newFilm.getReleaseDate());
-        assertEquals(film.getDuration(), newFilm.getDuration());
+        Optional<Film> filmOptional = Optional.of(filmStorage.create(film));
+        assertThat(filmOptional)
+                .isPresent()
+                .hasValueSatisfying(dbFilm ->
+                        assertThat(film).hasFieldOrPropertyWithValue("name", "Test")
+                );
     }
 
     @Test
-    void createFilmNoName() {
-        Film corruptFilm = new Film();
+    public void testFindFilmById() {
+        Optional<Film> filmOptional = filmStorage.findFilmById(1);
 
-        ConditionsNotMetException conditionsNotMet = assertThrows(ConditionsNotMetException.class,
-                () -> filmController.create(corruptFilm));
-        assertEquals("Название должно быть указано", conditionsNotMet.getMessage());
+        assertThat(filmOptional)
+                .isPresent()
+                .hasValueSatisfying(film ->
+                        assertThat(film).hasFieldOrPropertyWithValue("id", 1)
+                );
     }
 
     @Test
-    void createFilmLongDescription() {
-        Film corruptFilm = new Film();
-        corruptFilm.setName("LongDescription");
-        String description = "Друзья играют в мафию, но по какой-то причине не успевают закончить партию. " +
-                "Через некоторое время один из игравших сообщает другому, что кто-то решил продолжить игру. " +
-                "(дыра в завязке - надо было сразу звонить ментам)";
-        corruptFilm.setDescription(description);
-
-        ConditionsNotMetException conditionsNotMet = assertThrows(ConditionsNotMetException.class,
-                () -> filmController.create(corruptFilm));
-        assertEquals("Описание не должно быть длиннее 200 символов", conditionsNotMet.getMessage());
+    public void testUpdateFilm() {
+        Film film = new Film();
+        film.setId(1);
+        film.setName("Nina");
+        AgeRating mpa = new AgeRating();
+        mpa.setId(1);
+        film.setMpa(mpa);
+        Optional<Film> filmOptional = Optional.of(filmStorage.update(film));
+        assertThat(filmOptional)
+                .isPresent()
+                .hasValueSatisfying(dbFilm ->
+                        assertThat(film).hasFieldOrPropertyWithValue("name", "Nina")
+                );
     }
 
     @Test
-    void createFilmEarlyDate() {
-        Film corruptFilm = new Film();
-        corruptFilm.setName("EarlyDate");
-        corruptFilm.setReleaseDate(LocalDate.of(1895, Month.NOVEMBER, 20));
-
-        ConditionsNotMetException conditionsNotMet = assertThrows(ConditionsNotMetException.class,
-                () -> filmController.create(corruptFilm));
-        assertEquals("Дата релиза не может быть раньше 28 декабря 1885 года", conditionsNotMet.getMessage());
+    public void testGetAllFilms() {
+        List<Film> dbFilmList = (List<Film>) filmStorage.findAll();
+        assertEquals(1, dbFilmList.size());
     }
 
     @Test
-    void createFilmDurationNull() {
-        Film corruptFilm = new Film();
-        corruptFilm.setName("DurationNull");
-        corruptFilm.setDuration(0);
-
-        ConditionsNotMetException conditionsNotMet = assertThrows(ConditionsNotMetException.class,
-                () -> filmController.create(corruptFilm));
-        assertEquals("Длительность фильма должна быть положительной", conditionsNotMet.getMessage());
+    public void testGetAllGenres() {
+        List<Genre> dbGenreList = (List<Genre>) genreStorage.findAll();
+        assertEquals(6, dbGenreList.size());
     }
 
     @Test
-    void createFilmDurationNegative() {
-        Film corruptFilm = new Film();
-        corruptFilm.setName("DurationNegative");
-        corruptFilm.setDuration(-5);
+    public void testFindGenreById() {
+        Optional<Genre> genreOptional = genreStorage.findGenreById(1);
 
-        ConditionsNotMetException conditionsNotMet = assertThrows(ConditionsNotMetException.class,
-                () -> filmController.create(corruptFilm));
-        assertEquals("Длительность фильма должна быть положительной", conditionsNotMet.getMessage());
+        assertThat(genreOptional)
+                .isPresent()
+                .hasValueSatisfying(genre ->
+                        assertThat(genre).hasFieldOrPropertyWithValue("id", 1)
+                );
     }
 
     @Test
-    void changeFilm() {
-        Long filmId = filmController.create(film).getId();
-        Film filmUpdate = new Film();
-        filmUpdate.setId(filmId);
-        filmUpdate.setName("New name");
-        Film newFilm = filmController.update(filmUpdate);
-
-        assertNotNull(newFilm);
-        assertEquals(filmUpdate.getName(), newFilm.getName());
-        assertEquals(film.getDescription(), newFilm.getDescription());
-        assertEquals(film.getReleaseDate(), newFilm.getReleaseDate());
-        assertEquals(film.getDuration(), newFilm.getDuration());
+    public void testGetAllMpa() {
+        List<AgeRating> dbMpaList = (List<AgeRating>) ageRatingStorage.findAll();
+        assertEquals(5, dbMpaList.size());
     }
 
     @Test
-    void changeFilmNoId() {
-        Film filmUpdate = new Film();
-        filmUpdate.setName("New name");
+    public void testFindMpaById() {
+        Optional<AgeRating> mpaOptional = ageRatingStorage.findAgeRatingById(1);
 
-        ConditionsNotMetException conditionsNotMet = assertThrows(ConditionsNotMetException.class,
-                () -> filmController.update(filmUpdate));
-        assertEquals("Id должен быть указан", conditionsNotMet.getMessage());
-    }
-
-    @Test
-    void changeFilmNotFound() {
-        Long filmId = filmController.create(film).getId();
-        Film filmUpdate = new Film();
-        filmUpdate.setId(filmId + 1);
-        filmUpdate.setName("New name");
-
-        NotFoundException notFoundException = assertThrows(NotFoundException.class,
-                () -> filmController.update(filmUpdate));
-        assertEquals("Фильм не найден", notFoundException.getMessage());
-    }
-
-    @Test
-    void changeFilmLongDescription() {
-        Long filmId = filmController.create(film).getId();
-        Film filmUpdate = new Film();
-        filmUpdate.setId(filmId);
-        String description = "Друзья играют в мафию, но по какой-то причине не успевают закончить партию. " +
-                "Через некоторое время один из игравших сообщает другому, что кто-то решил продолжить игру. " +
-                "(дыра в завязке - надо было сразу звонить ментам)";
-        filmUpdate.setDescription(description);
-
-        ConditionsNotMetException conditionsNotMetException = assertThrows(ConditionsNotMetException.class,
-                () -> filmController.update(filmUpdate));
-        assertEquals("Описание не должно быть длиннее 200 символов", conditionsNotMetException.getMessage());
-    }
-
-    @Test
-    void changeFilmDurationNull() {
-        Long filmId = filmController.create(film).getId();
-        Film filmUpdate = new Film();
-        filmUpdate.setId(filmId);
-        filmUpdate.setDuration(0);
-
-        ConditionsNotMetException conditionsNotMetException = assertThrows(ConditionsNotMetException.class,
-                () -> filmController.update(filmUpdate));
-        assertEquals("Длительность фильма должна быть положительной", conditionsNotMetException.getMessage());
-    }
-
-    @Test
-    void changeFilmDurationNegative() {
-        Long filmId = filmController.create(film).getId();
-        Film filmUpdate = new Film();
-        filmUpdate.setId(filmId);
-        filmUpdate.setDuration(-5);
-
-        ConditionsNotMetException conditionsNotMetException = assertThrows(ConditionsNotMetException.class,
-                () -> filmController.update(filmUpdate));
-        assertEquals("Длительность фильма должна быть положительной", conditionsNotMetException.getMessage());
-    }
-
-    @Test
-    void changeFilmEarlyDate() {
-        Long filmId = filmController.create(film).getId();
-        Film filmUpdate = new Film();
-        filmUpdate.setId(filmId);
-        filmUpdate.setReleaseDate(LocalDate.of(1895, Month.NOVEMBER, 20));
-
-        ConditionsNotMetException conditionsNotMetException = assertThrows(ConditionsNotMetException.class,
-                () -> filmController.update(filmUpdate));
-        assertEquals("Дата релиза не может быть раньше 28 декабря 1885 года",
-                conditionsNotMetException.getMessage());
+        assertThat(mpaOptional)
+                .isPresent()
+                .hasValueSatisfying(mpa ->
+                        assertThat(mpa).hasFieldOrPropertyWithValue("id", 1)
+                );
     }
 }

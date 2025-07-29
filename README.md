@@ -119,10 +119,7 @@ SELECT *
 FROM users
 WHERE id IN (SELECT friend_id
     FROM friends
-    WHERE user_id = 0
-    UNION SELECT user_id
-    FROM friends
-    WHERE friend_id = 0);
+    WHERE user_id = 0);
 ```
 Получить список общих друзей для пользователей с айди 0 и 1:
 ```
